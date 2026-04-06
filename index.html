@@ -873,11 +873,17 @@ header::before {
 
     <!-- LOGIN PANEL -->
     <div id="adminLoginPanel">
-      <div class="admin-login-wrap">
-        <div class="admin-login-top">
-          <div class="admin-login-top-title">Администратор</div>
-          <div class="admin-login-top-sub">// RESTRICTED ACCESS · ADMIN ONLY</div>
-        </div>
+  <div class="admin-login-wrap">
+    <div style="margin-bottom:16px">
+      <button class="inner-back" onclick="toggleAdminView()" style="font-size:11px">
+        <svg viewBox="0 0 14 14"><line x1="11" y1="7" x2="2" y2="7"/><polyline points="6,2 2,7 6,12"/></svg>
+        НА ГЛАВНУЮ
+      </button>
+    </div>
+    <div class="admin-login-top">
+      <div class="admin-login-top-title">Администратор</div>
+      <div class="admin-login-top-sub">// RESTRICTED ACCESS · ADMIN ONLY</div>
+    </div>
         <div class="admin-login-body">
           <div class="admin-field">
             <div class="admin-field-label">Пароль доступа</div>
