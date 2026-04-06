@@ -620,38 +620,83 @@ header::before {
 @keyframes slideUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
 .fade-in { animation:slideUp 0.45s ease forwards; }
 
-/* ══ PAGE TRANSITION ANIMATIONS ══ */
-@keyframes pageSlideInRight {
-  from { opacity:0; transform:translateX(48px); }
-  to   { opacity:1; transform:translateX(0); }
-}
-@keyframes pageSlideOutLeft {
-  from { opacity:1; transform:translateX(0); }
-  to   { opacity:0; transform:translateX(-40px); }
-}
-@keyframes pageSlideInLeft {
-  from { opacity:0; transform:translateX(-48px); }
-  to   { opacity:1; transform:translateX(0); }
-}
-@keyframes pageSlideOutRight {
-  from { opacity:1; transform:translateX(0); }
-  to   { opacity:0; transform:translateX(40px); }
-}
-@keyframes cardStaggerIn {
-  from { opacity:0; transform:translateY(22px); }
-  to   { opacity:1; transform:translateY(0); }
+/* ══ DETROIT-STYLE TRANSITION ANIMATIONS ══ */
+
+/* Glitch flicker out - page leaving */
+@keyframes detroitOut {
+  0%   { opacity:1; transform:translateX(0) skewX(0deg); clip-path: inset(0 0 0 0); }
+  15%  { opacity:0.7; transform:translateX(-4px) skewX(-1.5deg); clip-path: inset(10% 0 5% 0); }
+  20%  { opacity:1; transform:translateX(2px) skewX(0.5deg); clip-path: inset(0 0 0 0); }
+  30%  { opacity:0.4; transform:translateX(-6px) skewX(-2deg); clip-path: inset(25% 0 30% 0); }
+  35%  { opacity:0.9; transform:translateX(3px) skewX(1deg); clip-path: inset(0 0 0 0); }
+  55%  { opacity:0.6; transform:translateX(-3px) skewX(-0.8deg); clip-path: inset(5% 0 60% 0); filter:brightness(1.4); }
+  65%  { opacity:0.2; transform:translateX(5px); clip-path: inset(70% 0 0 0); }
+  80%  { opacity:0.05; transform:translateX(-2px) skewX(-3deg); clip-path: inset(0 0 95% 0); filter:brightness(2); }
+  100% { opacity:0; transform:translateX(-8px) skewX(0deg); clip-path: inset(0 0 100% 0); filter:brightness(1); }
 }
 
-.page-exit-left  { animation: pageSlideOutLeft  0.28s cubic-bezier(0.4,0,1,1) forwards; }
-.page-exit-right { animation: pageSlideOutRight 0.28s cubic-bezier(0.4,0,1,1) forwards; }
-.page-enter-right { animation: pageSlideInRight 0.38s cubic-bezier(0,0,0.2,1) forwards; }
-.page-enter-left  { animation: pageSlideInLeft  0.38s cubic-bezier(0,0,0.2,1) forwards; }
+/* Glitch flicker in - page entering */
+@keyframes detroitIn {
+  0%   { opacity:0; transform:translateX(12px) skewX(2deg); clip-path: inset(100% 0 0 0); filter:brightness(2); }
+  10%  { opacity:0.6; transform:translateX(-4px) skewX(-1deg); clip-path: inset(0 0 70% 0); filter:brightness(1.8); }
+  18%  { opacity:0.3; transform:translateX(6px) skewX(1.5deg); clip-path: inset(30% 0 20% 0); filter:brightness(1.5); }
+  25%  { opacity:0.8; transform:translateX(-2px) skewX(-0.5deg); clip-path: inset(0 0 10% 0); filter:brightness(1.2); }
+  35%  { opacity:0.5; transform:translateX(4px) skewX(1deg); clip-path: inset(5% 0 40% 0); }
+  45%  { opacity:0.9; transform:translateX(-1px) skewX(-0.3deg); clip-path: inset(0 0 5% 0); }
+  55%  { opacity:0.75; transform:translateX(2px); clip-path: inset(2% 0 0 0); filter:brightness(1.1); }
+  70%  { opacity:0.95; transform:translateX(-1px) skewX(-0.2deg); clip-path: inset(0 0 0 0); }
+  82%  { opacity:0.88; transform:translateX(1px) skewX(0.2deg); filter:brightness(1.05); }
+  90%  { opacity:1; transform:translateX(0) skewX(0deg); filter:brightness(1); }
+  100% { opacity:1; transform:translateX(0) skewX(0deg); clip-path: inset(0 0 0 0); filter:brightness(1); }
+}
+
+/* Card glitch-in - stagger per card */
+@keyframes cardGlitchIn {
+  0%   { opacity:0; transform:translateX(8px) skewX(1.5deg); clip-path: inset(0 100% 0 0); }
+  20%  { opacity:0.7; transform:translateX(-3px) skewX(-0.8deg); clip-path: inset(0 30% 0 0); filter:brightness(1.5); }
+  35%  { opacity:0.5; transform:translateX(4px) skewX(0.5deg); clip-path: inset(0 50% 0 0); }
+  50%  { opacity:0.9; transform:translateX(-1px); clip-path: inset(0 10% 0 0); filter:brightness(1.2); }
+  65%  { opacity:0.8; transform:translateX(2px) skewX(-0.3deg); clip-path: inset(0 3% 0 0); }
+  80%  { opacity:0.95; transform:translateX(-1px); clip-path: inset(0 0 0 0); }
+  90%  { opacity:0.9; transform:translateX(1px); filter:brightness(1.05); }
+  100% { opacity:1; transform:translateX(0) skewX(0deg); clip-path: inset(0 0 0 0); filter:brightness(1); }
+}
+
+/* Scan line overlay during transitions */
+@keyframes scanSweep {
+  0%   { top: -4px; opacity:0.7; }
+  100% { top: 110%; opacity:0; }
+}
+
+/* Flicker for filter change */
+@keyframes filterFlicker {
+  0%,100% { opacity:1; filter:brightness(1); }
+  20%     { opacity:0.5; filter:brightness(1.6) contrast(1.2); }
+  25%     { opacity:0.9; filter:brightness(1); }
+  50%     { opacity:0.3; filter:brightness(1.8); }
+  55%     { opacity:0.85; filter:brightness(1); }
+  75%     { opacity:0.6; filter:brightness(1.3); }
+  80%     { opacity:1; filter:brightness(1); }
+}
+
+.page-exit   { animation: detroitOut 0.32s steps(1, end) forwards; pointer-events:none; }
+.page-enter  { animation: detroitIn  0.45s steps(1, end) forwards; }
+
+/* Scan line element */
+#transitionScan {
+  position: fixed; left:0; right:0; height:3px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0,87,255,0.6) 20%, rgba(255,255,255,0.9) 50%, rgba(0,87,255,0.6) 80%, transparent 100%);
+  z-index: 9999; pointer-events:none; display:none; top:-4px;
+  box-shadow: 0 0 8px rgba(0,87,255,0.8), 0 0 20px rgba(0,87,255,0.3);
+}
+#transitionScan.active { display:block; animation: scanSweep 0.35s linear forwards; }
 
 #homeView  { will-change: transform, opacity; }
 #innerView { will-change: transform, opacity; }
 </style>
 </head>
 <body>
+<div id="transitionScan"></div>
 
 <!-- HEADER -->
 <header>
@@ -1176,13 +1221,17 @@ function animateCards(container) {
   const cards = container.querySelectorAll('.log-card');
   cards.forEach((card, i) => {
     card.style.opacity = '0';
-    card.style.transform = 'translateY(20px)';
-    card.style.transition = 'none';
+    card.style.clipPath = 'inset(0 100% 0 0)';
+    card.style.filter = 'brightness(2)';
     setTimeout(() => {
-      card.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
-      card.style.opacity = '1';
-      card.style.transform = 'translateY(0)';
-    }, 40 + i * 55);
+      card.style.animation = `cardGlitchIn 0.38s steps(1,end) forwards`;
+      card.addEventListener('animationend', () => {
+        card.style.animation = '';
+        card.style.opacity = '1';
+        card.style.clipPath = '';
+        card.style.filter = '';
+      }, {once:true});
+    }, 60 + i * 70);
   });
 }
 
@@ -1288,28 +1337,27 @@ function setElectionFilter(filter, rowEl) {
   rowEl.classList.add('active');
 
   const container = document.getElementById('innerCards');
-  // Fade out current cards
-  container.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
+  // Detroit flicker out
+  container.style.animation = 'filterFlicker 0.22s steps(1,end) forwards';
   container.style.opacity = '0';
-  container.style.transform = 'translateY(10px)';
   setTimeout(() => {
+    container.style.animation = '';
+    container.style.opacity = '';
     renderInnerCards('elections');
-    container.style.transform = 'translateY(-6px)';
-    requestAnimationFrame(() => {
-      container.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-      container.style.opacity = '1';
-      container.style.transform = 'translateY(0)';
-      setTimeout(() => {
-        container.style.transition = '';
-        container.style.transform = '';
-      }, 320);
-    });
-  }, 190);
+  }, 220);
 }
 
 // ══════════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════════
+function fireScanLine() {
+  const scan = document.getElementById('transitionScan');
+  scan.classList.remove('active');
+  void scan.offsetWidth;
+  scan.classList.add('active');
+  scan.addEventListener('animationend', () => scan.classList.remove('active'), {once:true});
+}
+
 function openCategory(key) {
   const cat = categories[key];
   if (!cat) return;
@@ -1318,7 +1366,6 @@ function openCategory(key) {
   document.getElementById('adminView').classList.remove('active');
   document.getElementById('adminNavBtn').classList.remove('active');
 
-  // Prepare inner view content while home is still visible
   document.getElementById('innerView').style.setProperty('--current-color', cat.color);
   document.getElementById('breadcrumb').classList.add('active');
   document.getElementById('breadcrumbCurrent').textContent = cat.title;
@@ -1335,19 +1382,21 @@ function openCategory(key) {
   const homeView = document.getElementById('homeView');
   const inner = document.getElementById('innerView');
 
-  // Animate homeView out to the left
-  homeView.classList.add('page-exit-left');
+  fireScanLine();
+
+  // Glitch homeView out
+  homeView.classList.add('page-exit');
   homeView.addEventListener('animationend', function onExit() {
     homeView.removeEventListener('animationend', onExit);
-    homeView.classList.remove('page-exit-left');
+    homeView.classList.remove('page-exit');
     homeView.style.display = 'none';
 
-    // Now animate innerView in from the right
+    // Glitch innerView in
     inner.classList.add('active');
-    inner.classList.add('page-enter-right');
+    inner.classList.add('page-enter');
     inner.addEventListener('animationend', function onEnter() {
       inner.removeEventListener('animationend', onEnter);
-      inner.classList.remove('page-enter-right');
+      inner.classList.remove('page-enter');
     }, {once:true});
 
     window.scrollTo({top:0,behavior:'smooth'});
@@ -1358,24 +1407,25 @@ function goHome() {
   const inner = document.getElementById('innerView');
   const homeView = document.getElementById('homeView');
 
-  // Animate innerView out to the right
-  inner.classList.add('page-exit-right');
+  fireScanLine();
+
+  // Glitch innerView out
+  inner.classList.add('page-exit');
   inner.addEventListener('animationend', function onExit() {
     inner.removeEventListener('animationend', onExit);
-    inner.classList.remove('page-exit-right');
+    inner.classList.remove('page-exit');
     inner.classList.remove('active');
     inner.style.opacity = '';
     inner.style.transition = '';
-
     document.getElementById('breadcrumb').classList.remove('active');
     currentSection = null;
 
-    // Animate homeView in from the left
+    // Glitch homeView in
     homeView.style.display = 'block';
-    homeView.classList.add('page-enter-left');
+    homeView.classList.add('page-enter');
     homeView.addEventListener('animationend', function onEnter() {
       homeView.removeEventListener('animationend', onEnter);
-      homeView.classList.remove('page-enter-left');
+      homeView.classList.remove('page-enter');
     }, {once:true});
 
     window.scrollTo({top:0,behavior:'smooth'});
