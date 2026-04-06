@@ -620,78 +620,101 @@ header::before {
 @keyframes slideUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
 .fade-in { animation:slideUp 0.45s ease forwards; }
 
+/* ══ FLASH BLINK OVERLAY ══ */
+#flashBlink {
+  position:fixed; inset:0; z-index:9998; pointer-events:none;
+  background:#fff; opacity:0;
+}
+@keyframes blinkFlash {
+  0%   { opacity:0; }
+  18%  { opacity:0.55; }
+  32%  { opacity:0.1; }
+  48%  { opacity:0.4; }
+  60%  { opacity:0; }
+  100% { opacity:0; }
+}
+#flashBlink.active { animation: blinkFlash 0.22s ease-out forwards; }
+
 /* ══ PAGE TRANSITIONS ══ */
 
+/* Exit: snap-wipe to the right edge, tiny translate */
 @keyframes pageOut {
-  0%   { opacity:1; clip-path:inset(0 0 0 0); }
-  40%  { opacity:0.6; clip-path:inset(0 0 0 0); filter:brightness(1.15); }
-  100% { opacity:0; clip-path:inset(0 0 0 100%); filter:brightness(1); }
+  0%   { opacity:1; transform:translateX(0);    clip-path:inset(0 0% 0 0); }
+  35%  { opacity:1; transform:translateX(-6px); clip-path:inset(0 0% 0 0); }
+  100% { opacity:0; transform:translateX(-10px); clip-path:inset(0 100% 0 0); }
 }
+
+/* Enter: snap from right, lands with micro-bounce */
 @keyframes pageIn {
-  0%   { opacity:0; clip-path:inset(0 100% 0 0); filter:brightness(1.2); }
-  50%  { opacity:0.8; clip-path:inset(0 8% 0 0); filter:brightness(1.05); }
-  80%  { opacity:0.95; clip-path:inset(0 1% 0 0); }
-  100% { opacity:1; clip-path:inset(0 0 0 0); filter:brightness(1); }
+  0%   { opacity:0; transform:translateX(16px); clip-path:inset(0 0 0 100%); }
+  55%  { opacity:1; transform:translateX(-3px); clip-path:inset(0 0 0 0); }
+  78%  { opacity:1; transform:translateX(2px); }
+  100% { opacity:1; transform:translateX(0); }
 }
 
-/* Card wipe-in */
-@keyframes cardIn {
-  0%   { opacity:0; clip-path:inset(0 100% 0 0); }
-  55%  { opacity:0.9; clip-path:inset(0 4% 0 0); }
-  100% { opacity:1; clip-path:inset(0 0 0 0); }
+/* ══ CARD ENTRANCE ══ */
+/* Each card: quick drop + snap, single brightness pulse */
+@keyframes cardSnap {
+  0%   { opacity:0; transform:translateY(12px); filter:brightness(1.5); }
+  50%  { opacity:1; transform:translateY(-3px); filter:brightness(1.1); }
+  75%  { transform:translateY(1px); filter:brightness(1); }
+  100% { opacity:1; transform:translateY(0); filter:brightness(1); }
 }
 
-/* Filter flicker */
-@keyframes filterFlicker {
-  0%   { opacity:1; }
-  30%  { opacity:0.35; filter:brightness(1.3); }
-  55%  { opacity:0.8; filter:brightness(1); }
-  75%  { opacity:0.5; filter:brightness(1.15); }
+/* ══ FILTER CHANGE ══ */
+@keyframes sectionFlicker {
+  0%   { opacity:1; filter:brightness(1); }
+  20%  { opacity:0.2; filter:brightness(1.6); }
+  38%  { opacity:0.8; filter:brightness(1); }
+  55%  { opacity:0.15; filter:brightness(1.4); }
   100% { opacity:0; filter:brightness(1); }
 }
 
-/* Scan line */
+/* ══ SCAN LINE ══ */
 @keyframes scanSweep {
-  0%   { top:-4px; opacity:0.9; }
-  100% { top:110%; opacity:0.2; }
+  0%   { top:-3px; opacity:1; }
+  70%  { opacity:0.6; }
+  100% { top:105%; opacity:0; }
 }
-
-/* ══ PAGE LOAD ANIMATIONS ══ */
-
-/* Header drops in */
-@keyframes headerDrop {
-  0%   { transform:translateY(-100%); opacity:0; }
-  60%  { transform:translateY(3px); opacity:1; }
-  100% { transform:translateY(0); opacity:1; }
-}
-/* Hero wipes in from left */
-@keyframes heroWipe {
-  0%   { clip-path:inset(0 100% 0 0); opacity:0; }
-  100% { clip-path:inset(0 0 0 0); opacity:1; }
-}
-/* Stats bar rises */
-@keyframes statsRise {
-  0%   { transform:translateY(24px); opacity:0; }
-  100% { transform:translateY(0); opacity:1; }
-}
-/* Category card boot — wipe from left */
-@keyframes catBoot {
-  0%   { clip-path:inset(0 100% 0 0); opacity:0; filter:brightness(1.4); }
-  60%  { clip-path:inset(0 3% 0 0); opacity:1; filter:brightness(1.05); }
-  100% { clip-path:inset(0 0 0 0); opacity:1; filter:brightness(1); }
-}
-
-.page-exit  { animation:pageOut 0.22s ease-in  forwards; pointer-events:none; }
-.page-enter { animation:pageIn  0.28s ease-out forwards; }
-
-/* Scan line */
 #transitionScan {
   position:fixed; left:0; right:0; height:2px;
-  background:linear-gradient(90deg,transparent 0%,rgba(0,87,255,0.5) 20%,rgba(255,255,255,0.95) 50%,rgba(0,87,255,0.5) 80%,transparent 100%);
-  z-index:9999; pointer-events:none; display:none; top:-4px;
-  box-shadow:0 0 6px rgba(0,87,255,0.7),0 0 16px rgba(0,87,255,0.25);
+  background:linear-gradient(90deg,
+    transparent 0%, rgba(0,87,255,0.4) 15%,
+    rgba(255,255,255,1) 50%,
+    rgba(0,87,255,0.4) 85%, transparent 100%);
+  z-index:9999; pointer-events:none; display:none; top:-3px;
+  box-shadow:0 0 8px rgba(255,255,255,0.9), 0 0 20px rgba(0,87,255,0.5);
 }
-#transitionScan.active { display:block; animation:scanSweep 0.28s linear forwards; }
+#transitionScan.active { display:block; animation:scanSweep 0.26s cubic-bezier(0.4,0,1,1) forwards; }
+
+/* ══ BOOT ANIMATIONS ══ */
+
+/* Header: instant appear with brightness flare */
+@keyframes headerBoot {
+  0%   { opacity:0; filter:brightness(3); transform:translateY(-8px); }
+  40%  { opacity:1; filter:brightness(1.3); transform:translateY(2px); }
+  70%  { filter:brightness(0.9); transform:translateY(-1px); }
+  100% { opacity:1; filter:brightness(1); transform:translateY(0); }
+}
+
+/* Hero: wipe left→right with a flare at the edge */
+@keyframes heroBoot {
+  0%   { clip-path:inset(0 100% 0 0); filter:brightness(2); }
+  40%  { clip-path:inset(0 30% 0 0); filter:brightness(1.2); }
+  80%  { clip-path:inset(0 2% 0 0); filter:brightness(1.05); }
+  100% { clip-path:inset(0 0 0 0); filter:brightness(1); }
+}
+
+/* Cat cards: snap-drop with brightness hit */
+@keyframes catBoot {
+  0%   { opacity:0; transform:translateY(10px) scaleY(0.96); filter:brightness(2); }
+  45%  { opacity:1; transform:translateY(-4px) scaleY(1.01); filter:brightness(1.15); }
+  72%  { transform:translateY(1px) scaleY(0.995); filter:brightness(0.95); }
+  100% { opacity:1; transform:translateY(0) scaleY(1); filter:brightness(1); }
+}
+
+.page-exit  { animation:pageOut 0.2s  cubic-bezier(0.55,0,1,0.45) forwards; pointer-events:none; }
+.page-enter { animation:pageIn  0.26s cubic-bezier(0.16,1,0.3,1)  forwards; }
 
 #homeView  { will-change:transform,opacity; }
 #innerView { will-change:transform,opacity; }
@@ -699,6 +722,7 @@ header::before {
 </head>
 <body>
 <div id="transitionScan"></div>
+<div id="flashBlink"></div>
 
 <!-- HEADER -->
 <header>
@@ -1223,15 +1247,15 @@ function animateCards(container) {
   const cards = container.querySelectorAll('.log-card');
   cards.forEach((card, i) => {
     card.style.opacity = '0';
-    card.style.clipPath = 'inset(0 100% 0 0)';
     setTimeout(() => {
-      card.style.animation = 'cardIn 0.25s ease-out forwards';
+      card.style.animation = 'cardSnap 0.22s cubic-bezier(0.16,1,0.3,1) forwards';
       card.addEventListener('animationend', () => {
         card.style.animation = '';
         card.style.opacity = '1';
-        card.style.clipPath = '';
+        card.style.transform = '';
+        card.style.filter = '';
       }, {once:true});
-    }, 40 + i * 55);
+    }, 30 + i * 50);
   });
 }
 
@@ -1337,12 +1361,19 @@ function setElectionFilter(filter, rowEl) {
   rowEl.classList.add('active');
 
   const container = document.getElementById('innerCards');
-  container.style.animation = 'filterFlicker 0.18s ease-in forwards';
+  // Flicker blink
+  const blink = document.getElementById('flashBlink');
+  blink.classList.remove('active');
+  void blink.offsetWidth;
+  blink.classList.add('active');
+  blink.addEventListener('animationend', () => blink.classList.remove('active'), {once:true});
+
+  container.style.animation = 'sectionFlicker 0.16s ease-in forwards';
   setTimeout(() => {
     container.style.animation = '';
     container.style.opacity = '';
     renderInnerCards('elections');
-  }, 180);
+  }, 160);
 }
 
 // ══════════════════════════════════════════
@@ -1354,6 +1385,12 @@ function fireScanLine() {
   void scan.offsetWidth;
   scan.classList.add('active');
   scan.addEventListener('animationend', () => scan.classList.remove('active'), {once:true});
+
+  const blink = document.getElementById('flashBlink');
+  blink.classList.remove('active');
+  void blink.offsetWidth;
+  blink.classList.add('active');
+  blink.addEventListener('animationend', () => blink.classList.remove('active'), {once:true});
 }
 
 function openCategory(key) {
@@ -1757,60 +1794,59 @@ function escHtml(str) {
 // PAGE BOOT ANIMATION
 // ══════════════════════════════════════════
 (function bootSequence() {
-  // 1. Header drops in
-  const header = document.querySelector('header');
-  header.style.animation = 'headerDrop 0.3s cubic-bezier(0.2,0,0,1) 0.05s both';
+  // Blink flash on load
+  const blink = document.getElementById('flashBlink');
+  blink.classList.add('active');
+  blink.addEventListener('animationend', () => blink.classList.remove('active'), {once:true});
 
-  // 2. Hero wipes in
-  const hero = document.querySelector('.hero');
-  hero.style.opacity = '0';
-  hero.style.clipPath = 'inset(0 100% 0 0)';
-  setTimeout(() => {
-    hero.style.animation = 'heroWipe 0.32s ease-out forwards';
-    hero.addEventListener('animationend', () => {
-      hero.style.animation = '';
-      hero.style.clipPath = '';
-      hero.style.opacity = '1';
-    }, {once:true});
-  }, 180);
-
-  // 3. Stats bar rises
-  const statsBar = document.querySelector('.stats-bar');
-  if (statsBar) {
-    statsBar.style.opacity = '0';
-    statsBar.style.transform = 'translateY(24px)';
-    setTimeout(() => {
-      statsBar.style.animation = 'statsRise 0.25s ease-out forwards';
-      statsBar.addEventListener('animationend', () => {
-        statsBar.style.animation = '';
-        statsBar.style.opacity = '1';
-        statsBar.style.transform = '';
-      }, {once:true});
-    }, 340);
-  }
-
-  // 4. Category cards boot one by one
-  const catCards = document.querySelectorAll('.cat-card');
-  catCards.forEach((card, i) => {
-    card.style.opacity = '0';
-    card.style.clipPath = 'inset(0 100% 0 0)';
-    setTimeout(() => {
-      card.style.animation = 'catBoot 0.28s ease-out forwards';
-      card.addEventListener('animationend', () => {
-        card.style.animation = '';
-        card.style.opacity = '1';
-        card.style.clipPath = '';
-        card.style.filter = '';
-      }, {once:true});
-    }, 420 + i * 65);
-  });
-
-  // 5. Scan line sweeps on load
+  // Scan line
   setTimeout(() => {
     const scan = document.getElementById('transitionScan');
     scan.classList.add('active');
     scan.addEventListener('animationend', () => scan.classList.remove('active'), {once:true});
-  }, 60);
+  }, 40);
+
+  // Header boot
+  const header = document.querySelector('header');
+  header.style.opacity = '0';
+  header.style.filter = 'brightness(3)';
+  header.style.transform = 'translateY(-8px)';
+  setTimeout(() => {
+    header.style.animation = 'headerBoot 0.22s cubic-bezier(0.16,1,0.3,1) forwards';
+    header.addEventListener('animationend', () => {
+      header.style.animation = '';
+      header.style.opacity = '1';
+      header.style.filter = '';
+      header.style.transform = '';
+    }, {once:true});
+  }, 80);
+
+  // Hero boot
+  const hero = document.querySelector('.hero');
+  hero.style.clipPath = 'inset(0 100% 0 0)';
+  hero.style.filter = 'brightness(2)';
+  setTimeout(() => {
+    hero.style.animation = 'heroBoot 0.3s cubic-bezier(0.16,1,0.3,1) forwards';
+    hero.addEventListener('animationend', () => {
+      hero.style.animation = '';
+      hero.style.clipPath = '';
+      hero.style.filter = '';
+    }, {once:true});
+  }, 160);
+
+  // Cat cards — snappy stagger
+  document.querySelectorAll('.cat-card').forEach((card, i) => {
+    card.style.opacity = '0';
+    setTimeout(() => {
+      card.style.animation = 'catBoot 0.24s cubic-bezier(0.16,1,0.3,1) forwards';
+      card.addEventListener('animationend', () => {
+        card.style.animation = '';
+        card.style.opacity = '1';
+        card.style.transform = '';
+        card.style.filter = '';
+      }, {once:true});
+    }, 300 + i * 55);
+  });
 })();
 
 // Init election filter
