@@ -620,125 +620,103 @@ header::before {
 @keyframes slideUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
 .fade-in { animation:slideUp 0.45s ease forwards; }
 
-/* ══════════════════════════════════════════
-   FLASH / BLINK OVERLAY
-══════════════════════════════════════════ */
+/* ══ FLASH BLINK OVERLAY ══ */
 #flashBlink {
-  position:fixed; inset:0; z-index:9998; pointer-events:none; opacity:0;
-  background:linear-gradient(135deg, rgba(0,87,255,0.12) 0%, rgba(255,255,255,0.7) 50%, rgba(0,87,255,0.08) 100%);
+  position:fixed; inset:0; z-index:9998; pointer-events:none;
+  background:#fff; opacity:0;
 }
 @keyframes blinkFlash {
   0%   { opacity:0; }
-  12%  { opacity:0.85; }
-  22%  { opacity:0.05; }
-  34%  { opacity:0.45; }
-  46%  { opacity:0.02; }
-  58%  { opacity:0.2; }
+  18%  { opacity:0.55; }
+  32%  { opacity:0.1; }
+  48%  { opacity:0.4; }
+  60%  { opacity:0; }
   100% { opacity:0; }
 }
-#flashBlink.active { animation:blinkFlash 0.28s cubic-bezier(0.4,0,0.6,1) forwards; }
+#flashBlink.active { animation:blinkFlash 0.22s ease-out forwards; }
 
-/* ══════════════════════════════════════════
-   SCAN LINE
-══════════════════════════════════════════ */
-#transitionScan {
-  position:fixed; left:0; right:0; height:2px; top:-3px;
-  background:linear-gradient(90deg,
-    transparent 0%, rgba(0,87,255,0.3) 10%,
-    rgba(180,210,255,0.9) 40%, #fff 50%,
-    rgba(180,210,255,0.9) 60%, rgba(0,87,255,0.3) 90%, transparent 100%);
-  box-shadow:0 0 10px rgba(255,255,255,0.95), 0 0 24px rgba(0,87,255,0.6), 0 0 40px rgba(0,87,255,0.2);
-  z-index:9999; pointer-events:none; display:none;
-}
-@keyframes scanSweep {
-  0%   { top:-3px; opacity:1; }
-  80%  { opacity:0.7; }
-  100% { top:108%; opacity:0; }
-}
-#transitionScan.active { display:block; animation:scanSweep 0.3s cubic-bezier(0.4,0,0.8,1) forwards; }
+/* ══ PAGE TRANSITIONS ══ */
 
-/* ══════════════════════════════════════════
-   PAGE TRANSITIONS
-══════════════════════════════════════════ */
-
-/* Exit — content collapses inward + shakes before leaving */
 @keyframes pageOut {
-  0%   { opacity:1; transform:translateX(0) scale(1); filter:brightness(1); }
-  18%  { opacity:1; transform:translateX(-5px) scale(0.998); filter:brightness(1.2); }
-  32%  { opacity:0.9; transform:translateX(3px) scale(0.996); filter:brightness(0.9); }
-  48%  { opacity:0.6; transform:translateX(-2px) scale(0.994); filter:brightness(1.1); }
-  100% { opacity:0; transform:translateX(-14px) scale(0.99); filter:brightness(1); }
+  0%   { opacity:1; transform:translateX(0) skewX(0deg); clip-path:inset(0 0 0 0); }
+  15%  { opacity:0.7; transform:translateX(-4px) skewX(-1.5deg); clip-path:inset(10% 0 5% 0); }
+  20%  { opacity:1; transform:translateX(2px) skewX(0.5deg); clip-path:inset(0 0 0 0); }
+  30%  { opacity:0.4; transform:translateX(-6px) skewX(-2deg); clip-path:inset(25% 0 30% 0); }
+  35%  { opacity:0.9; transform:translateX(3px) skewX(1deg); clip-path:inset(0 0 0 0); }
+  55%  { opacity:0.6; transform:translateX(-3px) skewX(-0.8deg); clip-path:inset(5% 0 60% 0); filter:brightness(1.4); }
+  65%  { opacity:0.2; transform:translateX(5px); clip-path:inset(70% 0 0 0); }
+  80%  { opacity:0.05; transform:translateX(-2px) skewX(-3deg); clip-path:inset(0 0 95% 0); filter:brightness(2); }
+  100% { opacity:0; transform:translateX(-8px) skewX(0deg); clip-path:inset(0 0 100% 0); filter:brightness(1); }
 }
 
-/* Enter — sweeps in from right, spring-lands with shake */
 @keyframes pageIn {
-  0%   { opacity:0; transform:translateX(28px) scale(0.996); filter:brightness(1.4); }
-  30%  { opacity:1; transform:translateX(-5px) scale(1.002); filter:brightness(1.1); }
-  50%  { transform:translateX(3px) scale(0.999); filter:brightness(0.97); }
-  65%  { transform:translateX(-2px) scale(1.001); }
-  80%  { transform:translateX(1px) scale(1); }
-  100% { opacity:1; transform:translateX(0) scale(1); filter:brightness(1); }
+  0%   { opacity:0; transform:translateX(12px) skewX(2deg); clip-path:inset(100% 0 0 0); filter:brightness(2); }
+  10%  { opacity:0.6; transform:translateX(-4px) skewX(-1deg); clip-path:inset(0 0 70% 0); filter:brightness(1.8); }
+  18%  { opacity:0.3; transform:translateX(6px) skewX(1.5deg); clip-path:inset(30% 0 20% 0); filter:brightness(1.5); }
+  25%  { opacity:0.8; transform:translateX(-2px) skewX(-0.5deg); clip-path:inset(0 0 10% 0); filter:brightness(1.2); }
+  35%  { opacity:0.5; transform:translateX(4px) skewX(1deg); clip-path:inset(5% 0 40% 0); }
+  45%  { opacity:0.9; transform:translateX(-1px) skewX(-0.3deg); clip-path:inset(0 0 5% 0); }
+  55%  { opacity:0.75; transform:translateX(2px); clip-path:inset(2% 0 0 0); filter:brightness(1.1); }
+  70%  { opacity:0.95; transform:translateX(-1px) skewX(-0.2deg); clip-path:inset(0 0 0 0); }
+  82%  { opacity:0.88; transform:translateX(1px) skewX(0.2deg); filter:brightness(1.05); }
+  90%  { opacity:1; transform:translateX(0) skewX(0deg); filter:brightness(1); }
+  100% { opacity:1; transform:translateX(0) skewX(0deg); clip-path:inset(0 0 0 0); filter:brightness(1); }
 }
 
-.page-exit  { animation:pageOut 0.24s cubic-bezier(0.55,0,1,0.5)   forwards; pointer-events:none; }
-.page-enter { animation:pageIn  0.38s cubic-bezier(0.22,1,0.36,1)  forwards; }
-
-/* ══════════════════════════════════════════
-   CARD ENTRANCE — spring drop + shake on land
-══════════════════════════════════════════ */
-@keyframes cardSnap {
-  0%   { opacity:0; transform:translateY(18px) scale(0.97); filter:brightness(1.6); }
-  38%  { opacity:1; transform:translateY(-5px) scale(1.015); filter:brightness(1.08); }
-  55%  { transform:translateY(2px) scale(0.998); filter:brightness(0.96); }
-  68%  { transform:translateY(-1px) scale(1.003); filter:brightness(1.02); }
-  82%  { transform:translateY(0.5px) scale(0.999); }
-  100% { opacity:1; transform:translateY(0) scale(1); filter:brightness(1); }
+/* Card glitch-in */
+@keyframes cardGlitchIn {
+  0%   { opacity:0; transform:translateX(8px) skewX(1.5deg); clip-path:inset(0 100% 0 0); }
+  20%  { opacity:0.7; transform:translateX(-3px) skewX(-0.8deg); clip-path:inset(0 30% 0 0); filter:brightness(1.5); }
+  35%  { opacity:0.5; transform:translateX(4px) skewX(0.5deg); clip-path:inset(0 50% 0 0); }
+  50%  { opacity:0.9; transform:translateX(-1px); clip-path:inset(0 10% 0 0); filter:brightness(1.2); }
+  65%  { opacity:0.8; transform:translateX(2px) skewX(-0.3deg); clip-path:inset(0 3% 0 0); }
+  80%  { opacity:0.95; transform:translateX(-1px); clip-path:inset(0 0 0 0); }
+  90%  { opacity:0.9; transform:translateX(1px); filter:brightness(1.05); }
+  100% { opacity:1; transform:translateX(0) skewX(0deg); clip-path:inset(0 0 0 0); filter:brightness(1); }
 }
 
-/* ══════════════════════════════════════════
-   SECTION / FILTER FLICKER
-══════════════════════════════════════════ */
+/* Filter flicker */
 @keyframes sectionFlicker {
-  0%   { opacity:1; filter:brightness(1); }
-  18%  { opacity:0.1; filter:brightness(1.8); }
-  32%  { opacity:0.7; filter:brightness(1); }
-  50%  { opacity:0.05; filter:brightness(2); }
-  70%  { opacity:0.4; filter:brightness(1.2); }
-  100% { opacity:0; filter:brightness(1); }
+  0%,100% { opacity:1; filter:brightness(1); }
+  20%     { opacity:0.5; filter:brightness(1.6) contrast(1.2); }
+  25%     { opacity:0.9; filter:brightness(1); }
+  50%     { opacity:0.3; filter:brightness(1.8); }
+  55%     { opacity:0.85; filter:brightness(1); }
+  75%     { opacity:0.6; filter:brightness(1.3); }
+  80%     { opacity:1; filter:brightness(1); }
 }
 
-/* ══════════════════════════════════════════
-   BOOT — SITE LOAD
-══════════════════════════════════════════ */
-
-/* Header: flash-in from top with shake landing */
-@keyframes headerBoot {
-  0%   { opacity:0; transform:translateY(-100%) scaleY(0.8); filter:brightness(3); }
-  45%  { opacity:1; transform:translateY(5px) scaleY(1.01); filter:brightness(1.3); }
-  60%  { transform:translateY(-3px) scaleY(0.998); filter:brightness(0.92); }
-  75%  { transform:translateY(2px) scaleY(1.001); filter:brightness(1.04); }
-  88%  { transform:translateY(-1px) scaleY(1); filter:brightness(0.98); }
-  100% { opacity:1; transform:translateY(0) scaleY(1); filter:brightness(1); }
+/* Scan line */
+@keyframes scanSweep {
+  0%   { top:-4px; opacity:0.7; }
+  100% { top:110%; opacity:0; }
 }
-
-/* Hero: wipe left→right, speed ramp at edge */
-@keyframes heroBoot {
-  0%   { clip-path:inset(0 100% 0 0); filter:brightness(2.5); opacity:0.8; }
-  35%  { clip-path:inset(0 48% 0 0); filter:brightness(1.3); opacity:1; }
-  68%  { clip-path:inset(0 8% 0 0); filter:brightness(1.05); }
-  85%  { clip-path:inset(0 1% 0 0); filter:brightness(0.97); }
-  100% { clip-path:inset(0 0 0 0); filter:brightness(1); }
+#transitionScan {
+  position:fixed; left:0; right:0; height:3px; top:-4px;
+  background:linear-gradient(90deg,transparent 0%,rgba(0,87,255,0.6) 20%,rgba(255,255,255,0.9) 50%,rgba(0,87,255,0.6) 80%,transparent 100%);
+  z-index:9999; pointer-events:none; display:none;
+  box-shadow:0 0 8px rgba(0,87,255,0.8),0 0 20px rgba(0,87,255,0.3);
 }
+#transitionScan.active { display:block; animation:scanSweep 0.35s linear forwards; }
 
-/* Cat cards: spring-pop with brightness flash */
+/* Boot animations */
+@keyframes headerDrop {
+  0%   { transform:translateY(-100%); opacity:0; }
+  60%  { transform:translateY(3px); opacity:1; }
+  100% { transform:translateY(0); opacity:1; }
+}
+@keyframes heroWipe {
+  0%   { clip-path:inset(0 100% 0 0); opacity:0; }
+  100% { clip-path:inset(0 0 0 0); opacity:1; }
+}
 @keyframes catBoot {
-  0%   { opacity:0; transform:translateY(14px) scale(0.95); filter:brightness(2); }
-  40%  { opacity:1; transform:translateY(-6px) scale(1.02); filter:brightness(1.15); }
-  58%  { transform:translateY(2px) scale(0.997); filter:brightness(0.94); }
-  72%  { transform:translateY(-2px) scale(1.005); filter:brightness(1.03); }
-  85%  { transform:translateY(1px) scale(0.999); }
-  100% { opacity:1; transform:translateY(0) scale(1); filter:brightness(1); }
+  0%   { clip-path:inset(0 100% 0 0); opacity:0; filter:brightness(1.4); }
+  60%  { clip-path:inset(0 3% 0 0); opacity:1; filter:brightness(1.05); }
+  100% { clip-path:inset(0 0 0 0); opacity:1; filter:brightness(1); }
 }
+
+.page-exit  { animation:pageOut 0.32s steps(1,end) forwards; pointer-events:none; }
+.page-enter { animation:pageIn  0.45s steps(1,end) forwards; }
 
 #homeView  { will-change:transform,opacity; }
 #innerView { will-change:transform,opacity; }
@@ -1271,15 +1249,17 @@ function animateCards(container) {
   const cards = container.querySelectorAll('.log-card');
   cards.forEach((card, i) => {
     card.style.opacity = '0';
+    card.style.clipPath = 'inset(0 100% 0 0)';
+    card.style.filter = 'brightness(2)';
     setTimeout(() => {
-      card.style.animation = 'cardSnap 0.32s cubic-bezier(0.22,1,0.36,1) forwards';
+      card.style.animation = 'cardGlitchIn 0.38s steps(1,end) forwards';
       card.addEventListener('animationend', () => {
         card.style.animation = '';
         card.style.opacity = '1';
-        card.style.transform = '';
+        card.style.clipPath = '';
         card.style.filter = '';
       }, {once:true});
-    }, 30 + i * 45);
+    }, 60 + i * 70);
   });
 }
 
@@ -1818,7 +1798,6 @@ function escHtml(str) {
 // PAGE BOOT ANIMATION
 // ══════════════════════════════════════════
 (function bootSequence() {
-  // Blink + scan on load
   const blink = document.getElementById('flashBlink');
   blink.classList.add('active');
   blink.addEventListener('animationend', () => blink.classList.remove('active'), {once:true});
@@ -1827,46 +1806,35 @@ function escHtml(str) {
     const scan = document.getElementById('transitionScan');
     scan.classList.add('active');
     scan.addEventListener('animationend', () => scan.classList.remove('active'), {once:true});
-  }, 30);
-
-  // Header
-  const header = document.querySelector('header');
-  header.style.opacity = '0';
-  setTimeout(() => {
-    header.style.animation = 'headerBoot 0.32s cubic-bezier(0.22,1,0.36,1) forwards';
-    header.addEventListener('animationend', () => {
-      header.style.animation = '';
-      header.style.opacity = '1';
-    }, {once:true});
   }, 60);
 
-  // Hero wipe
+  const header = document.querySelector('header');
+  header.style.animation = 'headerDrop 0.3s cubic-bezier(0.2,0,0,1) 0.05s both';
+
   const hero = document.querySelector('.hero');
+  hero.style.opacity = '0';
   hero.style.clipPath = 'inset(0 100% 0 0)';
-  hero.style.filter = 'brightness(2.5)';
-  hero.style.opacity = '0.8';
   setTimeout(() => {
-    hero.style.animation = 'heroBoot 0.38s cubic-bezier(0.22,1,0.36,1) forwards';
+    hero.style.animation = 'heroWipe 0.32s ease-out forwards';
     hero.addEventListener('animationend', () => {
       hero.style.animation = '';
       hero.style.clipPath = '';
-      hero.style.filter = '';
-      hero.style.opacity = '';
+      hero.style.opacity = '1';
     }, {once:true});
-  }, 140);
+  }, 180);
 
-  // Cat cards — spring stagger
   document.querySelectorAll('.cat-card').forEach((card, i) => {
     card.style.opacity = '0';
+    card.style.clipPath = 'inset(0 100% 0 0)';
     setTimeout(() => {
-      card.style.animation = 'catBoot 0.34s cubic-bezier(0.22,1,0.36,1) forwards';
+      card.style.animation = 'catBoot 0.28s steps(1,end) forwards';
       card.addEventListener('animationend', () => {
         card.style.animation = '';
         card.style.opacity = '1';
-        card.style.transform = '';
+        card.style.clipPath = '';
         card.style.filter = '';
       }, {once:true});
-    }, 260 + i * 55);
+    }, 420 + i * 65);
   });
 })();
 
