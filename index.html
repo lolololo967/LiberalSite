@@ -619,6 +619,36 @@ header::before {
 
 @keyframes slideUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
 .fade-in { animation:slideUp 0.45s ease forwards; }
+
+/* ══ PAGE TRANSITION ANIMATIONS ══ */
+@keyframes pageSlideInRight {
+  from { opacity:0; transform:translateX(48px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+@keyframes pageSlideOutLeft {
+  from { opacity:1; transform:translateX(0); }
+  to   { opacity:0; transform:translateX(-40px); }
+}
+@keyframes pageSlideInLeft {
+  from { opacity:0; transform:translateX(-48px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+@keyframes pageSlideOutRight {
+  from { opacity:1; transform:translateX(0); }
+  to   { opacity:0; transform:translateX(40px); }
+}
+@keyframes cardStaggerIn {
+  from { opacity:0; transform:translateY(22px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.page-exit-left  { animation: pageSlideOutLeft  0.28s cubic-bezier(0.4,0,1,1) forwards; }
+.page-exit-right { animation: pageSlideOutRight 0.28s cubic-bezier(0.4,0,1,1) forwards; }
+.page-enter-right { animation: pageSlideInRight 0.38s cubic-bezier(0,0,0.2,1) forwards; }
+.page-enter-left  { animation: pageSlideInLeft  0.38s cubic-bezier(0,0,0.2,1) forwards; }
+
+#homeView  { will-change: transform, opacity; }
+#innerView { will-change: transform, opacity; }
 </style>
 </head>
 <body>
@@ -1142,6 +1172,20 @@ function renderLogCard(card, color) {
   </div>`;
 }
 
+function animateCards(container) {
+  const cards = container.querySelectorAll('.log-card');
+  cards.forEach((card, i) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    card.style.transition = 'none';
+    setTimeout(() => {
+      card.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, 40 + i * 55);
+  });
+}
+
 function renderInnerCards(section) {
   const color = SECTION_COLORS[section] || 'var(--c01)';
   const container = document.getElementById('innerCards');
@@ -1158,6 +1202,7 @@ function renderInnerCards(section) {
       ? `<div class="log-cards-grid">${cards.map(c => renderLogCard(c, color)).join('')}</div>`
       : `<div class="log-empty">// ЗАПИСЕЙ ПОК НЕТ</div>`;
   }
+  animateCards(container);
 }
 
 // ══════════════════════════════════════════
@@ -1237,10 +1282,29 @@ function buildNav(key) {
 }
 
 function setElectionFilter(filter, rowEl) {
+  if (currentElectionFilter === filter) return;
   currentElectionFilter = filter;
   document.querySelectorAll('.el-row').forEach(r => r.classList.remove('active'));
   rowEl.classList.add('active');
-  renderInnerCards('elections');
+
+  const container = document.getElementById('innerCards');
+  // Fade out current cards
+  container.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
+  container.style.opacity = '0';
+  container.style.transform = 'translateY(10px)';
+  setTimeout(() => {
+    renderInnerCards('elections');
+    container.style.transform = 'translateY(-6px)';
+    requestAnimationFrame(() => {
+      container.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      container.style.opacity = '1';
+      container.style.transform = 'translateY(0)';
+      setTimeout(() => {
+        container.style.transition = '';
+        container.style.transform = '';
+      }, 320);
+    });
+  }, 190);
 }
 
 // ══════════════════════════════════════════
@@ -1251,14 +1315,16 @@ function openCategory(key) {
   if (!cat) return;
 
   currentSection = key;
+  document.getElementById('adminView').classList.remove('active');
+  document.getElementById('adminNavBtn').classList.remove('active');
+
+  // Prepare inner view content while home is still visible
   document.getElementById('innerView').style.setProperty('--current-color', cat.color);
   document.getElementById('breadcrumb').classList.add('active');
   document.getElementById('breadcrumbCurrent').textContent = cat.title;
   document.getElementById('innerEyebrow').textContent = cat.eyebrow;
   document.getElementById('innerTitle').textContent = cat.title;
-
   buildNav(key);
-
   if (['elections','referendums','voting'].includes(key)) {
     if (key === 'elections') currentElectionFilter = 'all';
     renderInnerCards(key);
@@ -1266,28 +1332,54 @@ function openCategory(key) {
     document.getElementById('innerCards').innerHTML = '';
   }
 
-  document.getElementById('homeView').style.display = 'none';
-  document.getElementById('adminView').classList.remove('active');
-  document.getElementById('adminNavBtn').classList.remove('active');
+  const homeView = document.getElementById('homeView');
   const inner = document.getElementById('innerView');
-  inner.classList.add('active');
-  inner.style.opacity = 0;
-  requestAnimationFrame(() => {
-    inner.style.transition = 'opacity 0.35s ease';
-    inner.style.opacity = 1;
-  });
-  window.scrollTo({top:0,behavior:'smooth'});
+
+  // Animate homeView out to the left
+  homeView.classList.add('page-exit-left');
+  homeView.addEventListener('animationend', function onExit() {
+    homeView.removeEventListener('animationend', onExit);
+    homeView.classList.remove('page-exit-left');
+    homeView.style.display = 'none';
+
+    // Now animate innerView in from the right
+    inner.classList.add('active');
+    inner.classList.add('page-enter-right');
+    inner.addEventListener('animationend', function onEnter() {
+      inner.removeEventListener('animationend', onEnter);
+      inner.classList.remove('page-enter-right');
+    }, {once:true});
+
+    window.scrollTo({top:0,behavior:'smooth'});
+  }, {once:true});
 }
 
 function goHome() {
-  document.getElementById('homeView').style.display = 'block';
   const inner = document.getElementById('innerView');
-  inner.classList.remove('active');
-  inner.style.opacity = '';
-  inner.style.transition = '';
-  document.getElementById('breadcrumb').classList.remove('active');
-  currentSection = null;
-  window.scrollTo({top:0,behavior:'smooth'});
+  const homeView = document.getElementById('homeView');
+
+  // Animate innerView out to the right
+  inner.classList.add('page-exit-right');
+  inner.addEventListener('animationend', function onExit() {
+    inner.removeEventListener('animationend', onExit);
+    inner.classList.remove('page-exit-right');
+    inner.classList.remove('active');
+    inner.style.opacity = '';
+    inner.style.transition = '';
+
+    document.getElementById('breadcrumb').classList.remove('active');
+    currentSection = null;
+
+    // Animate homeView in from the left
+    homeView.style.display = 'block';
+    homeView.classList.add('page-enter-left');
+    homeView.addEventListener('animationend', function onEnter() {
+      homeView.removeEventListener('animationend', onEnter);
+      homeView.classList.remove('page-enter-left');
+    }, {once:true});
+
+    window.scrollTo({top:0,behavior:'smooth'});
+  }, {once:true});
 }
 
 function showHome() {
