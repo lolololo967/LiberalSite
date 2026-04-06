@@ -38,13 +38,14 @@ function sbRequest(method, path, body) {
       }
     };
     const req = https.request(opts, (r) => {
-      let d = '';
-      r.on('data', c => d += c);
-      r.on('end', () => {
-        try { resolve({ status: r.statusCode, data: JSON.parse(d || 'null') }); }
-        catch { resolve({ status: r.statusCode, data: d }); }
-      });
-    });
+  const chunks = [];
+  r.on('data', c => chunks.push(c));
+  r.on('end', () => {
+    const d = Buffer.concat(chunks).toString('utf-8');
+    try { resolve({ status: r.statusCode, data: JSON.parse(d || 'null') }); }
+    catch { resolve({ status: r.statusCode, data: d }); }
+  });
+});
     req.on('error', reject);
     if (bodyStr) req.write(bodyStr);
     req.end();
