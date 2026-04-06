@@ -1348,6 +1348,7 @@ function toggleAdminView() {
   if (adminView.classList.contains('active')) {
     adminView.classList.remove('active');
     btn.classList.remove('active');
+    document.getElementById('homeView').style.display = ''; // ← добавь это
     return;
   }
 
