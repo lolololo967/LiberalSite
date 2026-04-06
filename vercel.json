@@ -8,6 +8,9 @@
   },
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/img/(.*)", "dest": "/img/$1" },
+    { "src": "/(.*\\.png)", "dest": "/$1" },
+    { "src": "/(.*\\.ico)", "dest": "/$1" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
