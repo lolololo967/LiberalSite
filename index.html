@@ -1392,6 +1392,10 @@ function doLogout() {
   localStorage.removeItem('lg_admin_token');
   document.getElementById('adminLoginPanel').style.display = 'block';
   document.getElementById('adminDashboard').style.display = 'none';
+  // ↓ добавь эти две строки
+  document.getElementById('adminView').classList.remove('active');
+  document.getElementById('adminNavBtn').classList.remove('active');
+  document.getElementById('homeView').style.display = '';
 }
 
 function showAdminDashboard() {
