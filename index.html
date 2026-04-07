@@ -675,20 +675,6 @@ header::before {
   100% { opacity:1; transform:translateX(0) skewX(0deg); clip-path:inset(0 0 0 0); filter:brightness(1); }
 }
 
-/* Card glitch-out (scroll exit) */
-@keyframes cardGlitchOut {
-  0%   { opacity:1; transform:translateX(0) skewX(0deg); clip-path:inset(0 0 0 0); filter:brightness(1); }
-  15%  { opacity:0.7; transform:translateX(-3px) skewX(-1deg); clip-path:inset(0 0 0 0); filter:brightness(1.4); }
-  30%  { opacity:0.9; transform:translateX(4px) skewX(1.5deg); clip-path:inset(0 15% 0 0); }
-  50%  { opacity:0.4; transform:translateX(-5px) skewX(-2deg); clip-path:inset(0 45% 0 0); filter:brightness(1.8); }
-  70%  { opacity:0.2; transform:translateX(3px); clip-path:inset(0 70% 0 0); }
-  100% { opacity:0; transform:translateX(8px) skewX(1deg); clip-path:inset(0 100% 0 0); filter:brightness(2); }
-}
-
-.card-enter { animation: cardGlitchIn 0.38s steps(1,end) forwards !important; }
-.card-exit  { animation: cardGlitchOut 0.28s steps(1,end) forwards !important; }
-.card-hidden { opacity:0; clip-path:inset(0 100% 0 0); }
-
 /* Filter flicker */
 @keyframes sectionFlicker {
   0%,100% { opacity:1; filter:brightness(1); }
@@ -1259,47 +1245,9 @@ function renderLogCard(card, color) {
   </div>`;
 }
 
-/* ── Scroll-reveal observer (singleton) ── */
-let _scrollObserver = null;
-function getScrollObserver() {
-  if (_scrollObserver) return _scrollObserver;
-  _scrollObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      const card = entry.target;
-      if (entry.isIntersecting) {
-        // Card entering viewport → glitch in
-        card.classList.remove('card-hidden', 'card-exit');
-        void card.offsetWidth; // reflow
-        card.classList.add('card-enter');
-        card.addEventListener('animationend', () => {
-          card.classList.remove('card-enter');
-          card.style.opacity = '1';
-          card.style.clipPath = '';
-          card.style.filter = '';
-        }, {once: true});
-      } else {
-        // Card leaving viewport → glitch out
-        card.classList.remove('card-enter');
-        void card.offsetWidth;
-        card.classList.add('card-exit');
-        card.addEventListener('animationend', () => {
-          card.classList.remove('card-exit');
-          card.classList.add('card-hidden');
-        }, {once: true});
-      }
-    });
-  }, { threshold: 0.08 });
-  return _scrollObserver;
-}
-
 function animateCards(container) {
-  const obs = getScrollObserver();
   const cards = container.querySelectorAll('.log-card');
   cards.forEach((card, i) => {
-    // Unobserve first in case of re-render
-    obs.unobserve(card);
-    card.classList.remove('card-enter', 'card-exit', 'card-hidden');
-    // Initial boot stagger (only for first render)
     card.style.opacity = '0';
     card.style.clipPath = 'inset(0 100% 0 0)';
     card.style.filter = 'brightness(2)';
@@ -1310,9 +1258,7 @@ function animateCards(container) {
         card.style.opacity = '1';
         card.style.clipPath = '';
         card.style.filter = '';
-        // Start observing for scroll-triggered animations
-        obs.observe(card);
-      }, {once: true});
+      }, {once:true});
     }, 60 + i * 70);
   });
 }
