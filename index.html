@@ -468,7 +468,8 @@ header::before {
   position:relative;
   animation:modalIn 0.22s cubic-bezier(0.2,0,0,1) both;
 
-  overflow-y: auto; /* ← ВАЖНО */
+  overflow-y: auto;   /* вертикальный скролл */
+  overflow-x: hidden; /* отключаем горизонтальный */
 }
 @keyframes modalIn {
   from { opacity:0; transform:translateY(18px) scale(0.98); }
