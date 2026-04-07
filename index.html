@@ -478,6 +478,9 @@ header::before {
   overflow-y: auto;   /* вертикальный скролл */
   overflow-x: hidden; /* отключаем горизонтальный */
 }
+.party-modal::-webkit-scrollbar:hover{
+  cursor: none;
+}
 @keyframes modalIn {
   from { opacity:0; transform:translateY(18px) scale(0.98); }
   to   { opacity:1; transform:none; }
