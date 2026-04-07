@@ -444,6 +444,7 @@ header::before {
   font-family:'Share Tech Mono', monospace; font-size:9px; letter-spacing:0.2em;
   text-transform:uppercase; color:var(--ink2);  transition:all 0.2s;
   display:flex; align-items:center; justify-content:center; gap:8px;
+  cursor:none;
 }
 .party-filter-btn:last-child { border-right:none; }
 .party-filter-btn:hover { background:var(--off); color:var(--ink); }
@@ -466,9 +467,16 @@ header::before {
 }
 .party-modal-overlay.active { display:flex; }
 .party-modal {
-  width:100%; max-width:860px; background:var(--white);
-  border:2px solid var(--ink); position:relative;
+  width:100%;
+  max-width:860px;
+  max-height:550px;
+  background:var(--white);
+  border:2px solid var(--ink);
+  position:relative;
   animation:modalIn 0.22s cubic-bezier(0.2,0,0,1) both;
+
+  overflow-y: auto;   /* вертикальный скролл */
+  overflow-x: hidden; /* отключаем горизонтальный */
 }
 @keyframes modalIn {
   from { opacity:0; transform:translateY(18px) scale(0.98); }
