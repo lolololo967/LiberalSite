@@ -2725,12 +2725,10 @@ document.addEventListener('keydown', e => {
     }
   });
 
-  function animate() {
-    largeX += (mouseX - largeX) * 0.15;
-    largeY += (mouseY - largeY) * 0.15;
-    cursorLarge.style.transform = `translate(${largeX}px, ${largeY}px) translate(-50%, -50%)`;
-    requestAnimationFrame(animate);
-  }
+function animate() {
+  cursorLarge.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+  requestAnimationFrame(animate);
+}
 
   animate();
 </script>
