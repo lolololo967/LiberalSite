@@ -317,6 +317,117 @@ header::before {
   text-transform:uppercase; color:var(--ink2); opacity:0.5;
 }
 
+/* ══ PARTIES NAV ══ */
+.nav-parties-grid {
+  display:flex; flex-direction:column; gap:0;
+  border:1px solid var(--ink); margin-bottom:32px;
+}
+.party-card {
+  display:grid; grid-template-columns:200px 1fr auto;
+  align-items:stretch; border-bottom:1px solid var(--ink);
+  cursor:crosshair; transition:background 0.2s; position:relative; overflow:hidden;
+  min-height:120px;
+}
+.party-card:last-child { border-bottom:none; }
+.party-card:hover { background:var(--off); }
+
+/* Flag column */
+.party-flag-col {
+  position:relative; overflow:hidden; border-right:1px solid var(--ink);
+  display:flex; align-items:center; justify-content:center;
+  background:var(--ink); flex-shrink:0;
+}
+.party-flag-img {
+  width:100%; height:100%; object-fit:cover; display:block;
+  transition:transform 0.4s ease, opacity 0.3s;
+}
+.party-card:hover .party-flag-img { transform:scale(1.04); opacity:0.85; }
+.party-flag-placeholder {
+  width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+  background:repeating-linear-gradient(-45deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 2px, transparent 2px, transparent 10px);
+}
+.party-flag-placeholder-inner {
+  font-family:'Share Tech Mono', monospace; font-size:8px; letter-spacing:0.2em;
+  color:rgba(255,255,255,0.2); text-transform:uppercase;
+}
+
+/* Symbol badge */
+.party-symbol-badge {
+  position:absolute; bottom:8px; right:8px;
+  width:40px; height:40px; border:2px solid rgba(255,255,255,0.3);
+  background:rgba(10,12,16,0.7); display:flex; align-items:center; justify-content:center;
+  overflow:hidden; flex-shrink:0;
+}
+.party-symbol-img { width:100%; height:100%; object-fit:contain; display:block; }
+
+/* Content column */
+.party-content-col { padding:24px 28px; display:flex; flex-direction:column; justify-content:space-between; gap:12px; }
+.party-content-top {}
+.party-card-accent { height:2px; width:0; transition:width 0.35s ease; margin-bottom:10px; }
+.party-card:hover .party-card-accent { width:100%; }
+.party-card-name {
+  font-family:'Barlow Condensed', sans-serif; font-size:26px; font-weight:900;
+  text-transform:uppercase; letter-spacing:0.06em; color:var(--ink); line-height:1;
+  margin-bottom:6px;
+}
+.party-card-desc {
+  font-family:'Share Tech Mono', monospace; font-size:9px; letter-spacing:0.1em;
+  color:var(--ink2); opacity:0.55; line-height:1.7; max-width:480px;
+}
+.party-card-bottom {}
+.party-spectrum-wrap {}
+.party-spectrum-label {
+  display:flex; justify-content:space-between; margin-bottom:5px;
+}
+.party-spectrum-label span {
+  font-family:'Share Tech Mono', monospace; font-size:7px; letter-spacing:0.15em;
+  text-transform:uppercase; color:var(--ink2); opacity:0.35;
+}
+.party-track {
+  height:2px; background:rgba(10,12,16,0.1); position:relative;
+}
+.party-indicator-dot {
+  width:10px; height:10px; border-radius:50%;
+  position:absolute; top:50%; transform:translate(-50%,-50%);
+  left:var(--pos, 50%); transition:background 0.25s;
+  border:2px solid var(--party-color, var(--c04));
+  background:var(--white);
+}
+.party-card:hover .party-indicator-dot { background:var(--party-color, var(--c04)); }
+.party-meta-row {
+  display:flex; gap:16px; margin-top:8px; align-items:center;
+}
+.party-meta-tag {
+  font-family:'Share Tech Mono', monospace; font-size:7px; letter-spacing:0.15em;
+  text-transform:uppercase; color:var(--party-color, var(--c04)); opacity:0.7;
+  border:1px solid var(--party-color, var(--c04)); padding:2px 7px;
+}
+
+/* Right stat column */
+.party-stat-col {
+  width:90px; flex-shrink:0; border-left:1px solid var(--ink);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  padding:16px 12px;
+}
+.party-stat-num {
+  font-family:'Barlow Condensed', sans-serif; font-size:36px; font-weight:900; line-height:1;
+  color:var(--party-color, var(--c04)); opacity:0.15; transition:opacity 0.2s;
+}
+.party-card:hover .party-stat-num { opacity:0.35; }
+.party-stat-lbl {
+  font-family:'Share Tech Mono', monospace; font-size:7px; letter-spacing:0.15em;
+  text-transform:uppercase; color:var(--ink2); opacity:0.35;
+  text-align:center; line-height:1.4;
+}
+
+/* Empty parties */
+.parties-empty {
+  padding:80px 40px; text-align:center;
+  border:1px dashed rgba(10,12,16,0.15); background:var(--off); margin-bottom:32px;
+  font-family:'Share Tech Mono', monospace; font-size:9px; letter-spacing:0.25em;
+  text-transform:uppercase; color:var(--ink2); opacity:0.5;
+}
+
 /* ══ REFERENDUMS NAV ══ */
 .nav-referendums { display:grid; grid-template-columns:1fr 1fr 1fr; border:1px solid var(--ink); margin-bottom:32px; gap:0; }
 .ref-cell { padding:32px 24px; border-right:1px solid var(--ink); border-bottom:1px solid var(--ink); cursor:crosshair; position:relative; overflow:hidden; transition:background 0.2s; display:flex; flex-direction:column; justify-content:space-between; min-height:140px; }
@@ -343,17 +454,6 @@ header::before {
 .vote-bg-num { position:absolute; right:24px; top:50%; transform:translateY(-50%); font-family:'Barlow Condensed', sans-serif; font-size:72px; font-weight:900; color:var(--c03); opacity:0.04; line-height:1; transition:opacity 0.2s; pointer-events:none; }
 .vote-item:hover .vote-bg-num { opacity:0.08; }
 
-/* Other existing inner nav styles */
-.nav-parties { display:flex; flex-direction:column; gap:0; border:1px solid var(--ink); margin-bottom:32px; }
-.party-row { display:grid; grid-template-columns:200px 1fr 120px; align-items:center; border-bottom:1px solid var(--ink); cursor:crosshair; transition:background 0.2s; min-height:60px; }
-.party-row:last-child { border-bottom:none; }
-.party-row:hover { background:var(--off); }
-.party-name-cell { padding:18px 24px; border-right:1px solid var(--ink); font-family:'Barlow Condensed', sans-serif; font-size:18px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; }
-.party-spectrum { padding:0 24px; position:relative; }
-.party-track { height:2px; background:rgba(10,12,16,0.08); position:relative; }
-.party-indicator { width:8px; height:8px; border-radius:50%; border:2px solid var(--c04); position:absolute; top:50%; transform:translate(-50%,-50%); left:var(--pos, 50%); background:var(--white); transition:background 0.2s; }
-.party-row:hover .party-indicator { background:var(--c04); }
-.party-meta { padding:18px 24px; border-left:1px solid var(--ink); font-family:'Share Tech Mono', monospace; font-size:8px; letter-spacing:0.15em; color:var(--ink2); opacity:0.5; text-transform:uppercase; }
 .nav-constitution { display:flex; flex-direction:column; border:1px solid var(--ink); margin-bottom:32px; }
 .const-item { display:grid; grid-template-columns:80px 1fr 60px; align-items:stretch; border-bottom:1px solid var(--ink); cursor:crosshair; transition:background 0.2s; overflow:hidden; }
 .const-item:last-child { border-bottom:none; }
@@ -371,11 +471,6 @@ header::before {
 .law-tile { padding:28px 24px 24px; border-right:1px solid var(--ink); border-bottom:1px solid var(--ink); cursor:crosshair; position:relative; overflow:hidden; transition:background 0.2s; display:flex; flex-direction:column; gap:16px; min-height:130px; }
 .law-tile:nth-child(3n) { border-right:none; }
 .law-tile:hover { background:var(--off); }
-.law-icon { width:36px; height:36px; clip-path:polygon(50% 0%,100% 15%,100% 70%,50% 100%,0% 70%,0% 15%); background:rgba(0,184,217,0.12); display:flex; align-items:center; justify-content:center; transition:background 0.25s; font-size:16px; line-height:1; }
-.law-tile:hover .law-icon { background:rgba(0,184,217,0.25); }
-.law-name { font-family:'Barlow Condensed', sans-serif; font-size:17px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; }
-.law-dot { position:absolute; bottom:18px; right:18px; width:6px; height:6px; border-radius:50%; background:var(--c06); opacity:0; transition:opacity 0.2s; }
-.law-tile:hover .law-dot { opacity:1; }
 .nav-rules { display:grid; grid-template-columns:repeat(2,1fr); gap:0; border:1px solid var(--ink); margin-bottom:32px; }
 .rule-card { display:flex; align-items:stretch; border-right:1px solid var(--ink); border-bottom:1px solid var(--ink); cursor:crosshair; transition:background 0.2s; overflow:hidden; }
 .rule-card:nth-child(2n) { border-right:none; }
@@ -518,7 +613,7 @@ header::before {
 .admin-tab-btn {
   flex:1; padding:14px 20px; font-family:'Share Tech Mono', monospace;
   font-size:9px; letter-spacing:0.18em; text-transform:uppercase; cursor:pointer;
-  transition:all 0.2s; border-right:1px solid var(--ink); background:var(--white); color:var(--ink2); border:none;
+  transition:all 0.2s; background:var(--white); color:var(--ink2); border:none;
   border-right:1px solid var(--ink);
 }
 .admin-tab-btn:last-child { border-right:none; }
@@ -547,6 +642,59 @@ header::before {
   appearance:none;
 }
 .admin-select:focus { border-color:var(--c01); }
+
+/* Party image upload fields */
+.admin-img-upload-wrap { display:flex; flex-direction:column; gap:8px; }
+.admin-img-preview-row { display:flex; align-items:center; gap:12px; }
+.admin-img-preview {
+  width:80px; height:54px; border:1px solid var(--ink);
+  object-fit:cover; display:none; flex-shrink:0;
+  background:var(--off);
+}
+.admin-img-preview.flag { width:100px; height:60px; }
+.admin-img-preview.symbol { width:54px; height:54px; object-fit:contain; }
+.admin-img-preview.visible { display:block; }
+.admin-img-placeholder {
+  width:80px; height:54px; border:1px dashed rgba(10,12,16,0.2);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  font-family:'Share Tech Mono', monospace; font-size:7px; letter-spacing:0.12em;
+  color:var(--ink2); opacity:0.4; text-transform:uppercase; background:var(--off);
+}
+.admin-img-placeholder.flag { width:100px; height:60px; }
+.admin-img-placeholder.symbol { width:54px; height:54px; }
+.admin-file-input-label {
+  border:1px solid var(--line); padding:8px 14px; cursor:pointer;
+  font-family:'Share Tech Mono', monospace; font-size:8px; letter-spacing:0.15em;
+  text-transform:uppercase; color:var(--ink2); transition:all 0.2s; display:inline-block;
+}
+.admin-file-input-label:hover { border-color:var(--c04); color:var(--c04); }
+.admin-file-input { display:none; }
+.admin-img-clear-btn {
+  font-family:'Share Tech Mono', monospace; font-size:7px; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--c07); cursor:pointer; border:1px solid rgba(255,23,68,0.3);
+  padding:4px 8px; background:none; transition:all 0.2s; display:none;
+}
+.admin-img-clear-btn.visible { display:inline-block; }
+.admin-img-clear-btn:hover { background:var(--c07); color:#fff; border-color:var(--c07); }
+
+/* Spectrum slider */
+.spectrum-slider-wrap { display:flex; flex-direction:column; gap:8px; }
+.spectrum-slider-labels { display:flex; justify-content:space-between; }
+.spectrum-slider-labels span {
+  font-family:'Share Tech Mono', monospace; font-size:7px; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--ink2); opacity:0.5;
+}
+.admin-range {
+  -webkit-appearance:none; width:100%; height:3px;
+  background:linear-gradient(to right, #FF1744 0%, #9B30FF 50%, #0057FF 100%);
+  outline:none; cursor:pointer;
+}
+.admin-range::-webkit-slider-thumb {
+  -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+  background:var(--ink); border:3px solid var(--white); box-shadow:0 0 0 1px var(--ink);
+  cursor:pointer;
+}
+.spectrum-val { font-family:'Share Tech Mono', monospace; font-size:8px; letter-spacing:0.2em; color:var(--ink2); opacity:0.55; }
 
 /* Options builder */
 .admin-options-list { display:flex; flex-direction:column; gap:12px; margin-bottom:12px; }
@@ -581,6 +729,9 @@ header::before {
 .admin-card-row-info {}
 .admin-card-row-title { font-family:'Barlow Condensed', sans-serif; font-size:16px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; }
 .admin-card-row-meta { font-family:'Share Tech Mono', monospace; font-size:7px; letter-spacing:0.15em; color:var(--ink2); opacity:0.45; text-transform:uppercase; margin-top:2px; }
+.admin-card-row-thumb {
+  width:48px; height:32px; object-fit:cover; border:1px solid var(--line); flex-shrink:0; display:block;
+}
 .admin-card-row-actions { display:flex; gap:8px; }
 .admin-cards-empty { padding:48px; text-align:center; font-family:'Share Tech Mono', monospace; font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--ink2); opacity:0.4; }
 
@@ -592,6 +743,7 @@ header::before {
   .cat-card.featured .cat-name { color:var(--ink); }
   .cat-card.featured .cat-status { color:var(--ink2); }
   .cat-card.featured .cat-icon-wrap svg { stroke:var(--ink2); }
+  .party-card { grid-template-columns:140px 1fr auto; }
 }
 @media (max-width:768px) {
   header { padding:0 16px; }
@@ -610,6 +762,10 @@ header::before {
   .admin-opt-grid, .admin-opt-grid-3 { grid-template-columns:1fr; }
   .log-cards-grid { grid-template-columns:1fr; }
   .card-modal-body { padding:24px 20px; }
+  .party-card { grid-template-columns:1fr; }
+  .party-flag-col { min-height:140px; }
+  .party-stat-col { display:none; }
+  .admin-section-tabs { flex-wrap:wrap; }
 }
 @media (max-width:480px) {
   .categories-grid { grid-template-columns:1fr; }
@@ -636,7 +792,6 @@ header::before {
 #flashBlink.active { animation:blinkFlash 0.22s ease-out forwards; }
 
 /* ══ PAGE TRANSITIONS ══ */
-
 @keyframes pageOut {
   0%   { opacity:1; transform:translateX(0) skewX(0deg); clip-path:inset(0 0 0 0); }
   15%  { opacity:0.7; transform:translateX(-4px) skewX(-1.5deg); clip-path:inset(10% 0 5% 0); }
@@ -648,7 +803,6 @@ header::before {
   80%  { opacity:0.05; transform:translateX(-2px) skewX(-3deg); clip-path:inset(0 0 95% 0); filter:brightness(2); }
   100% { opacity:0; transform:translateX(-8px) skewX(0deg); clip-path:inset(0 0 100% 0); filter:brightness(1); }
 }
-
 @keyframes pageIn {
   0%   { opacity:0; transform:translateX(12px) skewX(2deg); clip-path:inset(100% 0 0 0); filter:brightness(2); }
   10%  { opacity:0.6; transform:translateX(-4px) skewX(-1deg); clip-path:inset(0 0 70% 0); filter:brightness(1.8); }
@@ -662,8 +816,6 @@ header::before {
   90%  { opacity:1; transform:translateX(0) skewX(0deg); filter:brightness(1); }
   100% { opacity:1; transform:translateX(0) skewX(0deg); clip-path:inset(0 0 0 0); filter:brightness(1); }
 }
-
-/* Card glitch-in */
 @keyframes cardGlitchIn {
   0%   { opacity:0; transform:translateX(8px) skewX(1.5deg); clip-path:inset(0 100% 0 0); }
   20%  { opacity:0.7; transform:translateX(-3px) skewX(-0.8deg); clip-path:inset(0 30% 0 0); filter:brightness(1.5); }
@@ -674,8 +826,6 @@ header::before {
   90%  { opacity:0.9; transform:translateX(1px); filter:brightness(1.05); }
   100% { opacity:1; transform:translateX(0) skewX(0deg); clip-path:inset(0 0 0 0); filter:brightness(1); }
 }
-
-/* Filter flicker */
 @keyframes sectionFlicker {
   0%,100% { opacity:1; filter:brightness(1); }
   20%     { opacity:0.5; filter:brightness(1.6) contrast(1.2); }
@@ -685,8 +835,6 @@ header::before {
   75%     { opacity:0.6; filter:brightness(1.3); }
   80%     { opacity:1; filter:brightness(1); }
 }
-
-/* Scan line */
 @keyframes scanSweep {
   0%   { top:-4px; opacity:0.7; }
   100% { top:110%; opacity:0; }
@@ -698,8 +846,6 @@ header::before {
   box-shadow:0 0 8px rgba(0,87,255,0.8),0 0 20px rgba(0,87,255,0.3);
 }
 #transitionScan.active { display:block; animation:scanSweep 0.35s linear forwards; }
-
-/* Boot animations */
 @keyframes headerDrop {
   0%   { transform:translateY(-100%); opacity:0; }
   60%  { transform:translateY(3px); opacity:1; }
@@ -714,10 +860,8 @@ header::before {
   60%  { clip-path:inset(0 3% 0 0); opacity:1; filter:brightness(1.05); }
   100% { clip-path:inset(0 0 0 0); opacity:1; filter:brightness(1); }
 }
-
 .page-exit  { animation:pageOut 0.32s steps(1,end) forwards; pointer-events:none; }
 .page-enter { animation:pageIn  0.45s steps(1,end) forwards; }
-
 #homeView  { will-change:transform,opacity; }
 #innerView { will-change:transform,opacity; }
 </style>
@@ -768,7 +912,6 @@ header::before {
     <div class="section-label">Разделы — Categories</div>
     <div class="categories-grid" id="categoriesGrid">
 
-      <!-- ELECTIONS -->
       <div class="cat-card featured" style="--card-color:var(--c01)" onclick="openCategory('elections')" tabindex="0">
         <div class="corner-tl"></div><div class="corner-br"></div>
         <div class="cat-top">
@@ -782,7 +925,6 @@ header::before {
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
-      <!-- REFERENDUMS -->
       <div class="cat-card featured" style="--card-color:var(--c02)" onclick="openCategory('referendums')" tabindex="0">
         <div class="corner-tl"></div><div class="corner-br"></div>
         <div class="cat-top">
@@ -796,7 +938,6 @@ header::before {
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
-      <!-- VOTING -->
       <div class="cat-card" style="--card-color:var(--c03)" onclick="openCategory('voting')" tabindex="0">
         <div class="corner-tl"></div><div class="corner-br"></div>
         <div class="cat-top">
@@ -810,7 +951,6 @@ header::before {
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
-      <!-- PARTIES -->
       <div class="cat-card" style="--card-color:var(--c04)" onclick="openCategory('parties')" tabindex="0">
         <div class="corner-tl"></div><div class="corner-br"></div>
         <div class="cat-top">
@@ -824,7 +964,6 @@ header::before {
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
-      <!-- CONSTITUTION -->
       <div class="cat-card" style="--card-color:var(--c05)" onclick="openCategory('constitution')" tabindex="0">
         <div class="corner-tl"></div><div class="corner-br"></div>
         <div class="cat-top">
@@ -838,7 +977,6 @@ header::before {
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
-      <!-- LAWS -->
       <div class="cat-card" style="--card-color:var(--c06)" onclick="openCategory('laws')" tabindex="0">
         <div class="corner-tl"></div><div class="corner-br"></div>
         <div class="cat-top">
@@ -852,7 +990,6 @@ header::before {
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
-      <!-- RULES -->
       <div class="cat-card" style="--card-color:var(--c07)" onclick="openCategory('rules')" tabindex="0">
         <div class="corner-tl"></div><div class="corner-br"></div>
         <div class="cat-top">
@@ -866,7 +1003,6 @@ header::before {
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
-      <!-- PROJECTS -->
       <div class="cat-card" style="--card-color:var(--c08)" onclick="openCategory('projects')" tabindex="0">
         <div class="corner-tl"></div><div class="corner-br"></div>
         <div class="cat-top">
@@ -880,7 +1016,6 @@ header::before {
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
-      <!-- DEBATES -->
       <div class="cat-card" style="--card-color:var(--c09)" onclick="openCategory('debates')" tabindex="0">
         <div class="corner-tl"></div><div class="corner-br"></div>
         <div class="cat-top">
@@ -894,7 +1029,6 @@ header::before {
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
-      <!-- TESTS -->
       <div class="cat-card" style="--card-color:var(--c10)" onclick="openCategory('tests')" tabindex="0">
         <div class="corner-tl"></div><div class="corner-br"></div>
         <div class="cat-top">
@@ -908,7 +1042,6 @@ header::before {
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
-      <!-- INFO -->
       <div class="cat-card" style="--card-color:var(--c11)" onclick="openCategory('info')" tabindex="0">
         <div class="corner-tl"></div><div class="corner-br"></div>
         <div class="cat-top">
@@ -922,7 +1055,7 @@ header::before {
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
-    </div><!-- /categories-grid -->
+    </div>
 
     <!-- STATS BAR -->
     <div class="stats-bar">
@@ -949,8 +1082,8 @@ header::before {
       </div>
     </div>
 
-  </div><!-- /main-view -->
-</div><!-- /homeView -->
+  </div>
+</div>
 
 <!-- ══ INNER VIEW ══ -->
 <div id="innerView" class="inner-view">
@@ -976,17 +1109,17 @@ header::before {
 
     <!-- LOGIN PANEL -->
     <div id="adminLoginPanel">
-  <div class="admin-login-wrap">
-    <div style="margin-bottom:16px">
-      <button class="inner-back" onclick="toggleAdminView()" style="font-size:11px">
-        <svg viewBox="0 0 14 14"><line x1="11" y1="7" x2="2" y2="7"/><polyline points="6,2 2,7 6,12"/></svg>
-        НА ГЛАВНУЮ
-      </button>
-    </div>
-    <div class="admin-login-top">
-      <div class="admin-login-top-title">Администратор</div>
-      <div class="admin-login-top-sub">// RESTRICTED ACCESS · ADMIN ONLY</div>
-    </div>
+      <div class="admin-login-wrap">
+        <div style="margin-bottom:16px">
+          <button class="inner-back" onclick="toggleAdminView()" style="font-size:11px">
+            <svg viewBox="0 0 14 14"><line x1="11" y1="7" x2="2" y2="7"/><polyline points="6,2 2,7 6,12"/></svg>
+            НА ГЛАВНУЮ
+          </button>
+        </div>
+        <div class="admin-login-top">
+          <div class="admin-login-top-title">Администратор</div>
+          <div class="admin-login-top-sub">// RESTRICTED ACCESS · ADMIN ONLY</div>
+        </div>
         <div class="admin-login-body">
           <div class="admin-field">
             <div class="admin-field-label">Пароль доступа</div>
@@ -1015,10 +1148,11 @@ header::before {
         <button class="admin-tab-btn active" onclick="switchAdminTab('elections',this)">Выборы</button>
         <button class="admin-tab-btn" onclick="switchAdminTab('referendums',this)">Референдумы</button>
         <button class="admin-tab-btn" onclick="switchAdminTab('voting',this)">Голосования</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab('parties',this)">Партии</button>
       </div>
 
-      <!-- Card form -->
-      <div class="admin-form-wrap">
+      <!-- ── CARD FORM (elections / referendums / voting) ── -->
+      <div class="admin-form-wrap" id="cardFormWrap">
         <div class="admin-form-head">
           <span class="admin-form-head-title" id="adminFormTitle">// НОВАЯ КАРТОЧКА</span>
           <button class="admin-btn-secondary admin-btn" id="adminCancelEditBtn" onclick="cancelEdit()" style="display:none">ОТМЕНИТЬ</button>
@@ -1068,7 +1202,125 @@ header::before {
         </div>
       </div>
 
-      <!-- Cards list -->
+      <!-- ── PARTY FORM ── -->
+      <div class="admin-form-wrap" id="partyFormWrap" style="display:none">
+        <div class="admin-form-head">
+          <span class="admin-form-head-title" id="adminPartyFormTitle">// НОВАЯ ПАРТИЯ</span>
+          <button class="admin-btn-secondary admin-btn" id="adminCancelPartyEditBtn" onclick="cancelPartyEdit()" style="display:none">ОТМЕНИТЬ</button>
+        </div>
+        <div class="admin-form-body">
+          <input type="hidden" id="editingPartyId">
+
+          <div class="admin-row admin-row-2">
+            <div class="admin-field">
+              <div class="admin-field-label">Название партии *</div>
+              <input type="text" class="admin-input" id="partyName" placeholder="Либеральный Рассвет">
+            </div>
+            <div class="admin-field">
+              <div class="admin-field-label">Аббревиатура / тег</div>
+              <input type="text" class="admin-input" id="partyTag" placeholder="ЛР · LIBERAL">
+            </div>
+          </div>
+
+          <div class="admin-field">
+            <div class="admin-field-label">Описание / идеология</div>
+            <textarea class="admin-textarea" id="partyDesc" placeholder="Краткое описание партии, её позиции и идеологии..." style="min-height:72px"></textarea>
+          </div>
+
+          <!-- Spectrum slider -->
+          <div class="admin-field">
+            <div class="admin-field-label">Политический спектр (0 = крайне левые, 100 = крайне правые)</div>
+            <div class="spectrum-slider-wrap">
+              <div class="spectrum-slider-labels">
+                <span>◀ Левые</span>
+                <span>Центр</span>
+                <span>Правые ▶</span>
+              </div>
+              <input type="range" class="admin-range" id="partySpectrum" min="0" max="100" value="50"
+                oninput="document.getElementById('partySpectrumVal').textContent = this.value">
+              <div class="spectrum-val">Значение: <span id="partySpectrumVal">50</span></div>
+            </div>
+          </div>
+
+          <!-- Accent color -->
+          <div class="admin-row admin-row-2">
+            <div class="admin-field">
+              <div class="admin-field-label">Цвет партии</div>
+              <div style="display:flex;gap:10px;align-items:center">
+                <input type="color" class="admin-input" id="partyColor" value="#9B30FF" style="width:60px;height:40px;padding:2px;cursor:pointer">
+                <input type="text" class="admin-input" id="partyColorHex" value="#9B30FF" placeholder="#RRGGBB"
+                  oninput="syncColorFromText(this.value)" style="flex:1">
+              </div>
+            </div>
+            <div class="admin-field">
+              <div class="admin-field-label">Статус</div>
+              <select class="admin-select" id="partyStatus">
+                <option value="ruling">Правящая</option>
+                <option value="opposition">Оппозиция</option>
+                <option value="coalition">Коалиция</option>
+                <option value="minor">Малая партия</option>
+                <option value="inactive">Неактивна</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Images -->
+          <div class="admin-row admin-row-2">
+            <!-- Flag -->
+            <div class="admin-field">
+              <div class="admin-field-label">Флаг партии (изображение)</div>
+              <div class="admin-img-upload-wrap">
+                <div class="admin-img-preview-row">
+                  <div class="admin-img-placeholder flag" id="partyFlagPlaceholder">ФЛАГ</div>
+                  <img class="admin-img-preview flag" id="partyFlagPreview" src="" alt="Flag preview">
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <label class="admin-file-input-label" for="partyFlagInput">
+                      📁 ВЫБРАТЬ ФАЙЛ
+                    </label>
+                    <input type="file" id="partyFlagInput" class="admin-file-input" accept="image/*"
+                      onchange="handleImageUpload(this,'partyFlagPreview','partyFlagPlaceholder','partyFlagClear','partyFlagBase64')">
+                    <button class="admin-img-clear-btn" id="partyFlagClear"
+                      onclick="clearImage('partyFlagPreview','partyFlagPlaceholder','partyFlagClear','partyFlagInput','partyFlagBase64')">
+                      ✕ УБРАТЬ
+                    </button>
+                  </div>
+                </div>
+                <input type="hidden" id="partyFlagBase64">
+              </div>
+            </div>
+
+            <!-- Symbol -->
+            <div class="admin-field">
+              <div class="admin-field-label">Символ / логотип партии</div>
+              <div class="admin-img-upload-wrap">
+                <div class="admin-img-preview-row">
+                  <div class="admin-img-placeholder symbol" id="partySymbolPlaceholder">СИМ</div>
+                  <img class="admin-img-preview symbol" id="partySymbolPreview" src="" alt="Symbol preview">
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <label class="admin-file-input-label" for="partySymbolInput">
+                      📁 ВЫБРАТЬ ФАЙЛ
+                    </label>
+                    <input type="file" id="partySymbolInput" class="admin-file-input" accept="image/*"
+                      onchange="handleImageUpload(this,'partySymbolPreview','partySymbolPlaceholder','partySymbolClear','partySymbolBase64')">
+                    <button class="admin-img-clear-btn" id="partySymbolClear"
+                      onclick="clearImage('partySymbolPreview','partySymbolPlaceholder','partySymbolClear','partySymbolInput','partySymbolBase64')">
+                      ✕ УБРАТЬ
+                    </button>
+                  </div>
+                </div>
+                <input type="hidden" id="partySymbolBase64">
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-form-actions">
+            <button class="admin-btn admin-btn-primary" onclick="saveParty()">СОХРАНИТЬ ПАРТИЮ</button>
+          </div>
+          <div id="adminPartySaveMsg" style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:0.15em;color:var(--c02);display:none;margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <!-- Cards / Parties list -->
       <div style="margin-bottom:12px">
         <div class="section-label" id="adminListLabel">Существующие карточки — Выборы</div>
       </div>
@@ -1102,6 +1354,7 @@ const SECTION_COLORS = {
 };
 
 let allCards = [];
+let allParties = [];
 let currentSection = null;
 let currentElectionFilter = 'all';
 let adminToken = localStorage.getItem('lg_admin_token');
@@ -1167,25 +1420,33 @@ async function apiDelete(path, body, token) {
 }
 
 // ══════════════════════════════════════════
-// LOAD CARDS
+// LOAD DATA
 // ══════════════════════════════════════════
 async function loadCards() {
   allCards = await apiGet('/api/cards');
   if (!Array.isArray(allCards)) allCards = [];
-  // Refresh inner view if open
   if (currentSection && ['elections','referendums','voting'].includes(currentSection)) {
     renderInnerCards(currentSection);
   }
-  // Refresh admin list if open
-  if (document.getElementById('adminDashboard').style.display !== 'none') {
+  if (document.getElementById('adminDashboard').style.display !== 'none' && adminCurrentTab !== 'parties') {
     renderAdminCardsList();
   }
 }
 
+async function loadParties() {
+  allParties = await apiGet('/api/parties');
+  if (!Array.isArray(allParties)) allParties = [];
+  if (currentSection === 'parties') renderPartiesView();
+  if (document.getElementById('adminDashboard').style.display !== 'none' && adminCurrentTab === 'parties') {
+    renderAdminPartiesList();
+  }
+}
+
 loadCards();
+loadParties();
 
 // ══════════════════════════════════════════
-// CARD SORTING: closest date to today first
+// CARD SORTING
 // ══════════════════════════════════════════
 function sortByClosestDate(cards) {
   const today = new Date();
@@ -1246,7 +1507,7 @@ function renderLogCard(card, color) {
 }
 
 function animateCards(container) {
-  const cards = container.querySelectorAll('.log-card');
+  const cards = container.querySelectorAll('.log-card, .party-card');
   cards.forEach((card, i) => {
     card.style.opacity = '0';
     card.style.clipPath = 'inset(0 100% 0 0)';
@@ -1283,6 +1544,77 @@ function renderInnerCards(section) {
 }
 
 // ══════════════════════════════════════════
+// PARTIES RENDERING
+// ══════════════════════════════════════════
+const PARTY_STATUS_LABELS = {
+  ruling:     'ПРАВЯЩАЯ',
+  opposition: 'ОППОЗИЦИЯ',
+  coalition:  'КОАЛИЦИЯ',
+  minor:      'МАЛАЯ ПАРТИЯ',
+  inactive:   'НЕАКТИВНА',
+};
+
+function renderPartyCard(party, idx) {
+  const color = escHtml(party.color || '#9B30FF');
+  const pos = Math.max(0, Math.min(100, party.spectrum ?? 50));
+  const statusLabel = PARTY_STATUS_LABELS[party.status] || '';
+
+  const flagHtml = party.flag_image
+    ? `<img class="party-flag-img" src="${party.flag_image}" alt="Флаг">`
+    : `<div class="party-flag-placeholder"><span class="party-flag-placeholder-inner">// NO FLAG</span></div>`;
+
+  const symbolHtml = party.symbol_image
+    ? `<div class="party-symbol-badge"><img class="party-symbol-img" src="${party.symbol_image}" alt="Символ"></div>`
+    : '';
+
+  return `
+  <div class="party-card" style="--party-color:${color}">
+    <div class="party-flag-col">
+      ${flagHtml}
+      ${symbolHtml}
+    </div>
+    <div class="party-content-col">
+      <div class="party-content-top">
+        <div class="party-card-accent" style="background:${color}"></div>
+        <div class="party-card-name">${escHtml(party.name)}</div>
+        ${party.description ? `<div class="party-card-desc">${escHtml(party.description)}</div>` : ''}
+      </div>
+      <div class="party-card-bottom">
+        <div class="party-spectrum-wrap">
+          <div class="party-spectrum-label">
+            <span>◀ ЛЕВЫЕ</span><span>ЦЕНТР</span><span>ПРАВЫЕ ▶</span>
+          </div>
+          <div class="party-track">
+            <div class="party-indicator-dot" style="--pos:${pos}%"></div>
+          </div>
+        </div>
+        <div class="party-meta-row">
+          ${statusLabel ? `<div class="party-meta-tag">${statusLabel}</div>` : ''}
+          ${party.tag ? `<div class="party-meta-tag" style="opacity:0.5">${escHtml(party.tag)}</div>` : ''}
+        </div>
+      </div>
+    </div>
+    <div class="party-stat-col">
+      <div class="party-stat-num">${String(idx+1).padStart(2,'0')}</div>
+      <div class="party-stat-lbl">ПАРТИЯ<br>№${idx+1}</div>
+    </div>
+  </div>`;
+}
+
+function renderPartiesView() {
+  const container = document.getElementById('innerCards');
+  if (!container) return;
+
+  if (allParties.length === 0) {
+    container.innerHTML = `<div class="parties-empty">// ПАРТИИ ЕЩЁ НЕ ДОБАВЛЕНЫ — ИСПОЛЬЗУЙТЕ ПАНЕЛЬ АДМИНИСТРАТОРА</div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="nav-parties-grid">${allParties.map((p,i) => renderPartyCard(p,i)).join('')}</div>`;
+  animateCards(container);
+}
+
+// ══════════════════════════════════════════
 // NAV BUILDER
 // ══════════════════════════════════════════
 function buildNav(key) {
@@ -1290,7 +1622,7 @@ function buildNav(key) {
   const navs = {
     elections: `<div class="nav-elections">
       ${[['Президентские','presidential'],['Парламентские','parliamentary'],['Все','all']].map(([l,f]) => `
-      <div class="el-row${f===currentElectionFilter||(!currentElectionFilter&&f==='all')?'':''}" onclick="setElectionFilter('${f}',this)" data-filter="${f}">
+      <div class="el-row" onclick="setElectionFilter('${f}',this)" data-filter="${f}">
         <div class="el-num"><div class="el-dot"></div></div>
         <div class="el-content">
           <span class="el-label">${l}</span>
@@ -1302,14 +1634,7 @@ function buildNav(key) {
 
     referendums: '',
     voting: '',
-
-    parties: `<div class="nav-parties">
-      ${[['Все партии',100,'ALL PARTIES'],['Правящяя',50,'RULING'],['Оппозиция',50,'OPPOSITION']].map(([l,pos,m])=>`<div class="party-row">
-        <div class="party-name-cell">${l}</div>
-        <div class="party-spectrum"><div class="party-track"><div class="party-indicator" style="--pos:${pos}%"></div></div></div>
-        <div class="party-meta">${m}</div>
-      </div>`).join('')}
-    </div>`,
+    parties: '', // dynamic, rendered separately
 
     constitution: `<div class="nav-constitution">
       ${[['I','Полный текст','FULL · TEXT'],['II','Главы','CHAPTERS']].map(([r,l,s])=>`<div class="const-item">
@@ -1348,12 +1673,9 @@ function buildNav(key) {
   };
   navEl.innerHTML = navs[key] || '';
 
-  // Mark active filter for elections
   if (key === 'elections') {
     navEl.querySelectorAll('.el-row').forEach(row => {
-      if (row.dataset.filter === currentElectionFilter || (currentElectionFilter === 'all' && row.dataset.filter === 'all')) {
-        row.classList.add('active');
-      }
+      if (row.dataset.filter === currentElectionFilter) row.classList.add('active');
     });
   }
 }
@@ -1365,7 +1687,6 @@ function setElectionFilter(filter, rowEl) {
   rowEl.classList.add('active');
 
   const container = document.getElementById('innerCards');
-  // Flicker blink
   const blink = document.getElementById('flashBlink');
   blink.classList.remove('active');
   void blink.offsetWidth;
@@ -1411,9 +1732,12 @@ function openCategory(key) {
   document.getElementById('innerEyebrow').textContent = cat.eyebrow;
   document.getElementById('innerTitle').textContent = cat.title;
   buildNav(key);
+
   if (['elections','referendums','voting'].includes(key)) {
     if (key === 'elections') currentElectionFilter = 'all';
     renderInnerCards(key);
+  } else if (key === 'parties') {
+    renderPartiesView();
   } else {
     document.getElementById('innerCards').innerHTML = '';
   }
@@ -1423,14 +1747,12 @@ function openCategory(key) {
 
   fireScanLine();
 
-  // Glitch homeView out
   homeView.classList.add('page-exit');
   homeView.addEventListener('animationend', function onExit() {
     homeView.removeEventListener('animationend', onExit);
     homeView.classList.remove('page-exit');
     homeView.style.display = 'none';
 
-    // Glitch innerView in
     inner.classList.add('active');
     inner.classList.add('page-enter');
     inner.addEventListener('animationend', function onEnter() {
@@ -1448,7 +1770,6 @@ function goHome() {
 
   fireScanLine();
 
-  // Glitch innerView out
   inner.classList.add('page-exit');
   inner.addEventListener('animationend', function onExit() {
     inner.removeEventListener('animationend', onExit);
@@ -1459,7 +1780,6 @@ function goHome() {
     document.getElementById('breadcrumb').classList.remove('active');
     currentSection = null;
 
-    // Glitch homeView in
     homeView.style.display = 'block';
     homeView.classList.add('page-enter');
     homeView.addEventListener('animationend', function onEnter() {
@@ -1535,7 +1855,7 @@ function toggleAdminView() {
   if (adminView.classList.contains('active')) {
     adminView.classList.remove('active');
     btn.classList.remove('active');
-    document.getElementById('homeView').style.display = ''; // ← добавь это
+    document.getElementById('homeView').style.display = '';
     return;
   }
 
@@ -1546,7 +1866,6 @@ function toggleAdminView() {
   btn.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
 
-  // Show correct panel
   if (adminToken) {
     showAdminDashboard();
   } else {
@@ -1579,7 +1898,6 @@ function doLogout() {
   localStorage.removeItem('lg_admin_token');
   document.getElementById('adminLoginPanel').style.display = 'block';
   document.getElementById('adminDashboard').style.display = 'none';
-  // ↓ добавь эти две строки
   document.getElementById('adminView').classList.remove('active');
   document.getElementById('adminNavBtn').classList.remove('active');
   document.getElementById('homeView').style.display = '';
@@ -1588,24 +1906,38 @@ function doLogout() {
 function showAdminDashboard() {
   document.getElementById('adminLoginPanel').style.display = 'none';
   document.getElementById('adminDashboard').style.display = 'block';
-  loadCards().then(() => renderAdminCardsList());
+  loadCards().then(() => { if (adminCurrentTab !== 'parties') renderAdminCardsList(); });
+  loadParties().then(() => { if (adminCurrentTab === 'parties') renderAdminPartiesList(); });
 }
 
 // ══════════════════════════════════════════
-// ADMIN TABS & FORM
+// ADMIN TABS
 // ══════════════════════════════════════════
 function switchAdminTab(section, btn) {
   adminCurrentTab = section;
   document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  const sectionNames = {elections:'Выборы', referendums:'Референдумы', voting:'Голосования'};
-  document.getElementById('adminListLabel').textContent = `Существующие карточки — ${sectionNames[section]}`;
-  // Show/hide election category field
-  document.getElementById('electionCategoryField').style.display = section === 'elections' ? 'flex' : 'none';
-  cancelEdit();
-  renderAdminCardsList();
+
+  const isParties = section === 'parties';
+  document.getElementById('cardFormWrap').style.display = isParties ? 'none' : 'block';
+  document.getElementById('partyFormWrap').style.display = isParties ? 'block' : 'none';
+
+  if (!isParties) {
+    const sectionNames = {elections:'Выборы', referendums:'Референдумы', voting:'Голосования'};
+    document.getElementById('adminListLabel').textContent = `Существующие карточки — ${sectionNames[section]}`;
+    document.getElementById('electionCategoryField').style.display = section === 'elections' ? 'flex' : 'none';
+    cancelEdit();
+    renderAdminCardsList();
+  } else {
+    document.getElementById('adminListLabel').textContent = 'Существующие партии';
+    cancelPartyEdit();
+    renderAdminPartiesList();
+  }
 }
 
+// ══════════════════════════════════════════
+// CARD FORM
+// ══════════════════════════════════════════
 function addOptionRow(opt) {
   optionCount++;
   const idx = optionCount;
@@ -1665,16 +1997,13 @@ function clearForm() {
   optionCount = 0;
 }
 
-function cancelEdit() {
-  clearForm();
-}
+function cancelEdit() { clearForm(); }
 
 function editCard(id) {
   const card = allCards.find(c => c.id === id);
   if (!card) return;
-  // Switch to correct tab
   const tabBtns = document.querySelectorAll('.admin-tab-btn');
-  const tabNames = ['elections','referendums','voting'];
+  const tabNames = ['elections','referendums','voting','parties'];
   tabBtns.forEach((btn, i) => {
     btn.classList.toggle('active', tabNames[i] === card.section);
   });
@@ -1694,8 +2023,6 @@ function editCard(id) {
 
   document.getElementById('adminFormTitle').textContent = '// РЕДАКТИРОВАНИЕ КАРТОЧКИ';
   document.getElementById('adminCancelEditBtn').style.display = 'inline-flex';
-
-  // Scroll to form
   document.querySelector('.admin-form-wrap').scrollIntoView({behavior:'smooth'});
 }
 
@@ -1713,8 +2040,7 @@ async function saveCard() {
 
   const payload = {
     section: adminCurrentTab,
-    title,
-    date,
+    title, date,
     text: document.getElementById('cardText').value.trim() || null,
     total_votes: parseInt(document.getElementById('cardTotalVotes').value) || 0,
     options: getFormOptions(),
@@ -1759,15 +2085,13 @@ function renderAdminCardsList() {
   const container = document.getElementById('adminCardsList');
   const cards = allCards.filter(c => c.section === adminCurrentTab);
   const sorted = sortByClosestDate(cards);
-  const sectionNames = {elections:'Выборы', referendums:'Референдумы', voting:'Голосования'};
-  document.getElementById('adminListLabel').textContent = `Существующие карточки — ${sectionNames[adminCurrentTab]}`;
 
   if (sorted.length === 0) {
     container.innerHTML = '<div class="admin-cards-empty">// НЕТ КАРТОЧЕК В ЭТОМ РАЗДЕЛЕ</div>';
     return;
   }
 
-  const colorMap = {elections: 'var(--c01)', referendums: 'var(--c02)', voting: 'var(--c03)'};
+  const colorMap = {elections:'var(--c01)', referendums:'var(--c02)', voting:'var(--c03)'};
   const color = colorMap[adminCurrentTab];
   const catNames = {presidential:'ПРЕЗИДЕНТСКИЕ', parliamentary:'ПАРЛАМЕНТСКИЕ'};
 
@@ -1784,6 +2108,216 @@ function renderAdminCardsList() {
       </div>
     </div>
   `).join('');
+}
+
+// ══════════════════════════════════════════
+// IMAGE UPLOAD HELPERS
+// ══════════════════════════════════════════
+function handleImageUpload(input, previewId, placeholderId, clearBtnId, hiddenId) {
+  const file = input.files[0];
+  if (!file) return;
+
+  // Check size — warn if >500KB (base64 inflates ~33%)
+  if (file.size > 800 * 1024) {
+    if (!confirm(`Файл ${(file.size/1024).toFixed(0)} КБ — это может замедлить загрузку. Продолжить?`)) {
+      input.value = '';
+      return;
+    }
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    const preview = document.getElementById(previewId);
+    const placeholder = document.getElementById(placeholderId);
+    const clearBtn = document.getElementById(clearBtnId);
+    const hidden = document.getElementById(hiddenId);
+
+    preview.src = dataUrl;
+    preview.classList.add('visible');
+    placeholder.style.display = 'none';
+    clearBtn.classList.add('visible');
+    hidden.value = dataUrl;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImage(previewId, placeholderId, clearBtnId, inputId, hiddenId) {
+  const preview = document.getElementById(previewId);
+  const placeholder = document.getElementById(placeholderId);
+  const clearBtn = document.getElementById(clearBtnId);
+  const input = document.getElementById(inputId);
+  const hidden = document.getElementById(hiddenId);
+
+  preview.src = '';
+  preview.classList.remove('visible');
+  placeholder.style.display = '';
+  clearBtn.classList.remove('visible');
+  input.value = '';
+  hidden.value = '';
+}
+
+function syncColorFromText(val) {
+  if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+    document.getElementById('partyColor').value = val;
+  }
+}
+
+// Sync color picker → text field
+document.getElementById('partyColor').addEventListener('input', function() {
+  document.getElementById('partyColorHex').value = this.value;
+});
+
+// ══════════════════════════════════════════
+// PARTY FORM
+// ══════════════════════════════════════════
+function clearPartyForm() {
+  document.getElementById('editingPartyId').value = '';
+  document.getElementById('partyName').value = '';
+  document.getElementById('partyTag').value = '';
+  document.getElementById('partyDesc').value = '';
+  document.getElementById('partySpectrum').value = 50;
+  document.getElementById('partySpectrumVal').textContent = '50';
+  document.getElementById('partyColor').value = '#9B30FF';
+  document.getElementById('partyColorHex').value = '#9B30FF';
+  document.getElementById('partyStatus').value = 'ruling';
+  clearImage('partyFlagPreview','partyFlagPlaceholder','partyFlagClear','partyFlagInput','partyFlagBase64');
+  clearImage('partySymbolPreview','partySymbolPlaceholder','partySymbolClear','partySymbolInput','partySymbolBase64');
+  document.getElementById('adminPartyFormTitle').textContent = '// НОВАЯ ПАРТИЯ';
+  document.getElementById('adminCancelPartyEditBtn').style.display = 'none';
+  document.getElementById('adminPartySaveMsg').style.display = 'none';
+}
+
+function cancelPartyEdit() { clearPartyForm(); }
+
+function editParty(id) {
+  const party = allParties.find(p => p.id === id);
+  if (!party) return;
+
+  document.getElementById('editingPartyId').value = party.id;
+  document.getElementById('partyName').value = party.name || '';
+  document.getElementById('partyTag').value = party.tag || '';
+  document.getElementById('partyDesc').value = party.description || '';
+  const spec = party.spectrum ?? 50;
+  document.getElementById('partySpectrum').value = spec;
+  document.getElementById('partySpectrumVal').textContent = spec;
+  const col = party.color || '#9B30FF';
+  document.getElementById('partyColor').value = col;
+  document.getElementById('partyColorHex').value = col;
+  document.getElementById('partyStatus').value = party.status || 'ruling';
+
+  // Load flag
+  if (party.flag_image) {
+    const prev = document.getElementById('partyFlagPreview');
+    prev.src = party.flag_image;
+    prev.classList.add('visible');
+    document.getElementById('partyFlagPlaceholder').style.display = 'none';
+    document.getElementById('partyFlagClear').classList.add('visible');
+    document.getElementById('partyFlagBase64').value = party.flag_image;
+  }
+
+  // Load symbol
+  if (party.symbol_image) {
+    const prev = document.getElementById('partySymbolPreview');
+    prev.src = party.symbol_image;
+    prev.classList.add('visible');
+    document.getElementById('partySymbolPlaceholder').style.display = 'none';
+    document.getElementById('partySymbolClear').classList.add('visible');
+    document.getElementById('partySymbolBase64').value = party.symbol_image;
+  }
+
+  document.getElementById('adminPartyFormTitle').textContent = '// РЕДАКТИРОВАНИЕ ПАРТИИ';
+  document.getElementById('adminCancelPartyEditBtn').style.display = 'inline-flex';
+  document.getElementById('partyFormWrap').scrollIntoView({behavior:'smooth'});
+}
+
+async function saveParty() {
+  const name = document.getElementById('partyName').value.trim();
+  const msgEl = document.getElementById('adminPartySaveMsg');
+
+  if (!name) {
+    msgEl.style.display = 'block'; msgEl.style.color = 'var(--c07)';
+    msgEl.textContent = '// ВВЕДИТЕ НАЗВАНИЕ ПАРТИИ';
+    return;
+  }
+  if (!adminToken) { doLogout(); return; }
+
+  const payload = {
+    name,
+    tag: document.getElementById('partyTag').value.trim() || null,
+    description: document.getElementById('partyDesc').value.trim() || null,
+    spectrum: parseInt(document.getElementById('partySpectrum').value) || 50,
+    color: document.getElementById('partyColor').value || '#9B30FF',
+    status: document.getElementById('partyStatus').value || 'ruling',
+    flag_image: document.getElementById('partyFlagBase64').value || null,
+    symbol_image: document.getElementById('partySymbolBase64').value || null,
+  };
+
+  const editId = document.getElementById('editingPartyId').value;
+  let r;
+  if (editId) {
+    r = await apiPut('/api/parties', {...payload, id: editId}, adminToken);
+  } else {
+    r = await apiPost('/api/parties', payload, adminToken);
+  }
+
+  if (r.ok) {
+    msgEl.style.display = 'block'; msgEl.style.color = 'var(--c02)';
+    msgEl.textContent = editId ? '// ПАРТИЯ ОБНОВЛЕНА ✓' : '// ПАРТИЯ СОЗДАНА ✓';
+    clearPartyForm();
+    await loadParties();
+    renderAdminPartiesList();
+  } else if (r.status === 401) {
+    doLogout();
+  } else {
+    const txt = await r.text().catch(()=>'');
+    msgEl.style.display = 'block'; msgEl.style.color = 'var(--c07)';
+    msgEl.textContent = '// ОШИБКА СОХРАНЕНИЯ' + (txt ? ': ' + txt.slice(0,60) : '');
+  }
+}
+
+async function deleteParty(id) {
+  if (!confirm('Удалить партию? Это действие необратимо.')) return;
+  if (!adminToken) { doLogout(); return; }
+  const r = await apiDelete('/api/parties', {id}, adminToken);
+  if (r.ok) {
+    await loadParties();
+    renderAdminPartiesList();
+  } else if (r.status === 401) {
+    doLogout();
+  }
+}
+
+function renderAdminPartiesList() {
+  const container = document.getElementById('adminCardsList');
+  document.getElementById('adminListLabel').textContent = 'Существующие партии';
+
+  if (allParties.length === 0) {
+    container.innerHTML = '<div class="admin-cards-empty">// НЕТ ПАРТИЙ — ДОБАВЬТЕ ПЕРВУЮ</div>';
+    return;
+  }
+
+  const statusLabels = {ruling:'ПРАВЯЩАЯ', opposition:'ОППОЗИЦИЯ', coalition:'КОАЛИЦИЯ', minor:'МАЛАЯ', inactive:'НЕАКТ.'};
+
+  container.innerHTML = allParties.map(party => {
+    const color = escHtml(party.color || '#9B30FF');
+    const thumb = party.flag_image
+      ? `<img class="admin-card-row-thumb" src="${party.flag_image}" alt="">`
+      : `<div style="width:48px;height:32px;background:var(--ink);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:7px;color:rgba(255,255,255,0.3);font-family:'Share Tech Mono',monospace">FLAG</span></div>`;
+    return `
+    <div class="admin-card-row">
+      <div class="admin-card-row-stripe" style="background:${color}"></div>
+      ${thumb}
+      <div class="admin-card-row-info">
+        <div class="admin-card-row-title">${escHtml(party.name)}</div>
+        <div class="admin-card-row-meta">${party.tag ? escHtml(party.tag) + ' · ' : ''}СПЕКТР: ${party.spectrum ?? 50} · ${statusLabels[party.status] || ''}</div>
+      </div>
+      <div class="admin-card-row-actions">
+        <button class="admin-btn admin-btn-secondary admin-btn" onclick="editParty('${party.id}')">ИЗМЕНИТЬ</button>
+        <button class="admin-btn admin-btn-danger admin-btn" onclick="deleteParty('${party.id}')">УДАЛИТЬ</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 // ══════════════════════════════════════════
@@ -1838,10 +2372,8 @@ function escHtml(str) {
   });
 })();
 
-// Init election filter
 currentElectionFilter = 'all';
 
-// Keyboard: escape closes modal/admin
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     if (document.getElementById('cardModalOverlay').classList.contains('active')) {
