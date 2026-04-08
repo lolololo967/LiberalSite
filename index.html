@@ -661,8 +661,6 @@ header::before {
 .parliament-svg-wrap {
   width: 100%; max-width: 480px; position: relative;
   margin: 0 auto;
-  background: var(--ink); border: 1px solid var(--ink);
-  padding: 20px 20px 12px;
 }
 .parliament-svg-wrap svg { width: 100%; height: auto; display: block; }
 .parliament-seat {
@@ -2890,7 +2888,7 @@ function renderParliamentView() {
 }
 
 function buildParliamentSVG(seats) {
-  const W = 440, H = 280;
+  const W = 440, H = 270;
   const cx = W / 2;
   const cy = H - 16; // baseline sits at bottom
 
