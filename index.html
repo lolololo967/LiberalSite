@@ -817,24 +817,46 @@ header::before {
 .admin-img-clear-btn.visible { display:inline-block; }
 .admin-img-clear-btn:hover { background:var(--c07); color:#fff; border-color:var(--c07); }
 
-/* Spectrum slider */
-.spectrum-slider-wrap { display:flex; flex-direction:column; gap:8px; }
-.spectrum-slider-labels { display:flex; justify-content:space-between; }
-.spectrum-slider-labels span {
-  font-family:'Share Tech Mono', monospace; font-size:7px; letter-spacing:0.12em;
-  text-transform:uppercase; color:var(--ink2); opacity:0.5;
+/* Political Compass */
+.compass-wrap { display:flex; flex-direction:column; align-items:center; gap:6px; user-select:none; }
+.compass-axis-label {
+  font-family:'Share Tech Mono',monospace; font-size:7px; letter-spacing:0.22em;
+  text-transform:uppercase; color:var(--ink2); opacity:0.55;
 }
-.admin-range {
-  -webkit-appearance:none; width:100%; height:3px;
-  background:linear-gradient(to right, #FF1744 0%, #9B30FF 50%, #0057FF 100%);
-  outline:none; 
+.compass-row { display:flex; align-items:center; gap:10px; }
+.compass-side-label {
+  font-family:'Share Tech Mono',monospace; font-size:7px; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--ink2); opacity:0.55;
+  writing-mode:vertical-rl; white-space:nowrap;
 }
-.admin-range::-webkit-slider-thumb {
-  -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
-  background:var(--ink); border:3px solid var(--white); box-shadow:0 0 0 1px var(--ink);
-  
+.compass-side-label.right { transform:rotate(180deg); }
+.compass-grid {
+  width:200px; height:200px; border:1px solid var(--ink);
+  position:relative; overflow:hidden;
+  background: conic-gradient(from 0deg at 50% 50%,
+    rgba(255,23,68,0.07) 0deg 90deg,
+    rgba(0,87,255,0.07) 90deg 180deg,
+    rgba(0,87,255,0.05) 180deg 270deg,
+    rgba(255,23,68,0.05) 270deg 360deg);
+  cursor:crosshair;
 }
-.spectrum-val { font-family:'Share Tech Mono', monospace; font-size:8px; letter-spacing:0.2em; color:var(--ink2); opacity:0.55; }
+.compass-line-h { position:absolute; left:0; right:0; top:50%; height:1px; background:var(--ink); opacity:0.15; transform:translateY(-50%); }
+.compass-line-v { position:absolute; top:0; bottom:0; left:50%; width:1px; background:var(--ink); opacity:0.15; transform:translateX(-50%); }
+.compass-q-labels { position:absolute; inset:0; pointer-events:none; }
+.compass-q-label {
+  position:absolute; font-family:'Share Tech Mono',monospace; font-size:6px;
+  letter-spacing:0.1em; text-transform:uppercase; opacity:0.25;
+}
+.compass-dot {
+  position:absolute; width:12px; height:12px; border-radius:50%;
+  background:var(--ink); border:2px solid var(--white); box-shadow:0 0 0 1.5px var(--ink);
+  transform:translate(-50%,-50%); left:50%; top:50%; pointer-events:none;
+  transition:left 0.08s ease, top 0.08s ease;
+}
+.compass-val-display {
+  font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:0.18em;
+  color:var(--ink2); opacity:0.55;
+}
 
 /* Options builder */
 .admin-options-list { display:flex; flex-direction:column; gap:12px; margin-bottom:12px; }
@@ -1378,18 +1400,32 @@ header::before {
             <textarea class="admin-textarea" id="partyDesc" placeholder="Краткое описание партии, её позиции и идеологии..." style="min-height:72px"></textarea>
           </div>
 
-          <!-- Spectrum slider -->
+          <!-- Political Compass -->
           <div class="admin-field">
-            <div class="admin-field-label">Политический спектр (0 = крайне левые, 100 = крайне правые)</div>
-            <div class="spectrum-slider-wrap">
-              <div class="spectrum-slider-labels">
-                <span>◀ Левые</span>
-                <span>Центр</span>
-                <span>Правые ▶</span>
+            <div class="admin-field-label">Политический компас</div>
+            <div class="compass-wrap">
+              <div class="compass-axis-label">ЛИБЕРТАРИЗМ</div>
+              <div class="compass-row">
+                <div class="compass-side-label">ЛЕВЫЕ</div>
+                <div class="compass-grid" id="partyCompass">
+                  <div class="compass-line-h"></div>
+                  <div class="compass-line-v"></div>
+                  <div class="compass-q-labels">
+                    <span class="compass-q-label" style="top:6px;left:6px">ЛИБ-ЛЕВ</span>
+                    <span class="compass-q-label" style="top:6px;right:6px">ЛИБ-ПРАВ</span>
+                    <span class="compass-q-label" style="bottom:6px;left:6px">АВТ-ЛЕВ</span>
+                    <span class="compass-q-label" style="bottom:6px;right:6px">АВТ-ПРАВ</span>
+                  </div>
+                  <div class="compass-dot" id="compassDot"></div>
+                </div>
+                <div class="compass-side-label right">ПРАВЫЕ</div>
               </div>
-              <input type="range" class="admin-range" id="partySpectrum" min="0" max="100" value="50"
-                oninput="document.getElementById('partySpectrumVal').textContent = this.value">
-              <div class="spectrum-val">Значение: <span id="partySpectrumVal">50</span></div>
+              <div class="compass-axis-label">АВТОРИТАРИЗМ</div>
+              <div class="compass-val-display">
+                Эконом: <span id="compassXVal">0</span> · Социал: <span id="compassYVal">0</span>
+              </div>
+              <input type="hidden" id="partyCompassX" value="0">
+              <input type="hidden" id="partyCompassY" value="0">
             </div>
           </div>
 
@@ -2448,8 +2484,7 @@ function clearPartyForm() {
   document.getElementById('partyName').value = '';
   document.getElementById('partyTag').value = '';
   document.getElementById('partyDesc').value = '';
-  document.getElementById('partySpectrum').value = 50;
-  document.getElementById('partySpectrumVal').textContent = '50';
+  setCompassValues(0, 0);
   document.getElementById('partyColor').value = '#9B30FF';
   document.getElementById('partyColorHex').value = '#9B30FF';
   document.getElementById('partyStatus').value = 'ruling';
@@ -2470,9 +2505,9 @@ function editParty(id) {
   document.getElementById('partyName').value = party.name || '';
   document.getElementById('partyTag').value = party.tag || '';
   document.getElementById('partyDesc').value = party.description || '';
-  const spec = party.spectrum ?? 50;
-  document.getElementById('partySpectrum').value = spec;
-  document.getElementById('partySpectrumVal').textContent = spec;
+  const cx = party.compass_x ?? 0;
+  const cy = party.compass_y ?? 0;
+  setCompassValues(cx, cy);
   const col = party.color || '#9B30FF';
   document.getElementById('partyColor').value = col;
   document.getElementById('partyColorHex').value = col;
@@ -2518,7 +2553,8 @@ async function saveParty() {
     name,
     tag: document.getElementById('partyTag').value.trim() || null,
     description: document.getElementById('partyDesc').value.trim() || null,
-    spectrum: parseInt(document.getElementById('partySpectrum').value) || 50,
+    compass_x: parseInt(document.getElementById('partyCompassX').value) || 0,
+    compass_y: parseInt(document.getElementById('partyCompassY').value) || 0,
     color: document.getElementById('partyColor').value || '#9B30FF',
     status: document.getElementById('partyStatus').value || 'ruling',
     flag_image: document.getElementById('partyFlagBase64').value || null,
@@ -2582,7 +2618,7 @@ function renderAdminPartiesList() {
       ${thumb}
       <div class="admin-card-row-info">
         <div class="admin-card-row-title">${escHtml(party.name)}</div>
-        <div class="admin-card-row-meta">${party.tag ? escHtml(party.tag) + ' · ' : ''}СПЕКТР: ${party.spectrum ?? 50} · ${statusLabels[party.status] || ''}</div>
+        <div class="admin-card-row-meta">${party.tag ? escHtml(party.tag) + ' · ' : ''}КОМПАС: (${party.compass_x ?? 0}, ${party.compass_y ?? 0}) · ${statusLabels[party.status] || ''}</div>
       </div>
       <div class="admin-card-row-actions">
         <button class="admin-btn admin-btn-secondary admin-btn" onclick="editParty('${party.id}')">ИЗМЕНИТЬ</button>
@@ -2646,6 +2682,43 @@ function escHtml(str) {
 
 currentElectionFilter = 'all';
 
+// ══════════════════════════════════════════
+// POLITICAL COMPASS WIDGET
+// ══════════════════════════════════════════
+function setCompassValues(cx, cy) { // cx, cy: -100..100
+  cx = Math.max(-100, Math.min(100, Math.round(Number(cx) || 0)));
+  cy = Math.max(-100, Math.min(100, Math.round(Number(cy) || 0)));
+  const pxPct = ((cx + 100) / 200) * 100;
+  const pyPct = ((-cy + 100) / 200) * 100;
+  const dot = document.getElementById('compassDot');
+  if (dot) { dot.style.left = pxPct + '%'; dot.style.top = pyPct + '%'; }
+  document.getElementById('partyCompassX').value = cx;
+  document.getElementById('partyCompassY').value = cy;
+  document.getElementById('compassXVal').textContent = cx;
+  document.getElementById('compassYVal').textContent = cy;
+}
+
+(function initCompass() {
+  const grid = document.getElementById('partyCompass');
+  if (!grid) return;
+  let dragging = false;
+
+  function applyPos(e) {
+    const rect = grid.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const rx = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const ry = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+    setCompassValues((rx * 200) - 100, -((ry * 200) - 100));
+  }
+
+  grid.addEventListener('mousedown', e => { dragging = true; applyPos(e); });
+  document.addEventListener('mousemove', e => { if (dragging) applyPos(e); });
+  document.addEventListener('mouseup', () => dragging = false);
+  grid.addEventListener('touchstart', e => { e.preventDefault(); applyPos(e); }, {passive:false});
+  grid.addEventListener('touchmove', e => { e.preventDefault(); applyPos(e); }, {passive:false});
+})();
+
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     if (document.getElementById('partyModalOverlay').classList.contains('active')) {
@@ -2666,7 +2739,7 @@ document.addEventListener('keydown', e => {
     cursor: none;
   }
 
- .cursor-large {
+  .cursor-large {
   position: fixed;
   top: 0;
   left: 0;
@@ -2675,7 +2748,6 @@ document.addEventListener('keydown', e => {
   pointer-events: none;
   z-index: 10000;
   mix-blend-mode: difference;
-  transition: width 0.15s ease, height 0.15s ease;
 }
 
 .cursor-large::before,
@@ -2683,9 +2755,9 @@ document.addEventListener('keydown', e => {
   content: '';
   position: absolute;
   background: white;
-  transition: width 0.15s ease, height 0.15s ease, left 0.15s ease, top 0.15s ease;
 }
 
+/* горизонтальная линия */
 .cursor-large::before {
   width: 20px;
   height: 1.5px;
@@ -2694,6 +2766,7 @@ document.addEventListener('keydown', e => {
   transform: translateY(-50%);
 }
 
+/* вертикальная линия */
 .cursor-large::after {
   width: 1.5px;
   height: 20px;
@@ -2703,13 +2776,11 @@ document.addEventListener('keydown', e => {
 }
 
 .cursor-large.hover::before {
-  width: 30px;
-  left: -5px;
+  width: 28px;
 }
 
 .cursor-large.hover::after {
-  height: 30px;
-  top: -5px;
+  height: 28px;
 }
 </style>
 
