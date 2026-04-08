@@ -2888,55 +2888,47 @@ function renderParliamentView() {
 }
 
 function buildParliamentSVG(seats) {
-  const S = 22;       // seat square size px
-  const rowRadGap = 10; // radial gap between rows
+  const W = 1100, H = 460;
+  const cx = W / 2;
+  const cy = H - 20; // baseline sits at bottom
+
+  const S = 24;       // seat square size px
   const total = seats.length;
 
-  // Number of rows: scale with seat count
-  const numRows = total <= 6 ? 1 : total <= 30 ? 2 : total <= 60 ? 3 : 4;
-  const outerCount = Math.ceil(total / numRows);
+  // Split into 2 rows: outer gets ceil(total/2), inner gets floor(total/2)
+  const outerCount = Math.ceil(total / 2);
+  const innerCount = total - outerCount;
 
-  // Radius: size outer arc so seats have ~8px gap between them
-  // Arc length of semicircle = π * R; each seat needs (S + 8) px of arc
-  const outerR = Math.max(Math.ceil(outerCount * (S + 8) / Math.PI), 80);
+  // Radii — sized so outer row fits inside the viewBox with padding
+  const outerR = (W / 2) - S - 20;  // leaves ~20px margin each side
+  const innerR = outerR - S - 14;   // gap between rows
 
-  // ViewBox sized to fit the semicircle
-  const pad = S + 24;
-  const W = Math.round(2 * (outerR + pad));
-  const H = Math.round(outerR + S + 50);
-  const cx = W / 2;
-  const cy = H - 16; // baseline y
+  // Angular margin: keep seats from overlapping at the edges (half seat arc)
+  // Minimum margin in radians so seat corner doesn't go past x=0 or x=W
+  const edgeMargin = Math.asin((S / 2 + 4) / outerR);
 
-  // Angular margin so edge seats don't clip the viewBox border
-  const edgeMargin = Math.asin(Math.min((S / 2 + 4) / outerR, 0.98));
-  const startAngle = Math.PI - edgeMargin; // leftmost (~170°)
-  const endAngle   = edgeMargin;           // rightmost (~10°)
+  const startAngle = Math.PI - edgeMargin;  // leftmost  (≈ 170°)
+  const endAngle   = edgeMargin;            // rightmost (≈ 10°)
 
-  // Evenly distribute count seats across the full arc for radius r
+  // Evenly distribute count seats between startAngle and endAngle
   function distribute(count, r) {
     if (count === 0) return [];
-    if (count === 1) return [{ x: cx + r * Math.cos(Math.PI / 2), y: cy - r * Math.sin(Math.PI / 2) }];
+    if (count === 1) {
+      const a = Math.PI / 2; // single seat: top centre
+      return [{ x: cx + r * Math.cos(a), y: cy - r * Math.sin(a) }];
+    }
     return Array.from({ length: count }, (_, i) => {
-      const t = i / (count - 1);
-      const angle = startAngle - t * (startAngle - endAngle);
+      const t = i / (count - 1);                        // 0 → 1
+      const angle = startAngle - t * (startAngle - endAngle); // π→0
       return { x: cx + r * Math.cos(angle), y: cy - r * Math.sin(angle) };
     });
   }
 
-  // Assign seats to rows
-  const rowConfigs = [];
-  let assigned = 0;
-  for (let row = 0; row < numRows; row++) {
-    const remaining = total - assigned;
-    const rowsLeft = numRows - row;
-    const count = row === numRows - 1 ? remaining : Math.ceil(remaining / rowsLeft);
-    const r = outerR - row * (S + rowRadGap);
-    rowConfigs.push({ r, count, startIdx: assigned });
-    assigned += count;
-  }
+  const outerPos = distribute(outerCount, outerR);
+  const innerPos = distribute(innerCount, innerR);
 
-  // Arc guide lines (one per row)
-  const arcLines = rowConfigs.map(({ r }) => {
+  // Arc guide lines
+  const arcLines = [innerR, outerR].map(r => {
     const x1 = (cx + r * Math.cos(startAngle)).toFixed(1);
     const y1 = (cy - r * Math.sin(startAngle)).toFixed(1);
     const x2 = (cx + r * Math.cos(endAngle)).toFixed(1);
@@ -2945,41 +2937,42 @@ function buildParliamentSVG(seats) {
   }).join('');
 
   // Baseline
-  const baseline = `<line x1="16" y1="${cy}" x2="${W - 16}" y2="${cy}" stroke="rgba(10,12,16,0.3)" stroke-width="2"/>`;
+  const baseline = `<line x1="20" y1="${cy}" x2="${W - 20}" y2="${cy}" stroke="rgba(10,12,16,0.3)" stroke-width="2"/>`;
 
-  // Seat elements
+  // Seats: outer rendered first (behind), inner on top
+  const allOrders = [
+    ...Array.from({ length: outerCount }, (_, i) => ({ pos: outerPos[i], seatIdx: i })),
+    ...Array.from({ length: innerCount }, (_, i) => ({ pos: innerPos[i], seatIdx: outerCount + i })),
+  ];
+
   const defs = [];
-  const seatElems = rowConfigs.flatMap(({ r, count, startIdx }) => {
-    const positions = distribute(count, r);
-    return positions.map((pos, j) => {
-      const seatIdx = startIdx + j;
-      const seat = seats[seatIdx];
-      if (!seat || !pos) return '';
-      const party = allParties.find(p => String(p.id) === String(seat.party_id));
-      const color = party ? escHtml(party.color || '#9B30FF') : '#D0D4DC';
-      const hasFlag = party && party.flag_image;
-      const cls = seat.member_name ? 'occupied' : 'empty';
-      const rx = (pos.x - S / 2).toFixed(1);
-      const ry = (pos.y - S / 2).toFixed(1);
-      const clipId = `pclip_${seatIdx}`;
+  const seatElems = allOrders.map(({ pos, seatIdx }) => {
+    const seat = seats[seatIdx];
+    if (!seat || !pos) return '';
+    const party = allParties.find(p => String(p.id) === String(seat.party_id));
+    const color = party ? escHtml(party.color || '#9B30FF') : '#D0D4DC';
+    const hasFlag = party && party.flag_image;
+    const cls = seat.member_name ? 'occupied' : 'empty';
+    const rx = (pos.x - S / 2).toFixed(1);
+    const ry = (pos.y - S / 2).toFixed(1);
+    const clipId = `pclip_${seatIdx}`;
 
-      if (hasFlag) {
-        defs.push(`<clipPath id="${clipId}"><rect x="${rx}" y="${ry}" width="${S}" height="${S}" rx="2"/></clipPath>`);
-      }
+    if (hasFlag) {
+      defs.push(`<clipPath id="${clipId}"><rect x="${rx}" y="${ry}" width="${S}" height="${S}" rx="2"/></clipPath>`);
+    }
 
-      const flagImg = hasFlag
-        ? `<image href="${party.flag_image}" x="${rx}" y="${ry}" width="${S}" height="${S}" clip-path="url(#${clipId})" preserveAspectRatio="xMidYMid slice"/>`
-        : '';
+    const flagImg = hasFlag
+      ? `<image href="${party.flag_image}" x="${rx}" y="${ry}" width="${S}" height="${S}" clip-path="url(#${clipId})" preserveAspectRatio="xMidYMid slice"/>`
+      : '';
 
-      const numLabel = cls === 'empty'
-        ? `<text x="${pos.x.toFixed(1)}" y="${(pos.y + 4).toFixed(1)}" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="7" fill="rgba(10,12,16,0.28)">${seatIdx + 1}</text>`
-        : '';
+    const numLabel = cls === 'empty'
+      ? `<text x="${pos.x.toFixed(1)}" y="${(pos.y + 4).toFixed(1)}" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="7" fill="rgba(10,12,16,0.28)">${seatIdx + 1}</text>`
+      : '';
 
-      return `<g class="parliament-seat ${cls}" data-idx="${seatIdx}" data-name="${escHtml(seat.member_name || '')}" data-party="${escHtml(party ? party.name : '')}">
+    return `<g class="parliament-seat ${cls}" data-idx="${seatIdx}" data-name="${escHtml(seat.member_name || '')}" data-party="${escHtml(party ? party.name : '')}">
       <rect class="parliament-seat-rect" x="${rx}" y="${ry}" width="${S}" height="${S}" rx="2" fill="${cls === 'occupied' ? color : '#D0D4DC'}"/>
       ${flagImg}${numLabel}
     </g>`;
-    });
   }).join('');
 
   const defsBlock = defs.length ? `<defs>${defs.join('')}</defs>` : '';
@@ -2990,7 +2983,7 @@ function buildParliamentSVG(seats) {
   ${arcLines}
   ${baseline}
   ${seatElems}
-  <text x="${cx}" y="18" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="8" fill="rgba(10,12,16,0.15)" letter-spacing="4">ПАРЛАМЕНТ · ${total} МЕСТ</text>
+  <text x="${cx}" y="22" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="8" fill="rgba(10,12,16,0.15)" letter-spacing="4">ПАРЛАМЕНТ · ${total} МЕСТ</text>
 </svg>`;
 }
 
