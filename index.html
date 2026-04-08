@@ -2939,10 +2939,22 @@ function buildParliamentSVG(seats) {
   // Baseline
   const baseline = `<line x1="10" y1="${cy}" x2="${W - 10}" y2="${cy}" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>`;
 
-  // Seats: outer rendered first (behind), inner on top
+  // Interleave: seat 0→outer, seat 1→inner, seat 2→outer, seat 3→inner, …
+  // Outer always has 1 more, overflow (when inner full) goes to outer.
+  const outerSeatIdxs = [];
+  const innerSeatIdxs = [];
+  for (let i = 0; i < total; i++) {
+    if (innerSeatIdxs.length < innerCount && i % 2 === 1) {
+      innerSeatIdxs.push(i);
+    } else {
+      outerSeatIdxs.push(i);
+    }
+  }
+
+  // Render outer first (behind), inner on top — preserves correct z-order
   const allOrders = [
-    ...Array.from({ length: outerCount }, (_, i) => ({ pos: outerPos[i], seatIdx: i })),
-    ...Array.from({ length: innerCount }, (_, i) => ({ pos: innerPos[i], seatIdx: outerCount + i })),
+    ...outerSeatIdxs.map((seatIdx, j) => ({ pos: outerPos[j], seatIdx })),
+    ...innerSeatIdxs.map((seatIdx, j) => ({ pos: innerPos[j], seatIdx })),
   ];
 
   const defs = [];
