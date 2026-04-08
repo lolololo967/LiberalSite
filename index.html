@@ -2895,13 +2895,13 @@ function buildParliamentSVG(seats) {
   const S = 24;       // seat square size px
   const total = seats.length;
 
-  // Split into 2 rows: outer gets ceil(total/2), inner gets floor(total/2)
-  const outerCount = Math.ceil(total / 2);
-  const innerCount = total - outerCount;
+  // Outer ring always has 1 more seat than inner ring
+  const innerCount = Math.ceil(total / 2) - 1;
+  const outerCount = total - innerCount;
 
   // Radii — sized so outer row fits inside the viewBox with padding
   const outerR = (W / 2) - S - 16;  // leaves ~16px margin each side
-  const innerR = outerR - S - 10;   // gap between rows
+  const innerR = outerR - S - 26;   // larger gap → inner arc noticeably smaller
 
   // Angular margin: keep seats from overlapping at the edges (half seat arc)
   // Minimum margin in radians so seat corner doesn't go past x=0 or x=W
@@ -2958,7 +2958,7 @@ function buildParliamentSVG(seats) {
     const clipId = `pclip_${seatIdx}`;
 
     if (hasFlag) {
-      defs.push(`<clipPath id="${clipId}"><rect x="${rx}" y="${ry}" width="${S}" height="${S}" rx="2"/></clipPath>`);
+      defs.push(`<clipPath id="${clipId}"><rect x="${rx}" y="${ry}" width="${S}" height="${S}"/></clipPath>`);
     }
 
     const flagImg = hasFlag
@@ -2970,7 +2970,7 @@ function buildParliamentSVG(seats) {
       : '';
 
     return `<g class="parliament-seat ${cls}" data-idx="${seatIdx}" data-name="${escHtml(seat.member_name || '')}" data-party="${escHtml(party ? party.name : '')}">
-      <rect class="parliament-seat-rect" x="${rx}" y="${ry}" width="${S}" height="${S}" rx="2" fill="${cls === 'occupied' ? color : '#D0D4DC'}"/>
+      <rect class="parliament-seat-rect" x="${rx}" y="${ry}" width="${S}" height="${S}" fill="${cls === 'occupied' ? color : '#D0D4DC'}"/>
       ${flagImg}${numLabel}
     </g>`;
   }).join('');
