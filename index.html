@@ -2922,32 +2922,11 @@ function buildParliamentSVG(seats) {
   const outerR = (W / 2) - S - 14;
   const innerR = outerR - S - 42; // large gap → inner arc visibly smaller
 
-  // ── Step 4: Per-ring distribution with independent edge margins ──────────────
-  // Each ring's edge margin is based on its own radius so both rings'
-  // endpoint seats sit at the same y-coordinate (no height mismatch).
-  function makeDistrib(r) {
-    const margin = Math.asin((S / 2 + 3) / r);
-    // Right → Left direction (seat 0 on right, last seat on left)
-    const saRight = margin;            // rightmost angle (≈ 10°)
-    const saLeft  = Math.PI - margin;  // leftmost angle  (≈ 170°)
-    return function(count) {
-      if (count === 0) return [];
-      if (count === 1) return [{ x: cx, y: cy - r }];
-      return Array.from({ length: count }, (_, i) => {
-        const t = i / (count - 1);                      // 0→1
-        const angle = saRight + t * (saLeft - saRight); // right→left
-        return { x: cx + r * Math.cos(angle), y: cy - r * Math.sin(angle) };
-      });
-    };
-  }
-  const outerPos = makeDistrib(outerR)(outerCount);
-  const innerPos = makeDistrib(innerR)(innerCount);
-
-  // ── Step 5: Interleaved seat→position assignment ─────────────────────────────
-  // Seat 0 → outer[0], seat 1 → inner[0], seat 2 → outer[1], …
-  // When inner is full (outer has 1 extra), overflow goes to outer.
-  const outerSeatIdxs = [];
-  const innerSeatIdxs = [];
+  // ── Step 4: Interleaved seat→column assignment ───────────────────────────────
+  // Seat 0 → outer col 0, seat 1 → inner col 0, seat 2 → outer col 1, …
+  // When inner is full (outer has 1 extra), overflow stays in outer.
+  const outerSeatIdxs = []; // outerSeatIdxs[col] = orderedSeats index
+  const innerSeatIdxs = []; // innerSeatIdxs[col] = orderedSeats index
   for (let i = 0; i < total; i++) {
     if (innerSeatIdxs.length < innerCount && i % 2 === 1) {
       innerSeatIdxs.push(i);
@@ -2955,6 +2934,29 @@ function buildParliamentSVG(seats) {
       outerSeatIdxs.push(i);
     }
   }
+
+  // ── Step 5: Angular positions — LEFT to RIGHT, column-based ──────────────────
+  // Outer ring defines the column angles. Inner ring uses the SAME angles as
+  // its paired outer column, so inner[j] is always directly "behind" outer[j].
+  // This guarantees that both seats of the same party column are visually adjacent.
+  const margin = Math.asin((S / 2 + 3) / outerR); // edge clearance
+  function colAngle(col) {
+    // col 0 → leftmost (π − margin), col outerCount−1 → rightmost (margin)
+    if (outerCount === 1) return Math.PI / 2;
+    const t = col / (outerCount - 1);
+    return (Math.PI - margin) - t * (Math.PI - 2 * margin);
+  }
+
+  const outerPos = outerSeatIdxs.map((_, col) => {
+    const a = colAngle(col);
+    return { x: cx + outerR * Math.cos(a), y: cy - outerR * Math.sin(a) };
+  });
+
+  // Inner seat at column j uses the SAME angle as outer column j
+  const innerPos = innerSeatIdxs.map((_, col) => {
+    const a = colAngle(col); // ← same angle as outer[col], not independent!
+    return { x: cx + innerR * Math.cos(a), y: cy - innerR * Math.sin(a) };
+  });
 
   // ── Step 6: Build seat SVG elements ─────────────────────────────────────────
   const defs = [];
@@ -2990,8 +2992,8 @@ function buildParliamentSVG(seats) {
   }
 
   // Render outer first (behind), inner on top for correct z-order
-  const outerElems = outerSeatIdxs.map((idx, j) => renderSeat(idx, outerPos[j])).join('');
-  const innerElems = innerSeatIdxs.map((idx, j) => renderSeat(idx, innerPos[j])).join('');
+  const outerElems = outerSeatIdxs.map((idx, col) => renderSeat(idx, outerPos[col])).join('');
+  const innerElems = innerSeatIdxs.map((idx, col) => renderSeat(idx, innerPos[col])).join('');
   const defsBlock = defs.length ? `<defs>${defs.join('')}</defs>` : '';
 
   // Thin visible baseline, no arc guide lines
