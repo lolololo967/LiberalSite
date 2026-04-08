@@ -653,6 +653,106 @@ header::before {
 .info-corner-num { position:absolute; bottom:20px; right:20px; font-family:'Barlow Condensed', sans-serif; font-size:52px; font-weight:900; color:var(--c11); opacity:0.07; line-height:1; pointer-events:none; transition:opacity 0.2s; }
 .info-cell:hover .info-corner-num { opacity:0.14; }
 
+/* ══ PARLIAMENT VIEW ══ */
+.parliament-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 40px;
+  padding: 0 0 40px;
+}
+.parliament-svg-wrap {
+  width: 100%; max-width: 860px; position: relative;
+}
+.parliament-svg-wrap svg { width: 100%; height: auto; display: block; }
+.parliament-seat {
+  cursor: pointer; transition: transform 0.2s;
+  transform-origin: center;
+}
+.parliament-seat:hover { filter: brightness(1.25); transform: scale(1.18); }
+.parliament-seat-circle {
+  stroke: var(--ink); stroke-width: 1.5; transition: stroke-width 0.2s;
+}
+.parliament-seat.empty .parliament-seat-circle {
+  fill: #EAECF0; stroke: rgba(10,12,16,0.18);
+}
+.parliament-seat.occupied .parliament-seat-circle {
+  stroke-width: 2.5;
+}
+.parliament-seat-flag {
+  clip-path: circle(10px at 10px 10px);
+}
+.parliament-seat-tooltip {
+  position: absolute; pointer-events: none;
+  background: var(--ink); color: #fff;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 8px 12px; border: 1px solid rgba(255,255,255,0.12);
+  white-space: nowrap; z-index: 50;
+  opacity: 0; transition: opacity 0.15s;
+}
+.parliament-seat-tooltip.visible { opacity: 1; }
+.parliament-legend {
+  width: 100%; max-width: 860px;
+  border: 1px solid var(--ink);
+}
+.parliament-legend-head {
+  padding: 14px 24px; border-bottom: 2px solid var(--ink);
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--ink);
+}
+.parliament-legend-title {
+  font-family: 'Share Tech Mono', monospace; font-size: 9px;
+  letter-spacing: 0.3em; text-transform: uppercase; color: #fff;
+}
+.parliament-legend-count {
+  font-family: 'Barlow Condensed', monospace; font-size: 22px;
+  font-weight: 900; color: var(--c03); opacity: 0.7;
+}
+.parliament-seats-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0;
+}
+.parliament-seat-row {
+  display: flex; align-items: center; gap: 0;
+  border-right: 1px solid var(--line2); border-bottom: 1px solid var(--line2);
+  transition: background 0.2s; position: relative; overflow: hidden;
+}
+.parliament-seat-row:hover { background: var(--off); }
+.parliament-seat-row-num {
+  width: 48px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px 0; border-right: 1px solid var(--line2);
+  font-family: 'Share Tech Mono', monospace; font-size: 9px;
+  letter-spacing: 0.1em; color: var(--ink2); opacity: 0.4;
+}
+.parliament-seat-row-flag {
+  width: 36px; height: 24px; flex-shrink: 0; margin: 0 12px;
+  border: 1px solid var(--line); overflow: hidden; background: var(--panel);
+  display: flex; align-items: center; justify-content: center;
+}
+.parliament-seat-row-flag img { width: 100%; height: 100%; object-fit: cover; }
+.parliament-seat-row-flag-empty {
+  font-family: 'Share Tech Mono', monospace; font-size: 6px;
+  letter-spacing: 0.1em; color: rgba(10,12,16,0.25);
+}
+.parliament-seat-row-info { flex: 1; padding: 14px 12px 14px 0; }
+.parliament-seat-row-name {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 16px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.parliament-seat-row-meta {
+  font-family: 'Share Tech Mono', monospace; font-size: 8px;
+  letter-spacing: 0.14em; color: var(--ink2); opacity: 0.5;
+  text-transform: uppercase; margin-top: 2px;
+}
+.parliament-seat-row-stripe {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+}
+.parliament-empty-msg {
+  padding: 48px 24px; text-align: center;
+  font-family: 'Share Tech Mono', monospace; font-size: 9px;
+  letter-spacing: 0.25em; color: var(--ink2); opacity: 0.4;
+  text-transform: uppercase;
+}
+
 /* ══ CORNER HUD ══ */
 .hud-corner { position:fixed; pointer-events:none; z-index:100; }
 .hud-tl { top:60px; left:0; width:60px; height:60px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); }
@@ -1122,15 +1222,15 @@ header::before {
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
-      <div class="cat-card" style="--card-color:var(--c03)" onclick="openCategory('voting')" tabindex="0">
+      <div class="cat-card" style="--card-color:var(--c03)" onclick="openCategory('parliament')" tabindex="0">
         <div class="corner-tl"></div><div class="corner-br"></div>
         <div class="cat-top">
           <div class="cat-num">03</div>
-          <div class="cat-icon-wrap"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          <div class="cat-icon-wrap"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/></svg></div>
         </div>
         <div class="cat-bottom">
-          <div class="cat-name">Голосования</div>
-          <div class="cat-status">Логи — Voting</div>
+          <div class="cat-name">Парламент</div>
+          <div class="cat-status">Parliament</div>
         </div>
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
@@ -1331,7 +1431,7 @@ header::before {
       <div class="admin-section-tabs">
         <button class="admin-tab-btn active" onclick="switchAdminTab('elections',this)">Выборы</button>
         <button class="admin-tab-btn" onclick="switchAdminTab('referendums',this)">Референдумы</button>
-        <button class="admin-tab-btn" onclick="switchAdminTab('voting',this)">Голосования</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab('parliament',this)">Парламент</button>
         <button class="admin-tab-btn" onclick="switchAdminTab('parties',this)">Партии</button>
       </div>
 
@@ -1521,6 +1621,40 @@ header::before {
         </div>
       </div>
 
+      <!-- ── PARLIAMENT FORM ── -->
+      <div class="admin-form-wrap" id="parliamentFormWrap" style="display:none">
+        <div class="admin-form-head">
+          <span class="admin-form-head-title" id="adminParliamentFormTitle">// НОВОЕ МЕСТО</span>
+          <button class="admin-btn-secondary admin-btn" id="adminCancelParliamentEditBtn" onclick="cancelParliamentEdit()" style="display:none">ОТМЕНИТЬ</button>
+        </div>
+        <div class="admin-form-body">
+          <input type="hidden" id="editingParliamentId">
+
+          <div class="admin-row admin-row-2">
+            <div class="admin-field">
+              <div class="admin-field-label">Имя депутата *</div>
+              <input type="text" class="admin-input" id="parliamentMemberName" placeholder="Имя участника">
+            </div>
+            <div class="admin-field">
+              <div class="admin-field-label">Партия</div>
+              <select class="admin-select" id="parliamentPartyId">
+                <option value="">— Без партии —</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="admin-field">
+            <div class="admin-field-label">Роль / должность</div>
+            <input type="text" class="admin-input" id="parliamentRole" placeholder="Напр: Спикер, Депутат...">
+          </div>
+
+          <div class="admin-form-actions">
+            <button class="admin-btn admin-btn-primary" onclick="saveParliamentSeat()">СОХРАНИТЬ МЕСТО</button>
+          </div>
+          <div id="adminParliamentSaveMsg" style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:0.15em;color:var(--c02);display:none;margin-top:8px;"></div>
+        </div>
+      </div>
+
       <!-- Cards / Parties list -->
       <div style="margin-bottom:12px">
         <div class="section-label" id="adminListLabel">Существующие карточки — Выборы</div>
@@ -1561,11 +1695,12 @@ header::before {
 const SECTION_COLORS = {
   elections: 'var(--c01)',
   referendums: 'var(--c02)',
-  voting: 'var(--c03)'
+  parliament: 'var(--c03)'
 };
 
 let allCards = [];
 let allParties = [];
+let allParliamentSeats = [];
 let currentSection = null;
 let currentElectionFilter = 'all';
 let currentPartyFilter = 'all';
@@ -1586,7 +1721,7 @@ dateEl.textContent = now.toLocaleDateString('ru-RU',{day:'2-digit',month:'long',
 const categories = {
   elections:    {title:'Выборы (логи)',     eyebrow:'Раздел 01 — Elections',   color:'var(--c01)'},
   referendums:  {title:'Референдумы (логи)',eyebrow:'Раздел 02 — Referendums', color:'var(--c02)'},
-  voting:       {title:'Голосования (логи)',eyebrow:'Раздел 03 — Voting',      color:'var(--c03)'},
+  parliament:   {title:'Парламент',         eyebrow:'Раздел 03 — Parliament',  color:'var(--c03)'},
   parties:      {title:'Партии',            eyebrow:'Раздел 04 — Parties',     color:'var(--c04)'},
   constitution: {title:'Конституция',       eyebrow:'Раздел 05 — Constitution',color:'var(--c05)'},
   laws:         {title:'Законы',            eyebrow:'Раздел 06 — Laws',        color:'var(--c06)'},
@@ -1654,8 +1789,18 @@ async function loadParties() {
   }
 }
 
+async function loadParliamentSeats() {
+  allParliamentSeats = await apiGet('/api/parliament');
+  if (!Array.isArray(allParliamentSeats)) allParliamentSeats = [];
+  if (currentSection === 'parliament') renderParliamentView();
+  if (document.getElementById('adminDashboard').style.display !== 'none' && adminCurrentTab === 'parliament') {
+    renderAdminParliamentList();
+  }
+}
+
 loadCards();
 loadParties();
+loadParliamentSeats();
 
 // ══════════════════════════════════════════
 // CARD SORTING
@@ -1886,6 +2031,7 @@ function buildNav(key) {
 
     referendums: '',
     voting: '',
+    parliament: '',
     parties: buildPartyFilterNav(),
 
     constitution: `<div class="nav-constitution">
@@ -1988,6 +2134,8 @@ function openCategory(key) {
   if (['elections','referendums','voting'].includes(key)) {
     if (key === 'elections') currentElectionFilter = 'all';
     renderInnerCards(key);
+  } else if (key === 'parliament') {
+    renderParliamentView();
   } else if (key === 'parties') {
     currentPartyFilter = 'all';
     buildNav(key); // rebuild after resetting filter so counts are correct
@@ -2242,8 +2390,9 @@ function doLogout() {
 function showAdminDashboard() {
   document.getElementById('adminLoginPanel').style.display = 'none';
   document.getElementById('adminDashboard').style.display = 'block';
-  loadCards().then(() => { if (adminCurrentTab !== 'parties') renderAdminCardsList(); });
-  loadParties().then(() => { if (adminCurrentTab === 'parties') renderAdminPartiesList(); });
+  loadCards().then(() => { if (adminCurrentTab !== 'parties' && adminCurrentTab !== 'parliament') renderAdminCardsList(); });
+  loadParties().then(() => { if (adminCurrentTab === 'parties') renderAdminPartiesList(); populateParliamentPartySelect(); });
+  loadParliamentSeats().then(() => { if (adminCurrentTab === 'parliament') renderAdminParliamentList(); });
 }
 
 // ══════════════════════════════════════════
@@ -2255,19 +2404,25 @@ function switchAdminTab(section, btn) {
   btn.classList.add('active');
 
   const isParties = section === 'parties';
-  document.getElementById('cardFormWrap').style.display = isParties ? 'none' : 'block';
+  const isParliament = section === 'parliament';
+  document.getElementById('cardFormWrap').style.display = (!isParties && !isParliament) ? 'block' : 'none';
   document.getElementById('partyFormWrap').style.display = isParties ? 'block' : 'none';
+  document.getElementById('parliamentFormWrap').style.display = isParliament ? 'block' : 'none';
 
-  if (!isParties) {
-    const sectionNames = {elections:'Выборы', referendums:'Референдумы', voting:'Голосования'};
-    document.getElementById('adminListLabel').textContent = `Существующие карточки — ${sectionNames[section]}`;
+  if (!isParties && !isParliament) {
+    const sectionNames = {elections:'Выборы', referendums:'Референдумы'};
+    document.getElementById('adminListLabel').textContent = `Существующие карточки — ${sectionNames[section] || section}`;
     document.getElementById('electionCategoryField').style.display = section === 'elections' ? 'flex' : 'none';
     cancelEdit();
     renderAdminCardsList();
-  } else {
+  } else if (isParties) {
     document.getElementById('adminListLabel').textContent = 'Существующие партии';
     cancelPartyEdit();
     renderAdminPartiesList();
+  } else {
+    document.getElementById('adminListLabel').textContent = 'Места в парламенте';
+    cancelParliamentEdit();
+    renderAdminParliamentList();
   }
 }
 
@@ -2671,6 +2826,299 @@ function renderAdminPartiesList() {
       <div class="admin-card-row-actions">
         <button class="admin-btn admin-btn-secondary admin-btn" onclick="editParty('${party.id}')">ИЗМЕНИТЬ</button>
         <button class="admin-btn admin-btn-danger admin-btn" onclick="deleteParty('${party.id}')">УДАЛИТЬ</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════
+// PARLIAMENT VIEW
+// ══════════════════════════════════════════
+function renderParliamentView() {
+  const container = document.getElementById('innerCards');
+  if (!container) return;
+
+  const seats = allParliamentSeats;
+  const total = seats.length;
+
+  if (total === 0) {
+    container.innerHTML = `
+      <div class="parliament-wrap">
+        <div class="parliament-empty-msg">// ПАРЛАМЕНТ ПУСТ — МЕСТА ЕЩЁ НЕ ДОБАВЛЕНЫ</div>
+      </div>`;
+    return;
+  }
+
+  // Build semicircle SVG
+  const svgHtml = buildParliamentSVG(seats);
+
+  // Build legend grid
+  const legendRows = seats.map((seat, i) => {
+    const party = allParties.find(p => String(p.id) === String(seat.party_id));
+    const color = party ? escHtml(party.color || '#9B30FF') : '#EAECF0';
+    const flagHtml = party && party.flag_image
+      ? `<img src="${party.flag_image}" alt="">`
+      : `<div class="parliament-seat-row-flag-empty">—</div>`;
+    const partyName = party ? escHtml(party.name) : '—';
+    const role = seat.role ? escHtml(seat.role) : 'ДЕПУТАТ';
+    return `
+    <div class="parliament-seat-row">
+      <div class="parliament-seat-row-stripe" style="background:${color}"></div>
+      <div class="parliament-seat-row-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="parliament-seat-row-flag">${flagHtml}</div>
+      <div class="parliament-seat-row-info">
+        <div class="parliament-seat-row-name">${escHtml(seat.member_name)}</div>
+        <div class="parliament-seat-row-meta">${role} · ${partyName}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `
+  <div class="parliament-wrap">
+    <div class="parliament-svg-wrap" id="parliamentSvgWrap">
+      ${svgHtml}
+      <div class="parliament-seat-tooltip" id="parliamentTooltip"></div>
+    </div>
+    <div class="parliament-legend">
+      <div class="parliament-legend-head">
+        <span class="parliament-legend-title">// Состав парламента</span>
+        <span class="parliament-legend-count">${total}</span>
+      </div>
+      <div class="parliament-seats-grid">${legendRows}</div>
+    </div>
+  </div>`;
+
+  // Attach tooltip hover events
+  attachParliamentTooltips();
+}
+
+function buildParliamentSVG(seats) {
+  const W = 860, H = 440;
+  const cx = W / 2, cy = H - 30;
+
+  // Arrange seats in concentric arcs (semicircle)
+  // Standard parliament layout: rows from inside out
+  const total = seats.length;
+  const rows = Math.ceil(Math.min(total, 50) / 10);
+  const seatRadius = 14;
+  const innerR = 120;
+  const rowGap = seatRadius * 2.8;
+
+  let seatPositions = [];
+  let seatsLeft = total;
+  for (let row = 0; row < rows && seatsLeft > 0; row++) {
+    const r = innerR + row * rowGap;
+    const arcLen = Math.PI * r;
+    const maxInRow = Math.floor(arcLen / (seatRadius * 2.4));
+    const inRow = Math.min(seatsLeft, maxInRow, Math.ceil(total / rows));
+    const angleStep = Math.PI / (inRow + 1);
+    for (let s = 0; s < inRow; s++) {
+      const angle = Math.PI - (s + 1) * angleStep;
+      seatPositions.push({
+        x: cx + r * Math.cos(angle),
+        y: cy - r * Math.sin(angle),
+        seatIdx: total - seatsLeft + s
+      });
+    }
+    seatsLeft -= inRow;
+  }
+
+  // Speaker podium
+  const podium = `
+    <rect x="${cx-28}" y="${cy-18}" width="56" height="18" rx="2" fill="var(--ink)" opacity="0.9"/>
+    <text x="${cx}" y="${cy-6}" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="7" fill="#fff" letter-spacing="1" opacity="0.7">СПИКЕР</text>`;
+
+  // Arc background lines
+  const arcLines = Array.from({length: rows}, (_, i) => {
+    const r = innerR + i * rowGap;
+    return `<path d="M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}" fill="none" stroke="var(--line)" stroke-width="1" stroke-dasharray="4 4"/>`;
+  }).join('');
+
+  // Base line
+  const baseline = `<line x1="${cx - innerR - rowGap * rows}" y1="${cy}" x2="${cx + innerR + rowGap * rows}" y2="${cy}" stroke="var(--ink)" stroke-width="2" opacity="0.5"/>`;
+
+  // Seats
+  const seatElems = seatPositions.map(pos => {
+    const seat = seats[pos.seatIdx];
+    if (!seat) return '';
+    const party = allParties.find(p => String(p.id) === String(seat.party_id));
+    const color = party ? escHtml(party.color || '#9B30FF') : '#EAECF0';
+    const hasFlag = party && party.flag_image;
+    const cls = seat.member_name ? 'occupied' : 'empty';
+    const imgId = `psimg_${pos.seatIdx}`;
+
+    const defs = hasFlag ? `<defs><clipPath id="clip_${pos.seatIdx}"><circle cx="${pos.x.toFixed(1)}" cy="${pos.y.toFixed(1)}" r="${seatRadius - 1}"/></clipPath></defs>` : '';
+    const flagImg = hasFlag ? `<image href="${party.flag_image}" x="${(pos.x - seatRadius + 1).toFixed(1)}" y="${(pos.y - seatRadius + 1).toFixed(1)}" width="${(seatRadius - 1) * 2}" height="${(seatRadius - 1) * 2}" clip-path="url(#clip_${pos.seatIdx})" preserveAspectRatio="xMidYMid slice"/>` : '';
+
+    return `${defs}
+    <g class="parliament-seat ${cls}"
+       data-idx="${pos.seatIdx}"
+       data-name="${escHtml(seat.member_name || '')}"
+       data-party="${escHtml(party ? party.name : '')}"
+       data-role="${escHtml(seat.role || 'Депутат')}">
+      <circle class="parliament-seat-circle" cx="${pos.x.toFixed(1)}" cy="${pos.y.toFixed(1)}" r="${seatRadius}" fill="${cls === 'occupied' ? color : '#EAECF0'}"/>
+      ${flagImg}
+      ${cls === 'empty' ? `<text x="${pos.x.toFixed(1)}" y="${(pos.y + 3).toFixed(1)}" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="8" fill="rgba(10,12,16,0.25)">${pos.seatIdx + 1}</text>` : ''}
+    </g>`;
+  }).join('');
+
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="${W}" height="${H}" fill="var(--off)" rx="0"/>
+    <!-- Arc guides -->
+    ${arcLines}
+    <!-- Baseline -->
+    ${baseline}
+    <!-- Seats -->
+    ${seatElems}
+    <!-- Podium -->
+    ${podium}
+    <!-- Labels -->
+    <text x="30" y="${cy - 4}" font-family="Share Tech Mono,monospace" font-size="8" fill="rgba(10,12,16,0.3)" letter-spacing="1">ЛЕВЫЕ</text>
+    <text x="${W - 30}" y="${cy - 4}" text-anchor="end" font-family="Share Tech Mono,monospace" font-size="8" fill="rgba(10,12,16,0.3)" letter-spacing="1">ПРАВЫЕ</text>
+    <text x="${cx}" y="18" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="8" fill="rgba(10,12,16,0.2)" letter-spacing="3">ПАРЛАМЕНТ · ${total} МЕСТ</text>
+  </svg>`;
+}
+
+function attachParliamentTooltips() {
+  const wrap = document.getElementById('parliamentSvgWrap');
+  const tooltip = document.getElementById('parliamentTooltip');
+  if (!wrap || !tooltip) return;
+
+  wrap.querySelectorAll('.parliament-seat.occupied').forEach(seat => {
+    seat.addEventListener('mouseenter', (e) => {
+      const name = seat.dataset.name;
+      const party = seat.dataset.party;
+      const role = seat.dataset.role;
+      tooltip.textContent = `${name}${party ? ' · ' + party : ''}${role ? ' · ' + role : ''}`;
+      tooltip.classList.add('visible');
+    });
+    seat.addEventListener('mousemove', (e) => {
+      const rect = wrap.getBoundingClientRect();
+      let left = e.clientX - rect.left + 12;
+      let top = e.clientY - rect.top - 36;
+      tooltip.style.left = left + 'px';
+      tooltip.style.top = top + 'px';
+    });
+    seat.addEventListener('mouseleave', () => {
+      tooltip.classList.remove('visible');
+    });
+  });
+}
+
+// ══════════════════════════════════════════
+// PARLIAMENT ADMIN
+// ══════════════════════════════════════════
+function clearParliamentForm() {
+  document.getElementById('editingParliamentId').value = '';
+  document.getElementById('parliamentMemberName').value = '';
+  document.getElementById('parliamentRole').value = '';
+  document.getElementById('adminParliamentFormTitle').textContent = '// НОВОЕ МЕСТО';
+  document.getElementById('adminCancelParliamentEditBtn').style.display = 'none';
+  document.getElementById('adminParliamentSaveMsg').style.display = 'none';
+  populateParliamentPartySelect();
+}
+
+function cancelParliamentEdit() { clearParliamentForm(); }
+
+function populateParliamentPartySelect(selectedId) {
+  const sel = document.getElementById('parliamentPartyId');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— Без партии —</option>' +
+    allParties.map(p => `<option value="${escHtml(p.id)}"${String(p.id) === String(selectedId) ? ' selected' : ''}>${escHtml(p.name)}</option>`).join('');
+}
+
+function editParliamentSeat(id) {
+  const seat = allParliamentSeats.find(s => String(s.id) === String(id));
+  if (!seat) return;
+  document.getElementById('editingParliamentId').value = seat.id;
+  document.getElementById('parliamentMemberName').value = seat.member_name || '';
+  document.getElementById('parliamentRole').value = seat.role || '';
+  populateParliamentPartySelect(seat.party_id);
+  document.getElementById('adminParliamentFormTitle').textContent = '// РЕДАКТИРОВАНИЕ МЕСТА';
+  document.getElementById('adminCancelParliamentEditBtn').style.display = 'inline-flex';
+  document.getElementById('parliamentFormWrap').scrollIntoView({behavior:'smooth'});
+}
+
+async function saveParliamentSeat() {
+  const name = document.getElementById('parliamentMemberName').value.trim();
+  const msgEl = document.getElementById('adminParliamentSaveMsg');
+
+  if (!name) {
+    msgEl.style.display = 'block'; msgEl.style.color = 'var(--c07)';
+    msgEl.textContent = '// ВВЕДИТЕ ИМЯ ДЕПУТАТА';
+    return;
+  }
+  if (!adminToken) { doLogout(); return; }
+
+  const payload = {
+    member_name: name,
+    party_id: document.getElementById('parliamentPartyId').value || null,
+    role: document.getElementById('parliamentRole').value.trim() || null,
+  };
+
+  const editId = document.getElementById('editingParliamentId').value;
+  let r;
+  if (editId) {
+    r = await apiPut('/api/parliament', {...payload, id: editId}, adminToken);
+  } else {
+    r = await apiPost('/api/parliament', payload, adminToken);
+  }
+
+  if (r.ok) {
+    msgEl.style.display = 'block'; msgEl.style.color = 'var(--c02)';
+    msgEl.textContent = editId ? '// МЕСТО ОБНОВЛЕНО ✓' : '// МЕСТО ДОБАВЛЕНО ✓';
+    clearParliamentForm();
+    await loadParliamentSeats();
+    renderAdminParliamentList();
+  } else if (r.status === 401) {
+    doLogout();
+  } else {
+    const txt = await r.text().catch(()=>'');
+    msgEl.style.display = 'block'; msgEl.style.color = 'var(--c07)';
+    msgEl.textContent = '// ОШИБКА: ' + txt.slice(0, 60);
+  }
+}
+
+async function deleteParliamentSeat(id) {
+  if (!confirm('Удалить это место?')) return;
+  if (!adminToken) { doLogout(); return; }
+  const r = await apiDelete('/api/parliament', {id}, adminToken);
+  if (r.ok) {
+    await loadParliamentSeats();
+    renderAdminParliamentList();
+  } else if (r.status === 401) {
+    doLogout();
+  }
+}
+
+function renderAdminParliamentList() {
+  const container = document.getElementById('adminCardsList');
+  document.getElementById('adminListLabel').textContent = 'Места в парламенте';
+  populateParliamentPartySelect();
+
+  if (allParliamentSeats.length === 0) {
+    container.innerHTML = '<div class="admin-cards-empty">// ПАРЛАМЕНТ ПУСТ — ДОБАВЬТЕ ПЕРВОЕ МЕСТО</div>';
+    return;
+  }
+
+  container.innerHTML = allParliamentSeats.map((seat, i) => {
+    const party = allParties.find(p => String(p.id) === String(seat.party_id));
+    const color = party ? escHtml(party.color || '#9B30FF') : '#EAECF0';
+    const thumb = party && party.flag_image
+      ? `<img class="admin-card-row-thumb" src="${party.flag_image}" alt="" style="border:1px solid var(--line)">`
+      : `<div style="width:48px;height:32px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--panel)"><span style="font-size:7px;color:rgba(10,12,16,0.3);font-family:'Share Tech Mono',monospace">—</span></div>`;
+    return `
+    <div class="admin-card-row">
+      <div class="admin-card-row-stripe" style="background:${color}"></div>
+      ${thumb}
+      <div class="admin-card-row-info">
+        <div class="admin-card-row-title">${escHtml(seat.member_name)}</div>
+        <div class="admin-card-row-meta">МЕСТО ${i+1} · ${seat.role ? escHtml(seat.role) : 'ДЕПУТАТ'} · ${party ? escHtml(party.name) : 'БЕЗ ПАРТИИ'}</div>
+      </div>
+      <div class="admin-card-row-actions">
+        <button class="admin-btn admin-btn-secondary" onclick="editParliamentSeat('${escHtml(String(seat.id))}')">ИЗМЕНИТЬ</button>
+        <button class="admin-btn admin-btn-danger" onclick="deleteParliamentSeat('${escHtml(String(seat.id))}')">УДАЛИТЬ</button>
       </div>
     </div>`;
   }).join('');
