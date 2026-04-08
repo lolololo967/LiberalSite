@@ -2997,7 +2997,6 @@ function buildParliamentSVG(seats) {
   const defsBlock = defs.length ? `<defs>${defs.join('')}</defs>` : '';
 
   // Thin visible baseline, no arc guide lines
-  const baseline = `<line x1="8" y1="${cy}" x2="${W - 8}" y2="${cy}" stroke="rgba(10,12,16,0.12)" stroke-width="1"/>`;
 
   return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
   ${defsBlock}
