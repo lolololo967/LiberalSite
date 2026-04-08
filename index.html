@@ -36,7 +36,7 @@ body {
   font-family: 'Barlow Condensed', sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
-
+  cursor: crosshair;
 }
 body::before {
   content:'';
@@ -76,7 +76,6 @@ header::before {
   display:flex; align-items:center; gap:12px;
   text-decoration:none;
   padding-left:16px;
-  cursor: none;
 }
 
 .logo-lg { height: 33px; position:relative; flex-shrink:0; }
@@ -257,7 +256,6 @@ header::before {
   display:flex; align-items:center; gap:8px; font-family:'Share Tech Mono', monospace;
   font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink2); 
   transition:color 0.2s; white-space:nowrap; flex-shrink:0; border:1px solid var(--line); padding:6px 14px;
-  cursor: none;
 }
 .inner-back:hover { color:var(--current-color, var(--c01)); border-color:var(--current-color, var(--c01)); }
 .inner-back svg { width:12px; height:12px; stroke:currentColor; fill:none; transition:transform 0.2s; }
@@ -444,7 +442,6 @@ header::before {
   font-family:'Share Tech Mono', monospace; font-size:9px; letter-spacing:0.2em;
   text-transform:uppercase; color:var(--ink2);  transition:all 0.2s;
   display:flex; align-items:center; justify-content:center; gap:8px;
-  cursor:none;
 }
 .party-filter-btn:last-child { border-right:none; }
 .party-filter-btn:hover { background:var(--off); color:var(--ink); }
@@ -479,7 +476,6 @@ header::before {
   overflow-x: hidden; /* отключаем горизонтальный */
 }
 .party-modal::-webkit-scrollbar:hover{
-  cursor: none;
 }
 @keyframes modalIn {
   from { opacity:0; transform:translateY(18px) scale(0.98); }
@@ -734,13 +730,11 @@ header::before {
   width:100%; border:1px solid var(--ink); padding:10px 14px;
   font-family:'Share Tech Mono', monospace; font-size:12px; letter-spacing:0.08em; color:var(--ink);
   background:var(--white); outline:none; transition:border-color 0.2s;
-  cursor: none;
 }
 .admin-input:focus { border-color:var(--c01); }
 .admin-btn {
   font-family:'Barlow Condensed', sans-serif; font-size:16px; font-weight:700; letter-spacing:0.1em;
   text-transform:uppercase; border:none; padding:12px 28px;  transition:all 0.2s;
-  cursor: none;
 }
 .admin-btn-primary { background:var(--ink); color:#fff; }
 .admin-btn-primary:hover { background:#14171e; }
@@ -1437,7 +1431,7 @@ header::before {
             <div class="admin-field">
               <div class="admin-field-label">Цвет партии</div>
               <div style="display:flex;gap:10px;align-items:center">
-                <input type="color" class="admin-input" id="partyColor" value="#9B30FF" style="width:60px;height:40px;padding:2px;cursor:url('img/Cursor-black.png'), auto">
+                <input type="color" class="admin-input" id="partyColor" value="#9B30FF" style="width:60px;height:40px;padding:2px;>
                 <input type="text" class="admin-input" id="partyColorHex" value="#9B30FF" placeholder="#RRGGBB"
                   oninput="syncColorFromText(this.value)" style="flex:1">
               </div>
@@ -2750,103 +2744,6 @@ document.addEventListener('keydown', e => {
   }
 });
 
-</script>
-<!-- Кастомный курсор -->
-<div class="cursor-large"></div>
-
-<style>
-  body {
-    cursor: none;
-  }
-
-  .cursor-large {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 20px;
-  height: 20px;
-  pointer-events: none;
-  z-index: 10000;
-  mix-blend-mode: difference;
-}
-
-.cursor-large::before,
-.cursor-large::after {
-  content: '';
-  position: absolute;
-  background: white;
-}
-
-/* горизонтальная линия */
-.cursor-large::before {
-  width: 20px;
-  height: 1.5px;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-}
-
-/* вертикальная линия */
-.cursor-large::after {
-  width: 1.5px;
-  height: 20px;
-  left: 50%;
-  top: 0;
-  transform: translateX(-50%);
-}
-
-.cursor-large.hover::before {
-  width: 28px;
-}
-
-.cursor-large.hover::after {
-  height: 28px;
-}
-</style>
-
-<script>
-  const cursorLarge = document.querySelector('.cursor-large');
-
-  let mouseX = 0, mouseY = 0;
-  let largeX = 0, largeY = 0;
-  let mouseVisible = true;
-
-  document.addEventListener('mousemove', e => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-
-    if (!mouseVisible) {
-      cursorLarge.style.opacity = 1;
-      mouseVisible = true;
-    }
-  });
-
-  document.addEventListener('mouseleave', () => {
-    cursorLarge.style.opacity = 0;
-    mouseVisible = false;
-  });
-
-  // Определяем интерактивные элементы
-  const interactiveSelectors = 'a, button, input, textarea, select, [role="button"], [onclick]';
-
-  document.addEventListener('mouseover', e => {
-    if (e.target.closest(interactiveSelectors)) {
-      cursorLarge.classList.add('hover');
-    }
-  });
-
-  document.addEventListener('mouseout', e => {
-    if (e.target.closest(interactiveSelectors)) {
-      cursorLarge.classList.remove('hover');
-    }
-  });
-
-function animate() {
-cursorLarge.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
-  requestAnimationFrame(animate);
-}
-
-  animate();
 </script>
 </body>
 </html>
