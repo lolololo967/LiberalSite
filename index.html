@@ -2888,11 +2888,11 @@ function renderParliamentView() {
 }
 
 function buildParliamentSVG(seats) {
-  const W = 1100, H = 580;
+  const W = 600, H = 340;
   const cx = W / 2;
   const cy = H - 20; // baseline sits at bottom
 
-  const S = 24;       // seat square size px
+  const S = 16;       // seat square size px
   const total = seats.length;
 
   // Split into 2 rows: outer gets ceil(total/2), inner gets floor(total/2)
@@ -2901,7 +2901,7 @@ function buildParliamentSVG(seats) {
 
   // Radii — sized so outer row fits inside the viewBox with padding
   const outerR = (W / 2) - S - 20;  // leaves ~20px margin each side
-  const innerR = outerR - S - 14;   // gap between rows
+  const innerR = outerR - S - 12;   // gap between rows
 
   // Angular margin: keep seats from overlapping at the edges (half seat arc)
   // Minimum margin in radians so seat corner doesn't go past x=0 or x=W
