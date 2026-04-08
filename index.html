@@ -659,25 +659,26 @@ header::before {
   padding: 0 0 40px;
 }
 .parliament-svg-wrap {
-  width: 100%; max-width: 860px; position: relative;
+  width: 100%; max-width: 780px; position: relative;
+  margin: 0 auto;
 }
 .parliament-svg-wrap svg { width: 100%; height: auto; display: block; }
 .parliament-seat {
-  cursor: pointer; transition: transform 0.2s;
+  cursor: pointer;
+  transform-box: fill-box;
   transform-origin: center;
+  transition: transform 0.15s, filter 0.15s;
 }
-.parliament-seat:hover { filter: brightness(1.25); transform: scale(1.18); }
-.parliament-seat-circle {
-  stroke: var(--ink); stroke-width: 1.5; transition: stroke-width 0.2s;
+.parliament-seat:hover { filter: brightness(1.2); transform: scale(1.15); }
+.parliament-seat-rect {
+  stroke: rgba(10,12,16,0.25); stroke-width: 1.5;
+  transition: stroke-width 0.15s;
 }
-.parliament-seat.empty .parliament-seat-circle {
-  fill: #EAECF0; stroke: rgba(10,12,16,0.18);
+.parliament-seat.empty .parliament-seat-rect {
+  fill: #D8DCE5; stroke: rgba(10,12,16,0.12);
 }
-.parliament-seat.occupied .parliament-seat-circle {
-  stroke-width: 2.5;
-}
-.parliament-seat-flag {
-  clip-path: circle(10px at 10px 10px);
+.parliament-seat.occupied .parliament-seat-rect {
+  stroke-width: 2;
 }
 .parliament-seat-tooltip {
   position: absolute; pointer-events: none;
@@ -690,7 +691,7 @@ header::before {
 }
 .parliament-seat-tooltip.visible { opacity: 1; }
 .parliament-legend {
-  width: 100%; max-width: 860px;
+  width: 100%; max-width: 780px;
   border: 1px solid var(--ink);
 }
 .parliament-legend-head {
@@ -1641,11 +1642,6 @@ header::before {
                 <option value="">— Без партии —</option>
               </select>
             </div>
-          </div>
-
-          <div class="admin-field">
-            <div class="admin-field-label">Роль / должность</div>
-            <input type="text" class="admin-input" id="parliamentRole" placeholder="Напр: Спикер, Депутат...">
           </div>
 
           <div class="admin-form-actions">
@@ -2860,7 +2856,6 @@ function renderParliamentView() {
       ? `<img src="${party.flag_image}" alt="">`
       : `<div class="parliament-seat-row-flag-empty">—</div>`;
     const partyName = party ? escHtml(party.name) : '—';
-    const role = seat.role ? escHtml(seat.role) : 'ДЕПУТАТ';
     return `
     <div class="parliament-seat-row">
       <div class="parliament-seat-row-stripe" style="background:${color}"></div>
@@ -2868,7 +2863,7 @@ function renderParliamentView() {
       <div class="parliament-seat-row-flag">${flagHtml}</div>
       <div class="parliament-seat-row-info">
         <div class="parliament-seat-row-name">${escHtml(seat.member_name)}</div>
-        <div class="parliament-seat-row-meta">${role} · ${partyName}</div>
+        <div class="parliament-seat-row-meta">${partyName}</div>
       </div>
     </div>`;
   }).join('');
@@ -2893,91 +2888,104 @@ function renderParliamentView() {
 }
 
 function buildParliamentSVG(seats) {
-  const W = 860, H = 440;
-  const cx = W / 2, cy = H - 30;
+  const W = 780, H = 420;
+  const cx = W / 2, cy = H - 28;
+  const S = 22; // seat square size
+  const gap = 6; // gap between seats
+  const step = S + gap;
 
-  // Arrange seats in concentric arcs (semicircle)
-  // Standard parliament layout: rows from inside out
+  // Always exactly 2 rows: inner and outer
   const total = seats.length;
-  const rows = Math.ceil(Math.min(total, 50) / 10);
-  const seatRadius = 14;
-  const innerR = 120;
-  const rowGap = seatRadius * 2.8;
+  const innerCount = Math.ceil(total / 2);
+  const outerCount = total - innerCount;
 
-  let seatPositions = [];
-  let seatsLeft = total;
-  for (let row = 0; row < rows && seatsLeft > 0; row++) {
-    const r = innerR + row * rowGap;
-    const arcLen = Math.PI * r;
-    const maxInRow = Math.floor(arcLen / (seatRadius * 2.4));
-    const inRow = Math.min(seatsLeft, maxInRow, Math.ceil(total / rows));
-    const angleStep = Math.PI / (inRow + 1);
-    for (let s = 0; s < inRow; s++) {
-      const angle = Math.PI - (s + 1) * angleStep;
-      seatPositions.push({
-        x: cx + r * Math.cos(angle),
-        y: cy - r * Math.sin(angle),
-        seatIdx: total - seatsLeft + s
+  const innerR = 145;
+  const outerR = 145 + step + 4;
+
+  function rowPositions(count, r) {
+    const positions = [];
+    for (let i = 0; i < count; i++) {
+      // spread from ~10° to ~170° (leave gap at edges)
+      const angle = Math.PI * (1 - (i + 1) / (count + 1));
+      positions.push({
+        x: cx + r * Math.cos(Math.PI - angle),
+        y: cy - r * Math.sin(angle)
       });
     }
-    seatsLeft -= inRow;
+    return positions;
   }
+
+  const innerPos = rowPositions(innerCount, innerR);
+  const outerPos = rowPositions(outerCount, outerR);
+  const allPos = [...outerPos, ...innerPos]; // outer first so inner renders on top
+
+  // Arc guide lines
+  const arcLines = [innerR, outerR].map(r =>
+    `<path d="M ${(cx - r).toFixed(1)} ${cy} A ${r} ${r} 0 0 1 ${(cx + r).toFixed(1)} ${cy}" fill="none" stroke="rgba(10,12,16,0.08)" stroke-width="1" stroke-dasharray="4 5"/>`
+  ).join('');
+
+  // Baseline
+  const baseX1 = (cx - outerR - step).toFixed(1);
+  const baseX2 = (cx + outerR + step).toFixed(1);
+  const baseline = `<line x1="${baseX1}" y1="${cy}" x2="${baseX2}" y2="${cy}" stroke="rgba(10,12,16,0.35)" stroke-width="2"/>`;
 
   // Speaker podium
   const podium = `
-    <rect x="${cx-28}" y="${cy-18}" width="56" height="18" rx="2" fill="var(--ink)" opacity="0.9"/>
-    <text x="${cx}" y="${cy-6}" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="7" fill="#fff" letter-spacing="1" opacity="0.7">СПИКЕР</text>`;
+    <rect x="${(cx-32).toFixed(1)}" y="${(cy-20).toFixed(1)}" width="64" height="20" rx="1" fill="var(--ink)" opacity="0.88"/>
+    <text x="${cx}" y="${(cy-7).toFixed(1)}" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="7" fill="#fff" letter-spacing="2" opacity="0.75">СПИКЕР</text>`;
 
-  // Arc background lines
-  const arcLines = Array.from({length: rows}, (_, i) => {
-    const r = innerR + i * rowGap;
-    return `<path d="M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}" fill="none" stroke="var(--line)" stroke-width="1" stroke-dasharray="4 4"/>`;
-  }).join('');
+  // Build all seat elements (outer row first = seats 0..outerCount-1, inner = outerCount..total-1)
+  const seatOrder = [
+    ...Array.from({length: outerCount}, (_, i) => ({ pos: outerPos[i], seatIdx: i })),
+    ...Array.from({length: innerCount}, (_, i) => ({ pos: innerPos[i], seatIdx: outerCount + i }))
+  ];
 
-  // Base line
-  const baseline = `<line x1="${cx - innerR - rowGap * rows}" y1="${cy}" x2="${cx + innerR + rowGap * rows}" y2="${cy}" stroke="var(--ink)" stroke-width="2" opacity="0.5"/>`;
-
-  // Seats
-  const seatElems = seatPositions.map(pos => {
-    const seat = seats[pos.seatIdx];
-    if (!seat) return '';
+  const defs = [];
+  const seatElems = seatOrder.map(({ pos, seatIdx }) => {
+    const seat = seats[seatIdx];
+    if (!seat || !pos) return '';
     const party = allParties.find(p => String(p.id) === String(seat.party_id));
-    const color = party ? escHtml(party.color || '#9B30FF') : '#EAECF0';
+    const color = party ? escHtml(party.color || '#9B30FF') : '#D8DCE5';
     const hasFlag = party && party.flag_image;
     const cls = seat.member_name ? 'occupied' : 'empty';
-    const imgId = `psimg_${pos.seatIdx}`;
+    const rx = (pos.x - S / 2).toFixed(1);
+    const ry = (pos.y - S / 2).toFixed(1);
+    const clipId = `pclip_${seatIdx}`;
 
-    const defs = hasFlag ? `<defs><clipPath id="clip_${pos.seatIdx}"><circle cx="${pos.x.toFixed(1)}" cy="${pos.y.toFixed(1)}" r="${seatRadius - 1}"/></clipPath></defs>` : '';
-    const flagImg = hasFlag ? `<image href="${party.flag_image}" x="${(pos.x - seatRadius + 1).toFixed(1)}" y="${(pos.y - seatRadius + 1).toFixed(1)}" width="${(seatRadius - 1) * 2}" height="${(seatRadius - 1) * 2}" clip-path="url(#clip_${pos.seatIdx})" preserveAspectRatio="xMidYMid slice"/>` : '';
+    if (hasFlag) {
+      defs.push(`<clipPath id="${clipId}"><rect x="${rx}" y="${ry}" width="${S}" height="${S}" rx="2"/></clipPath>`);
+    }
 
-    return `${defs}
+    const flagImg = hasFlag
+      ? `<image href="${party.flag_image}" x="${rx}" y="${ry}" width="${S}" height="${S}" clip-path="url(#${clipId})" preserveAspectRatio="xMidYMid slice"/>`
+      : '';
+
+    const numLabel = cls === 'empty'
+      ? `<text x="${pos.x.toFixed(1)}" y="${(pos.y + 4).toFixed(1)}" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="7" fill="rgba(10,12,16,0.3)">${seatIdx + 1}</text>`
+      : '';
+
+    return `
     <g class="parliament-seat ${cls}"
-       data-idx="${pos.seatIdx}"
+       data-idx="${seatIdx}"
        data-name="${escHtml(seat.member_name || '')}"
-       data-party="${escHtml(party ? party.name : '')}"
-       data-role="${escHtml(seat.role || 'Депутат')}">
-      <circle class="parliament-seat-circle" cx="${pos.x.toFixed(1)}" cy="${pos.y.toFixed(1)}" r="${seatRadius}" fill="${cls === 'occupied' ? color : '#EAECF0'}"/>
+       data-party="${escHtml(party ? party.name : '')}">
+      <rect class="parliament-seat-rect" x="${rx}" y="${ry}" width="${S}" height="${S}" rx="2" fill="${cls === 'occupied' ? color : '#D8DCE5'}"/>
       ${flagImg}
-      ${cls === 'empty' ? `<text x="${pos.x.toFixed(1)}" y="${(pos.y + 3).toFixed(1)}" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="8" fill="rgba(10,12,16,0.25)">${pos.seatIdx + 1}</text>` : ''}
+      ${numLabel}
     </g>`;
   }).join('');
 
+  const defsBlock = defs.length ? `<defs>${defs.join('')}</defs>` : '';
+
   return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
-    <!-- Background -->
-    <rect width="${W}" height="${H}" fill="var(--off)" rx="0"/>
-    <!-- Arc guides -->
-    ${arcLines}
-    <!-- Baseline -->
-    ${baseline}
-    <!-- Seats -->
-    ${seatElems}
-    <!-- Podium -->
-    ${podium}
-    <!-- Labels -->
-    <text x="30" y="${cy - 4}" font-family="Share Tech Mono,monospace" font-size="8" fill="rgba(10,12,16,0.3)" letter-spacing="1">ЛЕВЫЕ</text>
-    <text x="${W - 30}" y="${cy - 4}" text-anchor="end" font-family="Share Tech Mono,monospace" font-size="8" fill="rgba(10,12,16,0.3)" letter-spacing="1">ПРАВЫЕ</text>
-    <text x="${cx}" y="18" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="8" fill="rgba(10,12,16,0.2)" letter-spacing="3">ПАРЛАМЕНТ · ${total} МЕСТ</text>
-  </svg>`;
+  <rect width="${W}" height="${H}" fill="var(--off)"/>
+  ${defsBlock}
+  ${arcLines}
+  ${baseline}
+  ${seatElems}
+  ${podium}
+  <text x="${cx}" y="20" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="8" fill="rgba(10,12,16,0.18)" letter-spacing="3">ПАРЛАМЕНТ · ${total} МЕСТ</text>
+</svg>`;
 }
 
 function attachParliamentTooltips() {
@@ -2989,8 +2997,7 @@ function attachParliamentTooltips() {
     seat.addEventListener('mouseenter', (e) => {
       const name = seat.dataset.name;
       const party = seat.dataset.party;
-      const role = seat.dataset.role;
-      tooltip.textContent = `${name}${party ? ' · ' + party : ''}${role ? ' · ' + role : ''}`;
+      tooltip.textContent = `${name}${party ? ' · ' + party : ''}`;
       tooltip.classList.add('visible');
     });
     seat.addEventListener('mousemove', (e) => {
@@ -3012,7 +3019,6 @@ function attachParliamentTooltips() {
 function clearParliamentForm() {
   document.getElementById('editingParliamentId').value = '';
   document.getElementById('parliamentMemberName').value = '';
-  document.getElementById('parliamentRole').value = '';
   document.getElementById('adminParliamentFormTitle').textContent = '// НОВОЕ МЕСТО';
   document.getElementById('adminCancelParliamentEditBtn').style.display = 'none';
   document.getElementById('adminParliamentSaveMsg').style.display = 'none';
@@ -3033,7 +3039,6 @@ function editParliamentSeat(id) {
   if (!seat) return;
   document.getElementById('editingParliamentId').value = seat.id;
   document.getElementById('parliamentMemberName').value = seat.member_name || '';
-  document.getElementById('parliamentRole').value = seat.role || '';
   populateParliamentPartySelect(seat.party_id);
   document.getElementById('adminParliamentFormTitle').textContent = '// РЕДАКТИРОВАНИЕ МЕСТА';
   document.getElementById('adminCancelParliamentEditBtn').style.display = 'inline-flex';
@@ -3054,7 +3059,6 @@ async function saveParliamentSeat() {
   const payload = {
     member_name: name,
     party_id: document.getElementById('parliamentPartyId').value || null,
-    role: document.getElementById('parliamentRole').value.trim() || null,
   };
 
   const editId = document.getElementById('editingParliamentId').value;
@@ -3114,7 +3118,7 @@ function renderAdminParliamentList() {
       ${thumb}
       <div class="admin-card-row-info">
         <div class="admin-card-row-title">${escHtml(seat.member_name)}</div>
-        <div class="admin-card-row-meta">МЕСТО ${i+1} · ${seat.role ? escHtml(seat.role) : 'ДЕПУТАТ'} · ${party ? escHtml(party.name) : 'БЕЗ ПАРТИИ'}</div>
+        <div class="admin-card-row-meta">МЕСТО ${i+1} · ${party ? escHtml(party.name) : 'БЕЗ ПАРТИИ'}</div>
       </div>
       <div class="admin-card-row-actions">
         <button class="admin-btn admin-btn-secondary" onclick="editParliamentSeat('${escHtml(String(seat.id))}')">ИЗМЕНИТЬ</button>
