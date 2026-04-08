@@ -80,7 +80,7 @@ module.exports = async (req, res) => {
 
     // ── POST — create new party ──────────────────────────────────────────────
     if (req.method === 'POST') {
-      const { name, tag, description, spectrum, color, status, flag_image, symbol_image } = req.body || {};
+      const { name, tag, description, compass_x, compass_y, color, status, flag_image, symbol_image } = req.body || {};
 
       if (!name || !String(name).trim()) {
         return res.status(400).json({ error: 'Поле "name" обязательно' });
@@ -90,7 +90,8 @@ module.exports = async (req, res) => {
         name:         String(name).trim(),
         tag:          tag          ? String(tag).trim()         : null,
         description:  description  ? String(description).trim() : null,
-        spectrum:     Number.isFinite(Number(spectrum)) ? Number(spectrum) : 50,
+        compass_x:    Number.isFinite(Number(compass_x)) ? Math.round(Number(compass_x)) : 0,
+        compass_y:    Number.isFinite(Number(compass_y)) ? Math.round(Number(compass_y)) : 0,
         color:        color        ? String(color)               : '#9B30FF',
         status:       ['ruling','opposition','coalition','minor','inactive'].includes(status)
                         ? status : 'ruling',
@@ -108,7 +109,7 @@ module.exports = async (req, res) => {
       if (!id) return res.status(400).json({ error: 'Поле "id" обязательно' });
 
       // Only allow known updatable columns
-      const allowed = ['name','tag','description','spectrum','color','status','flag_image','symbol_image'];
+      const allowed = ['name','tag','description','compass_x','compass_y','color','status','flag_image','symbol_image'];
       const patch = {};
       for (const key of allowed) {
         if (Object.prototype.hasOwnProperty.call(fields, key)) {
