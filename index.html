@@ -536,12 +536,7 @@ header::before {
   font-family:'Share Tech Mono', monospace; font-size:11px; letter-spacing:0.08em;
   color:var(--ink2); line-height:1.9; white-space:pre-line;
 }
-.party-modal-section-title {
-  font-family:'Share Tech Mono', monospace; font-size:8px; letter-spacing:0.28em;
-  text-transform:uppercase; color:var(--ink2); opacity:0.4; margin-bottom:12px;
-  display:flex; align-items:center; gap:10px;
-}
-.party-modal-section-title::after { content:''; flex:1; height:1px; background:var(--line); }
+
 .party-modal-spectrum-track {
   height:4px; background:linear-gradient(to right,#FF1744,#9B30FF,#0057FF);
   position:relative; margin-bottom:8px;
@@ -2108,7 +2103,6 @@ const cx = party.compass_x ?? 0;
 
   const spectrumSection = `
     <div>
-      <div class="party-modal-section-title">Политический компас</div>
       <div class="compass-wrap" style="pointer-events:none">
         <div class="compass-axis-label">ЛИБЕРТАРИЗМ</div>
         <div class="compass-row">
@@ -2150,7 +2144,6 @@ const cx = party.compass_x ?? 0;
     <div class="party-modal-body" style="--pm-color:${escHtml(color)}">
       ${party.description ? `
         <div>
-          <div class="party-modal-section-title">Описание и идеология</div>
           <div class="party-modal-desc">${escHtml(party.description)}</div>
         </div>` : ''}
     </div>
