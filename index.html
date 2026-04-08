@@ -2666,7 +2666,7 @@ document.addEventListener('keydown', e => {
     cursor: none;
   }
 
-  .cursor-large {
+ .cursor-large {
   position: fixed;
   top: 0;
   left: 0;
@@ -2675,6 +2675,7 @@ document.addEventListener('keydown', e => {
   pointer-events: none;
   z-index: 10000;
   mix-blend-mode: difference;
+  transition: width 0.15s ease, height 0.15s ease;
 }
 
 .cursor-large::before,
@@ -2682,9 +2683,9 @@ document.addEventListener('keydown', e => {
   content: '';
   position: absolute;
   background: white;
+  transition: width 0.15s ease, height 0.15s ease, left 0.15s ease, top 0.15s ease;
 }
 
-/* горизонтальная линия */
 .cursor-large::before {
   width: 20px;
   height: 1.5px;
@@ -2693,7 +2694,6 @@ document.addEventListener('keydown', e => {
   transform: translateY(-50%);
 }
 
-/* вертикальная линия */
 .cursor-large::after {
   width: 1.5px;
   height: 20px;
@@ -2703,11 +2703,13 @@ document.addEventListener('keydown', e => {
 }
 
 .cursor-large.hover::before {
-  width: 28px;
+  width: 30px;
+  left: -5px;
 }
 
 .cursor-large.hover::after {
-  height: 28px;
+  height: 30px;
+  top: -5px;
 }
 </style>
 
