@@ -1787,7 +1787,7 @@ const PARTY_STATUS_LABELS = {
 
 function renderPartyCard(party, idx) {
   const color = escHtml(party.color || '#9B30FF');
-  const pos = Math.max(0, Math.min(100, party.spectrum ?? 50));
+const pos = Math.max(0, Math.min(100, ((( party.compass_x ?? 0) + 100) / 200) * 100));
   const statusLabel = PARTY_STATUS_LABELS[party.status] || '';
 
   const flagHtml = party.flag_image
@@ -2093,7 +2093,7 @@ function openPartyModal(id) {
   if (!party) return;
 
   const color = party.color || '#9B30FF';
-  const pos   = Math.max(0, Math.min(100, party.spectrum ?? 50));
+const pos   = Math.max(0, Math.min(100, (((party.compass_x ?? 0) + 100) / 200) * 100));
   const statusLabel = PARTY_STATUS_LABELS[party.status] || '';
 
   const flagHtml = party.flag_image
@@ -2104,16 +2104,33 @@ function openPartyModal(id) {
     ? `<div class="party-modal-flag-symbol"><img src="${party.symbol_image}" alt="Символ"></div>`
     : '';
 
+const cx = party.compass_x ?? 0;
+  const cy = party.compass_y ?? 0;
+  const pxPct = ((cx + 100) / 200) * 100;
+  const pyPct = ((-cy + 100) / 200) * 100;
+
   const spectrumSection = `
     <div>
-      <div class="party-modal-section-title">Политический спектр</div>
-      <div class="party-modal-spectrum-track">
-        <div class="party-modal-spectrum-dot" style="left:${pos}%"></div>
-      </div>
-      <div class="party-modal-spectrum-labels">
-        <span>◀ Крайне левые</span>
-        <span>Центр</span>
-        <span>Крайне правые ▶</span>
+      <div class="party-modal-section-title">Политический компас</div>
+      <div class="compass-wrap" style="pointer-events:none">
+        <div class="compass-axis-label">ЛИБЕРТАРИЗМ</div>
+        <div class="compass-row">
+          <div class="compass-side-label">ЛЕВЫЕ</div>
+          <div class="compass-grid" style="cursor:default">
+            <div class="compass-line-h"></div>
+            <div class="compass-line-v"></div>
+            <div class="compass-q-labels">
+              <span class="compass-q-label" style="top:6px;left:6px">ЛИБ-ЛЕВ</span>
+              <span class="compass-q-label" style="top:6px;right:6px">ЛИБ-ПРАВ</span>
+              <span class="compass-q-label" style="bottom:6px;left:6px">АВТ-ЛЕВ</span>
+              <span class="compass-q-label" style="bottom:6px;right:6px">АВТ-ПРАВ</span>
+            </div>
+            <div class="compass-dot" style="left:${pxPct}%;top:${pyPct}%;background:${escHtml(color)}"></div>
+          </div>
+          <div class="compass-side-label right">ПРАВЫЕ</div>
+        </div>
+        <div class="compass-axis-label">АВТОРИТАРИЗМ</div>
+        <div class="compass-val-display">Эконом: ${cx} · Социал: ${cy}</div>
       </div>
     </div>`;
 
