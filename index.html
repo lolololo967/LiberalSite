@@ -655,7 +655,7 @@ header::before {
 
 /* ══ PARLIAMENT VIEW ══ */
 .parliament-wrap {
-  display: flex; flex-direction: column; align-items: center; gap: 40px;
+  display: flex; align-items: center; gap: 40px;
   padding: 0 0 40px;
 }
 .parliament-svg-wrap {
@@ -2888,11 +2888,11 @@ function renderParliamentView() {
 }
 
 function buildParliamentSVG(seats) {
-  const W = 440, H = 270;
+  const W = 440, H = 330;
   const cx = W / 2;
   const cy = H - 16; // baseline sits at bottom
 
-  const S = 18;       // seat square size px
+  const S = 24;       // seat square size px
   const total = seats.length;
 
   // Split into 2 rows: outer gets ceil(total/2), inner gets floor(total/2)
