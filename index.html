@@ -2888,59 +2888,64 @@ function renderParliamentView() {
 }
 
 function buildParliamentSVG(seats) {
-  const W = 440, H = 330;
+  const W = 440, H = 300;
   const cx = W / 2;
-  const cy = H - 16; // baseline sits at bottom
+  const cy = H - 12; // baseline at bottom
 
-  const S = 24;       // seat square size px
+  const S = 22;        // seat square size px
   const total = seats.length;
+  if (total === 0) return '';
 
-  // Outer ring always has 1 more seat than inner ring
-  const innerCount = Math.ceil(total / 2) - 1;
+  // ── Step 1: Group seats by party so party members are always adjacent ───────
+  // Parties sorted by size descending, no-party seats at the end.
+  const partyBuckets = {};
+  const noPartySeats = [];
+  for (const seat of seats) {
+    const key = seat.party_id ? String(seat.party_id) : null;
+    if (key) {
+      if (!partyBuckets[key]) partyBuckets[key] = [];
+      partyBuckets[key].push(seat);
+    } else {
+      noPartySeats.push(seat);
+    }
+  }
+  const orderedSeats = [
+    ...Object.values(partyBuckets).sort((a, b) => b.length - a.length).flat(),
+    ...noPartySeats,
+  ];
+
+  // ── Step 2: Ring sizes (outer always has 1 more than inner) ─────────────────
+  const innerCount = Math.max(0, Math.ceil(total / 2) - 1);
   const outerCount = total - innerCount;
 
-  // Radii — sized so outer row fits inside the viewBox with padding
-  const outerR = (W / 2) - S - 16;  // leaves ~16px margin each side
-  const innerR = outerR - S - 26;   // larger gap → inner arc noticeably smaller
+  // ── Step 3: Radii ────────────────────────────────────────────────────────────
+  const outerR = (W / 2) - S - 14;
+  const innerR = outerR - S - 42; // large gap → inner arc visibly smaller
 
-  // Angular margin: keep seats from overlapping at the edges (half seat arc)
-  // Minimum margin in radians so seat corner doesn't go past x=0 or x=W
-  const edgeMargin = Math.asin((S / 2 + 4) / outerR);
-
-  const startAngle = Math.PI - edgeMargin;  // leftmost  (≈ 170°)
-  const endAngle   = edgeMargin;            // rightmost (≈ 10°)
-
-  // Evenly distribute count seats between startAngle and endAngle
-  function distribute(count, r) {
-    if (count === 0) return [];
-    if (count === 1) {
-      const a = Math.PI / 2; // single seat: top centre
-      return [{ x: cx + r * Math.cos(a), y: cy - r * Math.sin(a) }];
-    }
-    return Array.from({ length: count }, (_, i) => {
-      const t = i / (count - 1);                        // 0 → 1
-      const angle = startAngle - t * (startAngle - endAngle); // π→0
-      return { x: cx + r * Math.cos(angle), y: cy - r * Math.sin(angle) };
-    });
+  // ── Step 4: Per-ring distribution with independent edge margins ──────────────
+  // Each ring's edge margin is based on its own radius so both rings'
+  // endpoint seats sit at the same y-coordinate (no height mismatch).
+  function makeDistrib(r) {
+    const margin = Math.asin((S / 2 + 3) / r);
+    // Right → Left direction (seat 0 on right, last seat on left)
+    const saRight = margin;            // rightmost angle (≈ 10°)
+    const saLeft  = Math.PI - margin;  // leftmost angle  (≈ 170°)
+    return function(count) {
+      if (count === 0) return [];
+      if (count === 1) return [{ x: cx, y: cy - r }];
+      return Array.from({ length: count }, (_, i) => {
+        const t = i / (count - 1);                      // 0→1
+        const angle = saRight + t * (saLeft - saRight); // right→left
+        return { x: cx + r * Math.cos(angle), y: cy - r * Math.sin(angle) };
+      });
+    };
   }
+  const outerPos = makeDistrib(outerR)(outerCount);
+  const innerPos = makeDistrib(innerR)(innerCount);
 
-  const outerPos = distribute(outerCount, outerR);
-  const innerPos = distribute(innerCount, innerR);
-
-  // Arc guide lines
-  const arcLines = [innerR, outerR].map(r => {
-    const x1 = (cx + r * Math.cos(startAngle)).toFixed(1);
-    const y1 = (cy - r * Math.sin(startAngle)).toFixed(1);
-    const x2 = (cx + r * Math.cos(endAngle)).toFixed(1);
-    const y2 = (cy - r * Math.sin(endAngle)).toFixed(1);
-    return `<path d="M ${x1} ${y1} A ${r} ${r} 0 0 0 ${x2} ${y2}" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1" stroke-dasharray="5 6"/>`;
-  }).join('');
-
-  // Baseline
-  const baseline = `<line x1="10" y1="${cy}" x2="${W - 10}" y2="${cy}" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>`;
-
-  // Interleave: seat 0→outer, seat 1→inner, seat 2→outer, seat 3→inner, …
-  // Outer always has 1 more, overflow (when inner full) goes to outer.
+  // ── Step 5: Interleaved seat→position assignment ─────────────────────────────
+  // Seat 0 → outer[0], seat 1 → inner[0], seat 2 → outer[1], …
+  // When inner is full (outer has 1 extra), overflow goes to outer.
   const outerSeatIdxs = [];
   const innerSeatIdxs = [];
   for (let i = 0; i < total; i++) {
@@ -2951,16 +2956,13 @@ function buildParliamentSVG(seats) {
     }
   }
 
-  // Render outer first (behind), inner on top — preserves correct z-order
-  const allOrders = [
-    ...outerSeatIdxs.map((seatIdx, j) => ({ pos: outerPos[j], seatIdx })),
-    ...innerSeatIdxs.map((seatIdx, j) => ({ pos: innerPos[j], seatIdx })),
-  ];
-
+  // ── Step 6: Build seat SVG elements ─────────────────────────────────────────
   const defs = [];
-  const seatElems = allOrders.map(({ pos, seatIdx }) => {
-    const seat = seats[seatIdx];
-    if (!seat || !pos) return '';
+
+  function renderSeat(seatIdx, pos) {
+    if (!pos) return '';
+    const seat = orderedSeats[seatIdx];
+    if (!seat) return '';
     const party = allParties.find(p => String(p.id) === String(seat.party_id));
     const color = party ? escHtml(party.color || '#9B30FF') : '#D0D4DC';
     const hasFlag = party && party.flag_image;
@@ -2978,23 +2980,28 @@ function buildParliamentSVG(seats) {
       : '';
 
     const numLabel = cls === 'empty'
-      ? `<text x="${pos.x.toFixed(1)}" y="${(pos.y + 4).toFixed(1)}" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="7" fill="rgba(10,12,16,0.28)">${seatIdx + 1}</text>`
+      ? `<text x="${pos.x.toFixed(1)}" y="${(pos.y + 4).toFixed(1)}" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="7" fill="rgba(10,12,16,0.3)">${seatIdx + 1}</text>`
       : '';
 
     return `<g class="parliament-seat ${cls}" data-idx="${seatIdx}" data-name="${escHtml(seat.member_name || '')}" data-party="${escHtml(party ? party.name : '')}">
       <rect class="parliament-seat-rect" x="${rx}" y="${ry}" width="${S}" height="${S}" fill="${cls === 'occupied' ? color : '#D0D4DC'}"/>
       ${flagImg}${numLabel}
     </g>`;
-  }).join('');
+  }
 
+  // Render outer first (behind), inner on top for correct z-order
+  const outerElems = outerSeatIdxs.map((idx, j) => renderSeat(idx, outerPos[j])).join('');
+  const innerElems = innerSeatIdxs.map((idx, j) => renderSeat(idx, innerPos[j])).join('');
   const defsBlock = defs.length ? `<defs>${defs.join('')}</defs>` : '';
+
+  // Thin visible baseline, no arc guide lines
+  const baseline = `<line x1="8" y1="${cy}" x2="${W - 8}" y2="${cy}" stroke="rgba(10,12,16,0.12)" stroke-width="1"/>`;
 
   return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
   ${defsBlock}
-  ${arcLines}
   ${baseline}
-  ${seatElems}
-  <text x="${cx}" y="14" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="7" fill="rgba(255,255,255,0.25)" letter-spacing="4">ПАРЛАМЕНТ · ${total} МЕСТ</text>
+  ${outerElems}
+  ${innerElems}
 </svg>`;
 }
 
