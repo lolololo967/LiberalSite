@@ -2667,24 +2667,48 @@ document.addEventListener('keydown', e => {
   }
 
   .cursor-large {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 10px;
-    height: 10px;
-    background: white;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 10000;
-    transition: transform 0s ease, width 0.15s ease, height 0.15s ease, opacity 0.2s ease;
-    mix-blend-mode: difference;
-  }
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  z-index: 10000;
+  mix-blend-mode: difference;
+}
 
-  /* Класс для увеличения курсора */
-  .cursor-large.hover {
-    width: 20px;
-    height: 20px;
-  }
+.cursor-large::before,
+.cursor-large::after {
+  content: '';
+  position: absolute;
+  background: white;
+}
+
+/* горизонтальная линия */
+.cursor-large::before {
+  width: 20px;
+  height: 1.5px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+/* вертикальная линия */
+.cursor-large::after {
+  width: 1.5px;
+  height: 20px;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.cursor-large.hover::before {
+  width: 28px;
+}
+
+.cursor-large.hover::after {
+  height: 28px;
+}
 </style>
 
 <script>
@@ -2725,7 +2749,7 @@ document.addEventListener('keydown', e => {
   });
 
 function animate() {
-  cursorLarge.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+cursorLarge.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
   requestAnimationFrame(animate);
 }
 
