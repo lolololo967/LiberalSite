@@ -2910,16 +2910,25 @@ function buildParliamentSVG(seats) {
   const startAngle = Math.PI - edgeMargin;  // leftmost  (≈ 170°)
   const endAngle   = edgeMargin;            // rightmost (≈ 10°)
 
-  // Evenly distribute count seats between startAngle and endAngle
+  // Distribute count seats along an arc, capped so seats are never more than
+  // (S + gap) px apart. When fewer seats than the full arc allows, the segment
+  // is centred at the top of the semicircle.
   function distribute(count, r) {
     if (count === 0) return [];
+    const midAngle = Math.PI / 2;
     if (count === 1) {
-      const a = Math.PI / 2; // single seat: top centre
-      return [{ x: cx + r * Math.cos(a), y: cy - r * Math.sin(a) }];
+      return [{ x: cx + r * Math.cos(midAngle), y: cy - r * Math.sin(midAngle) }];
     }
+    const gap = 8; // px between seat squares
+    const step = (S + gap) / r; // angular step in radians
+    const maxSpan = startAngle - endAngle;
+    const desiredSpan = Math.min((count - 1) * step, maxSpan);
+    // centre around the top; clamp to [endAngle, startAngle]
+    let fromAngle = Math.min(midAngle + desiredSpan / 2, startAngle);
+    let toAngle   = Math.max(midAngle - desiredSpan / 2, endAngle);
     return Array.from({ length: count }, (_, i) => {
-      const t = i / (count - 1);                        // 0 → 1
-      const angle = startAngle - t * (startAngle - endAngle); // π→0
+      const t = i / (count - 1);
+      const angle = fromAngle - t * (fromAngle - toAngle);
       return { x: cx + r * Math.cos(angle), y: cy - r * Math.sin(angle) };
     });
   }
