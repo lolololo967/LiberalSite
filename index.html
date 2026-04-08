@@ -767,6 +767,25 @@ header::before {
   background:var(--white); outline:none; resize:vertical; transition:border-color 0.2s;
 }
 .admin-textarea:focus { border-color:var(--c01); }
+.rich-editor-wrap { border:1px solid var(--ink); transition:border-color 0.2s; }
+.rich-editor-wrap:focus-within { border-color:var(--c01); }
+.rich-editor-toolbar {
+  display:flex; gap:2px; padding:6px 8px;
+  border-bottom:1px solid var(--line); background:var(--off);
+}
+.rich-editor-btn {
+  font-family:'Share Tech Mono', monospace; font-size:10px; letter-spacing:0.08em;
+  padding:4px 10px; border:1px solid var(--line); background:var(--white);
+  color:var(--ink2); cursor:crosshair; transition:all 0.15s; text-transform:uppercase;
+}
+.rich-editor-btn:hover { border-color:var(--c01); color:var(--c01); background:rgba(0,87,255,0.04); }
+.rich-editor-body {
+  width:100%; min-height:100px; padding:10px 14px;
+  font-family:'Share Tech Mono', monospace; font-size:11px; letter-spacing:0.06em; color:var(--ink);
+  background:var(--white); outline:none; line-height:1.7; white-space:pre-wrap;
+}
+.rich-editor-body a { color:var(--c01); text-decoration:underline; }
+.rich-editor-body b, .rich-editor-body strong { font-weight:700; }
 .admin-select {
   width:100%; border:1px solid var(--ink); padding:10px 14px;
   font-family:'Share Tech Mono', monospace; font-size:12px; letter-spacing:0.08em; color:var(--ink);
@@ -1389,7 +1408,13 @@ header::before {
 
           <div class="admin-field">
             <div class="admin-field-label">Описание / идеология</div>
-            <textarea class="admin-textarea" id="partyDesc" placeholder="Краткое описание партии, её позиции и идеологии..." style="min-height:72px"></textarea>
+            <div class="rich-editor-wrap">
+              <div class="rich-editor-toolbar">
+                <button type="button" class="rich-editor-btn" onclick="partyDescFormat('bold')"><b>B</b></button>
+                <button type="button" class="rich-editor-btn" onclick="partyDescFormat('link')">🔗 ССЫЛКА</button>
+              </div>
+              <div class="rich-editor-body" id="partyDesc" contenteditable="true" data-placeholder="Краткое описание партии, её позиции и идеологии..."></div>
+            </div>
           </div>
 
           <!-- Political Compass -->
@@ -2144,7 +2169,7 @@ const cx = party.compass_x ?? 0;
     <div class="party-modal-body" style="--pm-color:${escHtml(color)}">
       ${party.description ? `
         <div>
-          <div class="party-modal-desc">${escHtml(party.description)}</div>
+          <div class="party-modal-desc">${party.description}</div>
         </div>` : ''}
     </div>
   `;
@@ -2472,6 +2497,26 @@ function clearImage(previewId, placeholderId, clearBtnId, inputId, hiddenId) {
   hidden.value = '';
 }
 
+function partyDescFormat(cmd) {
+  const editor = document.getElementById('partyDesc');
+  editor.focus();
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
+
+  if (cmd === 'bold') {
+    document.execCommand('bold', false, null);
+  }
+
+  if (cmd === 'link') {
+    const url = prompt('Введите URL ссылки:', 'https://');
+    if (!url || !url.trim()) return;
+    document.execCommand('createLink', false, url.trim());
+    // Make link open in new tab
+    const links = editor.querySelectorAll('a');
+    links.forEach(a => { a.target = '_blank'; a.rel = 'noopener noreferrer'; });
+  }
+}
+
 function syncColorFromText(val) {
   if (/^#[0-9a-fA-F]{6}$/.test(val)) {
     document.getElementById('partyColor').value = val;
@@ -2490,7 +2535,7 @@ function clearPartyForm() {
   document.getElementById('editingPartyId').value = '';
   document.getElementById('partyName').value = '';
   document.getElementById('partyTag').value = '';
-  document.getElementById('partyDesc').value = '';
+  document.getElementById('partyDesc').innerHTML = '';
   setCompassValues(0, 0);
   document.getElementById('partyColor').value = '#9B30FF';
   document.getElementById('partyColorHex').value = '#9B30FF';
@@ -2511,7 +2556,7 @@ function editParty(id) {
   document.getElementById('editingPartyId').value = party.id;
   document.getElementById('partyName').value = party.name || '';
   document.getElementById('partyTag').value = party.tag || '';
-  document.getElementById('partyDesc').value = party.description || '';
+  document.getElementById('partyDesc').innerHTML = party.description || '';
   const cx = party.compass_x ?? 0;
   const cy = party.compass_y ?? 0;
   setCompassValues(cx, cy);
@@ -2559,7 +2604,7 @@ async function saveParty() {
   const payload = {
     name,
     tag: document.getElementById('partyTag').value.trim() || null,
-    description: document.getElementById('partyDesc').value.trim() || null,
+    description: document.getElementById('partyDesc').innerHTML.trim() || null,
     compass_x: parseInt(document.getElementById('partyCompassX').value) || 0,
     compass_y: parseInt(document.getElementById('partyCompassY').value) || 0,
     color: document.getElementById('partyColor').value || '#9B30FF',
