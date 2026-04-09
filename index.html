@@ -652,7 +652,7 @@ header::before {
 }
 .const-pdf-canvas-wrap canvas {
   display:block; box-shadow:0 4px 24px rgba(10,12,16,0.18);
-  max-width:100%; height:auto;
+  /* width/height are set explicitly in JS to maintain aspect ratio */
 }
 .const-chapters-list { display:flex; flex-direction:column; }
 .const-ch-row {
@@ -2344,13 +2344,18 @@ async function _renderPage(num) {
   if (!canvas) { _pdfRendering = false; return; }
 
   const wrap  = document.getElementById('constPdfCanvasWrap');
-  const avail = wrap ? (wrap.clientWidth - 48) : 760;
+  const avail = wrap ? Math.max(300, wrap.clientWidth - 48) : 760;
   const vp1   = page.getViewport({ scale: 1 });
-  const scale = Math.max(1.0, avail / vp1.width);
+  // Scale to fit container exactly — Math.max(1.0,…) was the stretch culprit
+  const scale = avail / vp1.width;
   const vp    = page.getViewport({ scale });
 
   canvas.width  = vp.width;
   canvas.height = vp.height;
+  // height:auto is a no-op on <canvas>; set CSS dimensions explicitly
+  canvas.style.width  = vp.width + 'px';
+  canvas.style.height = vp.height + 'px';
+  canvas.style.maxWidth = '100%';
 
   await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
 
@@ -2503,11 +2508,20 @@ function openConstitutionChapter(idx) {
   blink.classList.remove('active'); void blink.offsetWidth; blink.classList.add('active');
   blink.addEventListener('animationend', () => blink.classList.remove('active'), {once:true});
 
-  // Switch to full text tab
-  currentConstTab = 'fulltext';
-  buildNav('constitution');
+  // Clear any in-progress render so the new page request goes through immediately
+  _pdfRendering   = false;
+  _pdfPendingPage = null;
 
-  // Open PDF at that exact page
+  // Switch to full-text tab
+  currentConstTab = 'fulltext';
+  // Rebuild nav so the correct tab appears active
+  buildNav('constitution');
+  // Highlight the active tab element (buildNav creates fresh DOM so we can query it)
+  document.querySelectorAll('.const-view-tab').forEach(t => {
+    t.classList.toggle('active', t.textContent.includes('Полный'));
+  });
+
+  // Navigate PDF to that chapter's page
   loadPdfViewer(ch.page || 1, ch.title);
 }
 
