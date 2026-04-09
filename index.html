@@ -2257,28 +2257,56 @@ function setElectionFilter(filter, rowEl) {
 // ══════════════════════════════════════════
 // CONSTITUTION VIEW
 // ══════════════════════════════════════════
-function renderConstitutionView() {
+let _constBlobUrl = null;  // cached blob URL for current PDF
+let _constBlobData = null; // the base64 data used to build that blob URL
+
+function getConstBlobUrl() {
+  const raw = constitution.pdf_data;
+  if (!raw) return null;
+  // Return cached URL if PDF hasn't changed
+  if (_constBlobUrl && _constBlobData === raw) return _constBlobUrl;
+  // Revoke old blob to free memory
+  if (_constBlobUrl) URL.revokeObjectURL(_constBlobUrl);
+  // Build new blob URL from base64
+  const base64 = raw.startsWith('data:') ? raw.split(',')[1] : raw;
+  try {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    _constBlobUrl  = URL.createObjectURL(blob);
+    _constBlobData = raw;
+    return _constBlobUrl;
+  } catch(e) { return null; }
+}
+
+function renderConstitutionPdf(page) {
+  const container = document.getElementById('innerCards');
+  if (!container) return;
+  const blobUrl = getConstBlobUrl();
+  if (!blobUrl) {
+    container.innerHTML = `<div class="const-view-pane">
+      <div class="const-no-pdf">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span>// PDF не загружен — используйте панель администратора</span>
+      </div>
+    </div>`;
+    return;
+  }
+  const src = blobUrl + (page ? '#page=' + page : '');
+  container.innerHTML = `<div class="const-view-pane">
+    <iframe class="const-pdf-embed" src="${src}" frameborder="0"></iframe>
+  </div>`;
+}
+
+function renderConstitutionView(page) {
   const container = document.getElementById('innerCards');
   if (!container) return;
 
   const chapters = Array.isArray(constitution.chapters) ? constitution.chapters : [];
 
   if (currentConstTab === 'fulltext') {
-    if (constitution.pdf_data) {
-      const src = constitution.pdf_data.startsWith('data:')
-        ? constitution.pdf_data
-        : 'data:application/pdf;base64,' + constitution.pdf_data;
-      container.innerHTML = `<div class="const-view-pane">
-        <embed class="const-pdf-embed" src="${src}" type="application/pdf">
-      </div>`;
-    } else {
-      container.innerHTML = `<div class="const-view-pane">
-        <div class="const-no-pdf">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          <span>// PDF не загружен — используйте панель администратора</span>
-        </div>
-      </div>`;
-    }
+    renderConstitutionPdf(page || null);
   } else {
     if (chapters.length === 0) {
       container.innerHTML = `<div class="const-view-pane">
@@ -2295,11 +2323,11 @@ function renderConstitutionView() {
       container.innerHTML = `<div class="const-view-pane">
         <div class="const-chapters-list">
           ${chapters.map((ch,i) => `
-          <div class="const-ch-row" onclick="openConstitutionChapter(${ch.page||1})">
+          <div class="const-ch-row" onclick="openConstitutionChapter(${ch.page || 1})">
             <div class="const-ch-num">${toRoman(i+1)}</div>
             <div class="const-ch-body">
               <div class="const-ch-title">${escHtml(ch.title)}</div>
-              ${ch.page ? `<div class="const-ch-page">Стр. ${ch.page}</div>` : ''}
+              ${ch.page ? `<div class="const-ch-page">Стр. ${ch.page}</div>` : '<div class="const-ch-page">// без страницы</div>'}
             </div>
             <div class="const-ch-arr"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
           </div>`).join('')}
@@ -2310,21 +2338,17 @@ function renderConstitutionView() {
 }
 
 function openConstitutionChapter(page) {
-  // Switch to full text and jump to page using PDF embed hash
+  // Animate tab switch
+  const blink = document.getElementById('flashBlink');
+  blink.classList.remove('active'); void blink.offsetWidth; blink.classList.add('active');
+  blink.addEventListener('animationend', () => blink.classList.remove('active'), {once:true});
+
+  // Switch to full text tab visually
   currentConstTab = 'fulltext';
   buildNav('constitution');
-  const container = document.getElementById('innerCards');
-  if (!container || !constitution.pdf_data) return;
-  const src = (constitution.pdf_data.startsWith('data:')
-    ? constitution.pdf_data
-    : 'data:application/pdf;base64,' + constitution.pdf_data) + '#page=' + page;
-  container.innerHTML = `<div class="const-view-pane">
-    <embed class="const-pdf-embed" src="${src}" type="application/pdf">
-  </div>`;
-  // Update tab active state
-  document.querySelectorAll('.const-view-tab').forEach((t,i) => {
-    t.classList.toggle('active', i === 0);
-  });
+
+  // Render PDF at the requested page via blob URL + #page=N
+  renderConstitutionPdf(page);
 }
 
 function switchConstTab(tab, el) {
@@ -2337,6 +2361,7 @@ function switchConstTab(tab, el) {
   blink.addEventListener('animationend', () => blink.classList.remove('active'), {once:true});
   renderConstitutionView();
 }
+
 
 
 function fireScanLine() {
