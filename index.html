@@ -599,6 +599,93 @@ header::before {
 .const-arr { width:20px; height:20px; opacity:0; transition:opacity 0.2s, transform 0.2s; transform:translateX(-4px); }
 .const-arr svg { stroke:var(--c05); fill:none; stroke-width:2; width:100%; height:100%; }
 .const-item:hover .const-arr { opacity:1; transform:translateX(4px); }
+.const-item { cursor: pointer; }
+
+/* ══ CONSTITUTION VIEW ══ */
+.const-view-tabs { display:flex; border:1px solid var(--ink); border-bottom:none; }
+.const-view-tab {
+  flex:1; padding:14px 24px; text-align:center;
+  font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:0.25em; text-transform:uppercase;
+  color:var(--ink2); border-right:1px solid var(--ink); background:var(--white);
+  transition:all 0.2s; cursor:crosshair;
+}
+.const-view-tab:last-child { border-right:none; }
+.const-view-tab.active { background:var(--ink); color:var(--c05); }
+.const-view-tab:hover:not(.active) { background:var(--off); color:var(--c05); }
+.const-view-pane { border:1px solid var(--ink); min-height:320px; }
+.const-pdf-embed {
+  width:100%; height:75vh; min-height:420px; display:block; border:none;
+  background:var(--off);
+}
+.const-no-pdf {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:12px; height:320px;
+  font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:0.2em;
+  color:var(--ink2); opacity:0.4; text-transform:uppercase;
+}
+.const-chapters-list { display:flex; flex-direction:column; }
+.const-ch-row {
+  display:grid; grid-template-columns:56px 1fr 80px;
+  align-items:stretch; border-bottom:1px solid var(--line); transition:background 0.2s;
+  cursor:crosshair;
+}
+.const-ch-row:last-child { border-bottom:none; }
+.const-ch-row:hover { background:var(--off); }
+.const-ch-num {
+  background:var(--ink); color:var(--c05);
+  font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:900;
+  display:flex; align-items:center; justify-content:center; padding:20px 0;
+  transition:background 0.2s;
+}
+.const-ch-row:hover .const-ch-num { background:#14171e; }
+.const-ch-body {
+  padding:18px 24px; display:flex; flex-direction:column; justify-content:center; gap:4px;
+  border-left:1px solid var(--ink); border-right:1px solid var(--ink);
+}
+.const-ch-title { font-family:'Barlow Condensed',sans-serif; font-size:17px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; }
+.const-ch-page { font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:0.2em; color:var(--c05); opacity:0.6; text-transform:uppercase; }
+.const-ch-arr {
+  display:flex; align-items:center; justify-content:center;
+}
+.const-ch-arr svg { width:18px; height:18px; stroke:var(--c05); fill:none; stroke-width:2; opacity:0.5; transition:opacity 0.2s, transform 0.2s; }
+.const-ch-row:hover .const-ch-arr svg { opacity:1; transform:translateX(4px); }
+.const-empty-state {
+  padding:48px 24px; text-align:center;
+  font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:0.2em;
+  color:var(--ink2); opacity:0.4; text-transform:uppercase;
+}
+
+/* ══ ADMIN CONSTITUTION ══ */
+.const-chapter-list-admin { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+.const-ch-admin-row {
+  display:grid; grid-template-columns:1fr 100px auto; gap:8px; align-items:center;
+  border:1px solid var(--line); padding:10px 14px;
+}
+.const-ch-admin-title { font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:0.06em; color:var(--ink); }
+.const-ch-admin-page { font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:0.06em; color:var(--ink2); }
+.const-text-select-wrap {
+  border:1px solid var(--ink); transition:border-color 0.2s; position:relative;
+}
+.const-text-select-wrap:focus-within { border-color:var(--c05); }
+.const-text-toolbar {
+  display:flex; gap:8px; padding:8px 10px;
+  border-bottom:1px solid var(--line); background:var(--off);
+  align-items:center;
+}
+.const-text-hint {
+  font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:0.12em;
+  color:var(--ink2); opacity:0.5; flex:1;
+}
+.const-text-area {
+  width:100%; min-height:180px; padding:12px 14px;
+  font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:0.05em; color:var(--ink);
+  background:var(--white); outline:none; resize:vertical; border:none;
+  line-height:1.75;
+}
+.const-pdf-upload-status {
+  font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:0.15em;
+  color:var(--ink2); opacity:0.6; text-transform:uppercase; margin-top:4px;
+}
 .nav-laws { display:grid; grid-template-columns:repeat(3,1fr); gap:0; border:1px solid var(--ink); margin-bottom:32px; }
 .law-tile { padding:28px 24px 24px; border-right:1px solid var(--ink); border-bottom:1px solid var(--ink);  position:relative; overflow:hidden; transition:background 0.2s; display:flex; flex-direction:column; gap:16px; min-height:130px; }
 .law-tile:nth-child(3n) { border-right:none; }
@@ -1434,6 +1521,7 @@ header::before {
         <button class="admin-tab-btn" onclick="switchAdminTab('referendums',this)">Референдумы</button>
         <button class="admin-tab-btn" onclick="switchAdminTab('parliament',this)">Парламент</button>
         <button class="admin-tab-btn" onclick="switchAdminTab('parties',this)">Партии</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab('constitution',this)">Конституция</button>
       </div>
 
       <!-- ── CARD FORM (elections / referendums / voting) ── -->
@@ -1651,8 +1739,71 @@ header::before {
         </div>
       </div>
 
+      <!-- ── CONSTITUTION FORM ── -->
+      <div class="admin-form-wrap" id="constitutionFormWrap" style="display:none">
+        <div class="admin-form-head">
+          <span class="admin-form-head-title">// КОНСТИТУЦИЯ</span>
+        </div>
+        <div class="admin-form-body">
+
+          <!-- PDF Upload -->
+          <div class="admin-field">
+            <div class="admin-field-label">PDF файл конституции</div>
+            <div class="admin-img-upload-wrap">
+              <div class="admin-img-preview-row">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <label class="admin-file-input-label" for="constitutionPdfInput">
+                    📄 ВЫБРАТЬ PDF ФАЙЛ
+                  </label>
+                  <input type="file" id="constitutionPdfInput" class="admin-file-input" accept="application/pdf"
+                    onchange="handlePdfUpload(this)">
+                  <button class="admin-img-clear-btn" id="constitutionPdfClear"
+                    onclick="clearConstitutionPdf()">
+                    ✕ УБРАТЬ PDF
+                  </button>
+                </div>
+                <div id="constitutionPdfStatus" class="const-pdf-upload-status" style="margin-left:14px;">
+                  // PDF не загружен
+                </div>
+              </div>
+              <input type="hidden" id="constitutionPdfBase64">
+            </div>
+          </div>
+
+          <!-- Chapter text area with selection -->
+          <div class="admin-field">
+            <div class="admin-field-label">Текст конституции (для выделения глав)</div>
+            <div class="const-text-select-wrap">
+              <div class="const-text-toolbar">
+                <span class="const-text-hint">// Выделите текст названия главы мышью, затем нажмите кнопку →</span>
+                <button type="button" class="rich-editor-btn" onclick="captureChapterFromSelection()" style="flex-shrink:0">
+                  + ДОБАВИТЬ ГЛАВУ ИЗ ВЫДЕЛЕНИЯ
+                </button>
+              </div>
+              <textarea class="const-text-area" id="constitutionTextArea" placeholder="Вставьте текст конституции сюда. Выделите название главы и нажмите «+ ДОБАВИТЬ ГЛАВУ ИЗ ВЫДЕЛЕНИЯ»..."></textarea>
+            </div>
+          </div>
+
+          <!-- Chapters list -->
+          <div class="admin-field">
+            <div class="admin-field-label" style="display:flex;align-items:center;justify-content:space-between">
+              <span>Главы</span>
+              <button type="button" class="admin-btn admin-btn-secondary" style="font-size:8px;padding:4px 10px" onclick="addChapterManually()">+ ДОБАВИТЬ ВРУЧНУЮ</button>
+            </div>
+            <div class="const-chapter-list-admin" id="adminChapterList">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:0.12em;color:var(--ink2);opacity:0.4">// Нет глав</div>
+            </div>
+          </div>
+
+          <div class="admin-form-actions">
+            <button class="admin-btn admin-btn-primary" onclick="saveConstitution()">СОХРАНИТЬ КОНСТИТУЦИЮ</button>
+          </div>
+          <div id="adminConstitutionSaveMsg" style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:0.15em;color:var(--c02);display:none;margin-top:8px;"></div>
+        </div>
+      </div>
+
       <!-- Cards / Parties list -->
-      <div style="margin-bottom:12px">
+      <div id="adminListSection" style="margin-bottom:12px">
         <div class="section-label" id="adminListLabel">Существующие карточки — Выборы</div>
       </div>
       <div class="admin-cards-list" id="adminCardsList">
@@ -1697,7 +1848,9 @@ const SECTION_COLORS = {
 let allCards = [];
 let allParties = [];
 let allParliamentSeats = [];
+let constitution = { pdf_data: null, chapters: [] };
 let currentSection = null;
+let currentConstTab = 'fulltext';
 let currentElectionFilter = 'all';
 let currentPartyFilter = 'all';
 let adminToken = localStorage.getItem('lg_admin_token');
@@ -1794,9 +1947,18 @@ async function loadParliamentSeats() {
   }
 }
 
+async function loadConstitution() {
+  try {
+    const data = await apiGet('/api/constitution');
+    constitution = data && typeof data === 'object' ? data : { pdf_data: null, chapters: [] };
+  } catch(e) { constitution = { pdf_data: null, chapters: [] }; }
+  if (currentSection === 'constitution') renderConstitutionView();
+}
+
 loadCards();
 loadParties();
 loadParliamentSeats();
+loadConstitution();
 
 // ══════════════════════════════════════════
 // CARD SORTING
@@ -2030,12 +2192,9 @@ function buildNav(key) {
     parliament: '',
     parties: buildPartyFilterNav(),
 
-    constitution: `<div class="nav-constitution">
-      ${[['I','Полный текст','FULL · TEXT'],['II','Главы','CHAPTERS']].map(([r,l,s])=>`<div class="const-item">
-        <div class="const-roman">${r}</div>
-        <div class="const-body"><div class="const-label">${l}</div><div class="const-sub">${s}</div></div>
-        <div class="const-arrow-cell"><div class="const-arr"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div></div>
-      </div>`).join('')}
+    constitution: `<div class="const-view-tabs">
+      <div class="const-view-tab${currentConstTab==='fulltext'?' active':''}" onclick="switchConstTab('fulltext',this)">I — Полный текст</div>
+      <div class="const-view-tab${currentConstTab==='chapters'?' active':''}" onclick="switchConstTab('chapters',this)">II — Главы</div>
     </div>`,
 
     laws: `<div class="nav-laws"></div>`,
@@ -2096,8 +2255,90 @@ function setElectionFilter(filter, rowEl) {
 }
 
 // ══════════════════════════════════════════
-// NAVIGATION
+// CONSTITUTION VIEW
 // ══════════════════════════════════════════
+function renderConstitutionView() {
+  const container = document.getElementById('innerCards');
+  if (!container) return;
+
+  const chapters = Array.isArray(constitution.chapters) ? constitution.chapters : [];
+
+  if (currentConstTab === 'fulltext') {
+    if (constitution.pdf_data) {
+      const src = constitution.pdf_data.startsWith('data:')
+        ? constitution.pdf_data
+        : 'data:application/pdf;base64,' + constitution.pdf_data;
+      container.innerHTML = `<div class="const-view-pane">
+        <embed class="const-pdf-embed" src="${src}" type="application/pdf">
+      </div>`;
+    } else {
+      container.innerHTML = `<div class="const-view-pane">
+        <div class="const-no-pdf">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>// PDF не загружен — используйте панель администратора</span>
+        </div>
+      </div>`;
+    }
+  } else {
+    if (chapters.length === 0) {
+      container.innerHTML = `<div class="const-view-pane">
+        <div class="const-empty-state">// Главы не определены — используйте панель администратора</div>
+      </div>`;
+    } else {
+      const toRoman = n => {
+        const vals = [1000,900,500,400,100,90,50,40,10,9,5,4,1];
+        const syms = ['M','CM','D','CD','C','XC','L','XL','X','IX','V','IV','I'];
+        let result = '', num = n;
+        for(let i=0;i<vals.length;i++){while(num>=vals[i]){result+=syms[i];num-=vals[i];}}
+        return result;
+      };
+      container.innerHTML = `<div class="const-view-pane">
+        <div class="const-chapters-list">
+          ${chapters.map((ch,i) => `
+          <div class="const-ch-row" onclick="openConstitutionChapter(${ch.page||1})">
+            <div class="const-ch-num">${toRoman(i+1)}</div>
+            <div class="const-ch-body">
+              <div class="const-ch-title">${escHtml(ch.title)}</div>
+              ${ch.page ? `<div class="const-ch-page">Стр. ${ch.page}</div>` : ''}
+            </div>
+            <div class="const-ch-arr"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    }
+  }
+}
+
+function openConstitutionChapter(page) {
+  // Switch to full text and jump to page using PDF embed hash
+  currentConstTab = 'fulltext';
+  buildNav('constitution');
+  const container = document.getElementById('innerCards');
+  if (!container || !constitution.pdf_data) return;
+  const src = (constitution.pdf_data.startsWith('data:')
+    ? constitution.pdf_data
+    : 'data:application/pdf;base64,' + constitution.pdf_data) + '#page=' + page;
+  container.innerHTML = `<div class="const-view-pane">
+    <embed class="const-pdf-embed" src="${src}" type="application/pdf">
+  </div>`;
+  // Update tab active state
+  document.querySelectorAll('.const-view-tab').forEach((t,i) => {
+    t.classList.toggle('active', i === 0);
+  });
+}
+
+function switchConstTab(tab, el) {
+  if (currentConstTab === tab) return;
+  currentConstTab = tab;
+  document.querySelectorAll('.const-view-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const blink = document.getElementById('flashBlink');
+  blink.classList.remove('active'); void blink.offsetWidth; blink.classList.add('active');
+  blink.addEventListener('animationend', () => blink.classList.remove('active'), {once:true});
+  renderConstitutionView();
+}
+
+
 function fireScanLine() {
   const scan = document.getElementById('transitionScan');
   scan.classList.remove('active');
@@ -2136,6 +2377,10 @@ function openCategory(key) {
     currentPartyFilter = 'all';
     buildNav(key); // rebuild after resetting filter so counts are correct
     renderPartiesView();
+  } else if (key === 'constitution') {
+    currentConstTab = 'fulltext';
+    buildNav(key);
+    renderConstitutionView();
   } else {
     document.getElementById('innerCards').innerHTML = '';
   }
@@ -2386,9 +2631,10 @@ function doLogout() {
 function showAdminDashboard() {
   document.getElementById('adminLoginPanel').style.display = 'none';
   document.getElementById('adminDashboard').style.display = 'block';
-  loadCards().then(() => { if (adminCurrentTab !== 'parties' && adminCurrentTab !== 'parliament') renderAdminCardsList(); });
+  loadCards().then(() => { if (adminCurrentTab !== 'parties' && adminCurrentTab !== 'parliament' && adminCurrentTab !== 'constitution') renderAdminCardsList(); });
   loadParties().then(() => { if (adminCurrentTab === 'parties') renderAdminPartiesList(); populateParliamentPartySelect(); });
   loadParliamentSeats().then(() => { if (adminCurrentTab === 'parliament') renderAdminParliamentList(); });
+  loadConstitution().then(() => { if (adminCurrentTab === 'constitution') loadConstitutionAdminForm(); });
 }
 
 // ══════════════════════════════════════════
@@ -2401,11 +2647,18 @@ function switchAdminTab(section, btn) {
 
   const isParties = section === 'parties';
   const isParliament = section === 'parliament';
-  document.getElementById('cardFormWrap').style.display = (!isParties && !isParliament) ? 'block' : 'none';
+  const isConstitution = section === 'constitution';
+  document.getElementById('cardFormWrap').style.display = (!isParties && !isParliament && !isConstitution) ? 'block' : 'none';
   document.getElementById('partyFormWrap').style.display = isParties ? 'block' : 'none';
   document.getElementById('parliamentFormWrap').style.display = isParliament ? 'block' : 'none';
+  document.getElementById('constitutionFormWrap').style.display = isConstitution ? 'block' : 'none';
 
-  if (!isParties && !isParliament) {
+  const listSection = document.getElementById('adminListSection');
+  const cardsListEl = document.getElementById('adminCardsList');
+  if (listSection) listSection.style.display = isConstitution ? 'none' : 'block';
+  if (cardsListEl) cardsListEl.style.display = isConstitution ? 'none' : 'block';
+
+  if (!isParties && !isParliament && !isConstitution) {
     const sectionNames = {elections:'Выборы', referendums:'Референдумы'};
     document.getElementById('adminListLabel').textContent = `Существующие карточки — ${sectionNames[section] || section}`;
     document.getElementById('electionCategoryField').style.display = section === 'elections' ? 'flex' : 'none';
@@ -2415,10 +2668,12 @@ function switchAdminTab(section, btn) {
     document.getElementById('adminListLabel').textContent = 'Существующие партии';
     cancelPartyEdit();
     renderAdminPartiesList();
-  } else {
+  } else if (isParliament) {
     document.getElementById('adminListLabel').textContent = 'Места в парламенте';
     cancelParliamentEdit();
     renderAdminParliamentList();
+  } else if (isConstitution) {
+    loadConstitutionAdminForm();
   }
 }
 
@@ -3144,6 +3399,145 @@ function renderAdminParliamentList() {
       </div>
     </div>`;
   }).join('');
+}
+
+// ══════════════════════════════════════════
+// CONSTITUTION ADMIN
+// ══════════════════════════════════════════
+let adminChapters = []; // [{title, page}]
+
+function loadConstitutionAdminForm() {
+  // Populate PDF status
+  const statusEl = document.getElementById('constitutionPdfStatus');
+  const clearBtn = document.getElementById('constitutionPdfClear');
+  const b64 = document.getElementById('constitutionPdfBase64').value;
+  if (constitution.pdf_data && !b64) {
+    // Loaded from server, not yet overwritten
+    document.getElementById('constitutionPdfBase64').value = constitution.pdf_data;
+    statusEl.textContent = '// PDF загружен с сервера ✓';
+    statusEl.style.color = 'var(--c02)';
+    clearBtn.classList.add('visible');
+  } else if (!b64 && !constitution.pdf_data) {
+    statusEl.textContent = '// PDF не загружен';
+    statusEl.style.color = '';
+    clearBtn.classList.remove('visible');
+  }
+  // Populate chapters
+  adminChapters = JSON.parse(JSON.stringify(Array.isArray(constitution.chapters) ? constitution.chapters : []));
+  renderAdminChapterList();
+}
+
+function handlePdfUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById('constitutionPdfStatus');
+  const clearBtn = document.getElementById('constitutionPdfClear');
+  statusEl.textContent = '// Загрузка...';
+  statusEl.style.color = '';
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result; // data:application/pdf;base64,...
+    document.getElementById('constitutionPdfBase64').value = dataUrl;
+    statusEl.textContent = `// ${file.name} (${(file.size/1024).toFixed(0)} КБ) ✓`;
+    statusEl.style.color = 'var(--c02)';
+    clearBtn.classList.add('visible');
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearConstitutionPdf() {
+  document.getElementById('constitutionPdfBase64').value = '';
+  document.getElementById('constitutionPdfInput').value = '';
+  document.getElementById('constitutionPdfStatus').textContent = '// PDF убран';
+  document.getElementById('constitutionPdfStatus').style.color = 'var(--c07)';
+  document.getElementById('constitutionPdfClear').classList.remove('visible');
+}
+
+function captureChapterFromSelection() {
+  const textarea = document.getElementById('constitutionTextArea');
+  const start = textarea.selectionStart;
+  const end   = textarea.selectionEnd;
+  if (start === end) {
+    alert('Выделите текст названия главы в поле ниже, затем нажмите кнопку.');
+    return;
+  }
+  const selected = textarea.value.substring(start, end).trim();
+  if (!selected) return;
+  // Ask for page number
+  const pageStr = prompt(`Название главы:\n"${selected}"\n\nВведите номер страницы (или оставьте пустым):`, '');
+  const page = pageStr !== null ? parseInt(pageStr, 10) || null : null;
+  adminChapters.push({ title: selected, page });
+  renderAdminChapterList();
+}
+
+function addChapterManually() {
+  const title = prompt('Название главы:');
+  if (!title || !title.trim()) return;
+  const pageStr = prompt('Номер страницы (или оставьте пустым):');
+  const page = pageStr ? parseInt(pageStr, 10) || null : null;
+  adminChapters.push({ title: title.trim(), page });
+  renderAdminChapterList();
+}
+
+function removeAdminChapter(idx) {
+  adminChapters.splice(idx, 1);
+  renderAdminChapterList();
+}
+
+function renderAdminChapterList() {
+  const container = document.getElementById('adminChapterList');
+  if (adminChapters.length === 0) {
+    container.innerHTML = '<div style="font-family:\'Share Tech Mono\',monospace;font-size:8px;letter-spacing:0.12em;color:var(--ink2);opacity:0.4">// Нет глав</div>';
+    return;
+  }
+  container.innerHTML = adminChapters.map((ch, i) => `
+    <div class="const-ch-admin-row">
+      <span class="const-ch-admin-title">${escHtml(ch.title)}</span>
+      <span class="const-ch-admin-page" style="text-align:center">${ch.page ? 'Стр. ' + ch.page : '—'}</span>
+      <div style="display:flex;gap:6px;justify-content:flex-end">
+        <button class="admin-btn admin-btn-secondary" style="font-size:7px;padding:3px 8px"
+          onclick="editAdminChapter(${i})">✎</button>
+        <button class="admin-btn admin-btn-danger" style="font-size:7px;padding:3px 8px"
+          onclick="removeAdminChapter(${i})">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function editAdminChapter(idx) {
+  const ch = adminChapters[idx];
+  const title = prompt('Название главы:', ch.title);
+  if (title === null) return;
+  const pageStr = prompt('Номер страницы:', ch.page || '');
+  const page = pageStr ? parseInt(pageStr, 10) || null : null;
+  adminChapters[idx] = { title: title.trim() || ch.title, page };
+  renderAdminChapterList();
+}
+
+async function saveConstitution() {
+  const msgEl = document.getElementById('adminConstitutionSaveMsg');
+  if (!adminToken) { doLogout(); return; }
+
+  const pdfData = document.getElementById('constitutionPdfBase64').value || null;
+
+  msgEl.style.display = 'block'; msgEl.style.color = 'var(--ink2)';
+  msgEl.textContent = '// Сохранение...';
+
+  const r = await apiPost('/api/constitution', {
+    pdf_data: pdfData,
+    chapters: adminChapters,
+  }, adminToken);
+
+  if (r.ok) {
+    msgEl.style.color = 'var(--c02)';
+    msgEl.textContent = '// КОНСТИТУЦИЯ СОХРАНЕНА ✓';
+    await loadConstitution();
+  } else if (r.status === 401) {
+    doLogout();
+  } else {
+    const txt = await r.text().catch(() => '');
+    msgEl.style.color = 'var(--c07)';
+    msgEl.textContent = '// ОШИБКА: ' + txt.slice(0, 80);
+  }
 }
 
 // ══════════════════════════════════════════
