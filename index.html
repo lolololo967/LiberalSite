@@ -613,15 +613,46 @@ header::before {
 .const-view-tab.active { background:var(--ink); color:var(--c05); }
 .const-view-tab:hover:not(.active) { background:var(--off); color:var(--c05); }
 .const-view-pane { border:1px solid var(--ink); min-height:320px; }
-.const-pdf-embed {
-  width:100%; height:75vh; min-height:420px; display:block; border:none;
-  background:var(--off);
-}
 .const-no-pdf {
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   gap:12px; height:320px;
   font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:0.2em;
   color:var(--ink2); opacity:0.4; text-transform:uppercase;
+}
+/* PDF.js canvas viewer */
+.const-pdf-toolbar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 20px; background:var(--ink); border-bottom:1px solid rgba(255,255,255,0.08);
+  gap:16px;
+}
+.const-pdf-nav-btn {
+  font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:0.18em; text-transform:uppercase;
+  color:#fff; border:1px solid rgba(255,255,255,0.2); padding:6px 14px; background:none;
+  cursor:crosshair; transition:all 0.2s;
+}
+.const-pdf-nav-btn:hover:not(:disabled) { border-color:var(--c05); color:var(--c05); }
+.const-pdf-nav-btn:disabled { opacity:0.25; cursor:default; }
+.const-pdf-page-info {
+  font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:0.2em;
+  color:rgba(255,255,255,0.5); text-align:center; flex:1;
+}
+.const-pdf-chapter-label {
+  font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:0.14em;
+  color:var(--c05); opacity:0.7; max-width:300px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.const-pdf-loading {
+  display:flex; align-items:center; justify-content:center; height:320px;
+  font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:0.2em;
+  color:var(--ink2); opacity:0.4; text-transform:uppercase;
+}
+.const-pdf-canvas-wrap {
+  overflow-y:auto; overflow-x:auto; background:var(--panel);
+  display:flex; justify-content:center; padding:24px; min-height:420px;
+  max-height:75vh;
+}
+.const-pdf-canvas-wrap canvas {
+  display:block; box-shadow:0 4px 24px rgba(10,12,16,0.18);
+  max-width:100%; height:auto;
 }
 .const-chapters-list { display:flex; flex-direction:column; }
 .const-ch-row {
@@ -2255,37 +2286,122 @@ function setElectionFilter(filter, rowEl) {
 }
 
 // ══════════════════════════════════════════
-// CONSTITUTION VIEW
+// CONSTITUTION VIEW  (PDF.js renderer)
 // ══════════════════════════════════════════
-let _constBlobUrl = null;  // cached blob URL for current PDF
-let _constBlobData = null; // the base64 data used to build that blob URL
+let _constBlobUrl     = null;
+let _constBlobData    = null;
+let _pdfDoc           = null;
+let _pdfLoadedBlob    = null;
+let _pdfCurrentPage   = 1;
+let _pdfTotalPages    = 0;
+let _pdfRendering     = false;
+let _pdfPendingPage   = null;
+let _pdfCurrentChapterLabel = '';
 
+// ── Get/cache Blob URL ────────────────────
 function getConstBlobUrl() {
   const raw = constitution.pdf_data;
   if (!raw) return null;
-  // Return cached URL if PDF hasn't changed
   if (_constBlobUrl && _constBlobData === raw) return _constBlobUrl;
-  // Revoke old blob to free memory
-  if (_constBlobUrl) URL.revokeObjectURL(_constBlobUrl);
-  // Build new blob URL from base64
+  if (_constBlobUrl) { URL.revokeObjectURL(_constBlobUrl); _constBlobUrl = null; }
   const base64 = raw.startsWith('data:') ? raw.split(',')[1] : raw;
   try {
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const bin = atob(base64);
+    const buf = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+    const blob = new Blob([buf], { type: 'application/pdf' });
     _constBlobUrl  = URL.createObjectURL(blob);
     _constBlobData = raw;
-    return _constBlobUrl;
   } catch(e) { return null; }
+  return _constBlobUrl;
 }
 
-function renderConstitutionPdf(page) {
+// ── Load PDF.js library ───────────────────
+function ensurePdfJs() {
+  return new Promise((resolve, reject) => {
+    if (window.pdfjsLib) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload = () => {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      resolve();
+    };
+    s.onerror = () => reject(new Error('Не удалось загрузить PDF.js'));
+    document.head.appendChild(s);
+  });
+}
+
+// ── Render a single page to canvas ───────
+async function _renderPage(num) {
+  if (!_pdfDoc) return;
+  _pdfRendering = true;
+  _pdfCurrentPage = num;
+  _updatePdfToolbar();
+
+  const page = await _pdfDoc.getPage(num);
+  const canvas = document.getElementById('constPdfCanvas');
+  if (!canvas) { _pdfRendering = false; return; }
+
+  const wrap  = document.getElementById('constPdfCanvasWrap');
+  const avail = wrap ? (wrap.clientWidth - 48) : 760;
+  const vp1   = page.getViewport({ scale: 1 });
+  const scale = Math.max(1.0, avail / vp1.width);
+  const vp    = page.getViewport({ scale });
+
+  canvas.width  = vp.width;
+  canvas.height = vp.height;
+
+  await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+
+  _pdfRendering = false;
+  if (_pdfPendingPage !== null) {
+    const p = _pdfPendingPage; _pdfPendingPage = null;
+    _renderPage(p);
+  }
+}
+
+function _queuePage(num) {
+  num = Math.max(1, Math.min(num, _pdfTotalPages));
+  if (_pdfRendering) { _pdfPendingPage = num; return; }
+  _renderPage(num);
+}
+
+function _updatePdfToolbar() {
+  const info = document.getElementById('constPdfPageInfo');
+  const prev = document.getElementById('constPdfPrev');
+  const next = document.getElementById('constPdfNext');
+  const lbl  = document.getElementById('constPdfChapterLabel');
+  if (info) info.textContent = `${_pdfCurrentPage} / ${_pdfTotalPages}`;
+  if (prev) prev.disabled = _pdfCurrentPage <= 1;
+  if (next) next.disabled = _pdfCurrentPage >= _pdfTotalPages;
+  if (lbl)  lbl.textContent = _pdfCurrentChapterLabel;
+}
+
+// ── Build the PDF shell DOM ───────────────
+function _buildPdfShell() {
   const container = document.getElementById('innerCards');
-  if (!container) return;
+  container.innerHTML = `<div class="const-view-pane">
+    <div class="const-pdf-toolbar">
+      <button class="const-pdf-nav-btn" id="constPdfPrev"
+        onclick="pdfGoPage(_pdfCurrentPage - 1)">← НАЗАД</button>
+      <span class="const-pdf-page-info" id="constPdfPageInfo">...</span>
+      <span class="const-pdf-chapter-label" id="constPdfChapterLabel"></span>
+      <button class="const-pdf-nav-btn" id="constPdfNext"
+        onclick="pdfGoPage(_pdfCurrentPage + 1)">ВПЕРЁД →</button>
+    </div>
+    <div class="const-pdf-canvas-wrap" id="constPdfCanvasWrap">
+      <div class="const-pdf-loading" id="constPdfLoading">// Загрузка PDF...</div>
+      <canvas id="constPdfCanvas" style="display:none"></canvas>
+    </div>
+  </div>`;
+}
+
+// ── Public: open PDF at page ──────────────
+async function loadPdfViewer(page, chapterLabel) {
   const blobUrl = getConstBlobUrl();
   if (!blobUrl) {
-    container.innerHTML = `<div class="const-view-pane">
+    document.getElementById('innerCards').innerHTML = `<div class="const-view-pane">
       <div class="const-no-pdf">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         <span>// PDF не загружен — используйте панель администратора</span>
@@ -2293,20 +2409,57 @@ function renderConstitutionPdf(page) {
     </div>`;
     return;
   }
-  const src = blobUrl + (page ? '#page=' + page : '');
-  container.innerHTML = `<div class="const-view-pane">
-    <iframe class="const-pdf-embed" src="${src}" frameborder="0"></iframe>
-  </div>`;
+
+  _buildPdfShell();
+  _pdfCurrentChapterLabel = chapterLabel || '';
+
+  try {
+    await ensurePdfJs();
+
+    // Reload document only if blob changed
+    if (_pdfLoadedBlob !== blobUrl) {
+      _pdfDoc        = null;
+      _pdfTotalPages = 0;
+      const task  = pdfjsLib.getDocument(blobUrl);
+      _pdfDoc     = await task.promise;
+      _pdfTotalPages  = _pdfDoc.numPages;
+      _pdfLoadedBlob  = blobUrl;
+    }
+
+    // Show canvas, hide loader
+    const loading = document.getElementById('constPdfLoading');
+    const canvas  = document.getElementById('constPdfCanvas');
+    if (loading) loading.style.display = 'none';
+    if (canvas)  canvas.style.display  = 'block';
+
+    _pdfCurrentPage = Math.max(1, Math.min(page || 1, _pdfTotalPages));
+    _pdfRendering   = false;
+    _pdfPendingPage = null;
+    await _renderPage(_pdfCurrentPage);
+
+  } catch(e) {
+    const wrap = document.getElementById('constPdfCanvasWrap');
+    if (wrap) wrap.innerHTML = `<div class="const-pdf-loading" style="color:var(--c07)">// Ошибка загрузки PDF: ${e.message}</div>`;
+  }
 }
 
-function renderConstitutionView(page) {
+// ── Called from toolbar buttons ───────────
+function pdfGoPage(num) {
+  if (!_pdfDoc) return;
+  num = Math.max(1, Math.min(num, _pdfTotalPages));
+  if (num === _pdfCurrentPage && !_pdfRendering) return;
+  _pdfCurrentChapterLabel = '';
+  _queuePage(num);
+}
+
+// ── Main render dispatcher ────────────────
+function renderConstitutionView(page, chapterLabel) {
   const container = document.getElementById('innerCards');
   if (!container) return;
-
   const chapters = Array.isArray(constitution.chapters) ? constitution.chapters : [];
 
   if (currentConstTab === 'fulltext') {
-    renderConstitutionPdf(page || null);
+    loadPdfViewer(page || 1, chapterLabel || '');
   } else {
     if (chapters.length === 0) {
       container.innerHTML = `<div class="const-view-pane">
@@ -2314,22 +2467,24 @@ function renderConstitutionView(page) {
       </div>`;
     } else {
       const toRoman = n => {
-        const vals = [1000,900,500,400,100,90,50,40,10,9,5,4,1];
-        const syms = ['M','CM','D','CD','C','XC','L','XL','X','IX','V','IV','I'];
-        let result = '', num = n;
-        for(let i=0;i<vals.length;i++){while(num>=vals[i]){result+=syms[i];num-=vals[i];}}
-        return result;
+        const v=['M','CM','D','CD','C','XC','L','XL','X','IX','V','IV','I'];
+        const d=[1000,900,500,400,100,90,50,40,10,9,5,4,1];
+        let r=''; for(let i=0;i<d.length;i++) while(n>=d[i]){r+=v[i];n-=d[i];} return r;
       };
       container.innerHTML = `<div class="const-view-pane">
         <div class="const-chapters-list">
           ${chapters.map((ch,i) => `
-          <div class="const-ch-row" onclick="openConstitutionChapter(${ch.page || 1})">
+          <div class="const-ch-row" onclick="openConstitutionChapter(${i})">
             <div class="const-ch-num">${toRoman(i+1)}</div>
             <div class="const-ch-body">
               <div class="const-ch-title">${escHtml(ch.title)}</div>
-              ${ch.page ? `<div class="const-ch-page">Стр. ${ch.page}</div>` : '<div class="const-ch-page">// без страницы</div>'}
+              ${ch.page
+                ? `<div class="const-ch-page">Стр. ${ch.page}</div>`
+                : `<div class="const-ch-page" style="opacity:0.3">// без страницы</div>`}
             </div>
-            <div class="const-ch-arr"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
+            <div class="const-ch-arr">
+              <svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg>
+            </div>
           </div>`).join('')}
         </div>
       </div>`;
@@ -2337,18 +2492,23 @@ function renderConstitutionView(page) {
   }
 }
 
-function openConstitutionChapter(page) {
-  // Animate tab switch
+// ── Chapter click handler ─────────────────
+function openConstitutionChapter(idx) {
+  const chapters = Array.isArray(constitution.chapters) ? constitution.chapters : [];
+  const ch = chapters[idx];
+  if (!ch) return;
+
+  // Flash effect
   const blink = document.getElementById('flashBlink');
   blink.classList.remove('active'); void blink.offsetWidth; blink.classList.add('active');
   blink.addEventListener('animationend', () => blink.classList.remove('active'), {once:true});
 
-  // Switch to full text tab visually
+  // Switch to full text tab
   currentConstTab = 'fulltext';
   buildNav('constitution');
 
-  // Render PDF at the requested page via blob URL + #page=N
-  renderConstitutionPdf(page);
+  // Open PDF at that exact page
+  loadPdfViewer(ch.page || 1, ch.title);
 }
 
 function switchConstTab(tab, el) {
@@ -2361,6 +2521,7 @@ function switchConstTab(tab, el) {
   blink.addEventListener('animationend', () => blink.classList.remove('active'), {once:true});
   renderConstitutionView();
 }
+
 
 
 
