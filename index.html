@@ -1775,6 +1775,20 @@ header::before {
         <div class="admin-form-head">
           <span class="admin-form-head-title">// КОНСТИТУЦИЯ</span>
         </div>
+        <div class="admin-form-body">
+          <div class="admin-field">
+            <div class="admin-field-label">Текст конституции</div>
+            <div class="const-text-select-wrap">
+              <textarea class="const-text-area" id="constitutionTextArea"
+                placeholder="Вставьте текст конституции сюда..."
+                style="min-height:360px"></textarea>
+            </div>
+          </div>
+          <div class="admin-form-actions">
+            <button class="admin-btn admin-btn-primary" onclick="saveConstitution()">СОХРАНИТЬ</button>
+          </div>
+          <div id="adminConstitutionSaveMsg" style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:0.15em;display:none;margin-top:8px;"></div>
+        </div>
       </div>
 
       <!-- Cards / Parties list -->
@@ -1823,6 +1837,7 @@ const SECTION_COLORS = {
 let allCards = [];
 let allParties = [];
 let allParliamentSeats = [];
+let constitution = { pdf_data: null };
 
 let currentSection = null;
 let currentConstTab = 'fulltext';
@@ -1925,6 +1940,7 @@ async function loadParliamentSeats() {
 loadCards();
 loadParties();
 loadParliamentSeats();
+loadConstitution();
 
 // ══════════════════════════════════════════
 // CARD SORTING
@@ -2158,10 +2174,7 @@ function buildNav(key) {
     parliament: '',
     parties: buildPartyFilterNav(),
 
-    constitution: `<div class="const-view-tabs">
-      <div class="const-view-tab${currentConstTab==='fulltext'?' active':''}" onclick="switchConstTab('fulltext',this)">I — Полный текст</div>
-      <div class="const-view-tab${currentConstTab==='chapters'?' active':''}" onclick="switchConstTab('chapters',this)">II — Главы</div>
-    </div>`,
+    constitution: ``,
 
     laws: `<div class="nav-laws"></div>`,
 
@@ -2223,16 +2236,37 @@ function setElectionFilter(filter, rowEl) {
 // ══════════════════════════════════════════
 // CONSTITUTION VIEW
 // ══════════════════════════════════════════
-function renderConstitutionView() {
-  const container = document.getElementById('innerCards');
-  if (container) container.innerHTML = '';
+async function loadConstitution() {
+  try {
+    const data = await apiGet('/api/constitution');
+    constitution = data && typeof data === 'object' ? data : { pdf_data: null };
+  } catch(e) { constitution = { pdf_data: null }; }
+  if (currentSection === 'constitution') renderConstitutionView();
 }
 
-function switchConstTab(tab, el) {
-  if (currentConstTab === tab) return;
-  currentConstTab = tab;
-  document.querySelectorAll('.const-view-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
+function renderConstitutionView() {
+  const container = document.getElementById('innerCards');
+  if (!container) return;
+  const text = constitution.pdf_data || '';
+  if (!text.trim()) {
+    container.innerHTML = `
+      <div style="
+        padding:48px 32px; text-align:center;
+        border:1px solid var(--ink);
+        font-family:'Share Tech Mono',monospace; font-size:9px;
+        letter-spacing:0.25em; text-transform:uppercase;
+        color:var(--ink2); opacity:0.4;
+      ">// Текст конституции не добавлен — используйте панель администратора</div>`;
+    return;
+  }
+  container.innerHTML = `
+    <div style="
+      border:1px solid var(--ink);
+      padding:40px 48px;
+      font-family:'Share Tech Mono',monospace;
+      font-size:11px; line-height:2; letter-spacing:0.06em;
+      color:var(--ink); white-space:pre-wrap; word-break:break-word;
+    ">${escHtml(text)}</div>`;
 }
 
 
@@ -2533,7 +2567,7 @@ function showAdminDashboard() {
   loadCards().then(() => { if (adminCurrentTab !== 'parties' && adminCurrentTab !== 'parliament' && adminCurrentTab !== 'constitution') renderAdminCardsList(); });
   loadParties().then(() => { if (adminCurrentTab === 'parties') renderAdminPartiesList(); populateParliamentPartySelect(); });
   loadParliamentSeats().then(() => { if (adminCurrentTab === 'parliament') renderAdminParliamentList(); });
-
+  loadConstitution().then(() => { if (adminCurrentTab === 'constitution') loadConstitutionAdminForm(); });
 }
 
 // ══════════════════════════════════════════
@@ -2571,6 +2605,8 @@ function switchAdminTab(section, btn) {
     document.getElementById('adminListLabel').textContent = 'Места в парламенте';
     cancelParliamentEdit();
     renderAdminParliamentList();
+  } else if (isConstitution) {
+    loadConstitutionAdminForm();
   }
 }
 
@@ -3296,6 +3332,38 @@ function renderAdminParliamentList() {
       </div>
     </div>`;
   }).join('');
+}
+
+// ══════════════════════════════════════════
+// CONSTITUTION ADMIN
+// ══════════════════════════════════════════
+function loadConstitutionAdminForm() {
+  const ta = document.getElementById('constitutionTextArea');
+  if (ta) ta.value = constitution.pdf_data || '';
+  const msg = document.getElementById('adminConstitutionSaveMsg');
+  if (msg) { msg.style.display = 'none'; msg.textContent = ''; }
+}
+
+async function saveConstitution() {
+  const msgEl = document.getElementById('adminConstitutionSaveMsg');
+  if (!adminToken) { doLogout(); return; }
+  const text = document.getElementById('constitutionTextArea').value || '';
+  msgEl.style.display = 'block';
+  msgEl.style.color = 'var(--ink2)';
+  msgEl.textContent = '// Сохранение...';
+  const r = await apiPost('/api/constitution', { pdf_data: text, chapters: [] }, adminToken);
+  if (r.ok) {
+    constitution.pdf_data = text;
+    msgEl.style.color = 'var(--c02)';
+    msgEl.textContent = '// СОХРАНЕНО ✓';
+    if (currentSection === 'constitution') renderConstitutionView();
+  } else if (r.status === 401) {
+    doLogout();
+  } else {
+    const txt = await r.text().catch(() => '');
+    msgEl.style.color = 'var(--c07)';
+    msgEl.textContent = '// ОШИБКА: ' + txt.slice(0, 80);
+  }
 }
 
 // ══════════════════════════════════════════
