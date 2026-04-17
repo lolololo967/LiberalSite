@@ -2364,31 +2364,37 @@ function renderConstitutionView() {
   requestAnimationFrame(_initConstitutionObserver);
 }
 
+let _constScrollLock = false;
+
 function constJumpTo(num, el) {
   document.querySelectorAll('.const-nav-item').forEach(n => n.classList.remove('active'));
   if (el) el.classList.add('active');
   const target = document.getElementById('const-ch-' + num);
-  if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (!target) return;
+  _constScrollLock = true;
+  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  clearTimeout(window._constScrollTimer);
+  window._constScrollTimer = setTimeout(() => { _constScrollLock = false; }, 800);
 }
 
 function _initConstitutionObserver() {
   const headings = document.querySelectorAll('.const-ch-heading');
   if (!headings.length) return;
-  const body = document.getElementById('constTextBody');
-  if (!body) return;
 
   const observer = new IntersectionObserver((entries) => {
+    if (_constScrollLock) return;
+    let best = null;
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const num = entry.target.id.replace('const-ch-', '');
-        document.querySelectorAll('.const-nav-item').forEach(n => n.classList.remove('active'));
-        const navItem = document.querySelector(`.const-nav-item[onclick*="'${num}'"]`);
-        if (navItem) {
-          navItem.classList.add('active');
-          navItem.scrollIntoView({ block:'nearest' });
-        }
-      }
+      if (entry.isIntersecting) best = entry.target;
     });
+    if (!best) return;
+    const num = best.id.replace('const-ch-', '');
+    document.querySelectorAll('.const-nav-item').forEach(n => n.classList.remove('active'));
+    const navItem = document.querySelector(`.const-nav-item[onclick*="'${num}'"]`);
+    if (navItem) {
+      navItem.classList.add('active');
+      navItem.scrollIntoView({ block: 'nearest' });
+    }
   }, { root: null, rootMargin: '-55px 0px -70% 0px', threshold: 0 });
 
   headings.forEach(h => observer.observe(h));
