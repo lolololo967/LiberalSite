@@ -686,6 +686,71 @@ header::before {
   color:var(--ink2); opacity:0.4; text-transform:uppercase;
 }
 
+/* ══ CONSTITUTION LAYOUT ══ */
+.const-layout {
+  display:grid; grid-template-columns:260px 1fr;
+  border:1px solid var(--ink); min-height:520px;
+}
+.const-sidebar {
+  border-right:1px solid var(--ink);
+  display:flex; flex-direction:column;
+  position:sticky; top:55px; align-self:start;
+  max-height:calc(100vh - 88px); overflow-y:auto;
+}
+.const-sidebar-head {
+  padding:14px 20px; border-bottom:2px solid var(--ink);
+  font-family:'Share Tech Mono',monospace; font-size:8px;
+  letter-spacing:0.3em; text-transform:uppercase;
+  color:var(--c05); flex-shrink:0; background:var(--ink); color:var(--c05);
+}
+.const-sidebar-list { display:flex; flex-direction:column; }
+.const-nav-item {
+  display:grid; grid-template-columns:36px 1fr;
+  align-items:stretch; border-bottom:1px solid var(--line);
+  cursor:crosshair; transition:background 0.15s; overflow:hidden;
+}
+.const-nav-item:last-child { border-bottom:none; }
+.const-nav-item:hover { background:var(--off); }
+.const-nav-item.active { background:var(--ink); }
+.const-nav-item.active .const-nav-num { color:var(--c05); }
+.const-nav-item.active .const-nav-title { color:#fff; }
+.const-nav-num {
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Share Tech Mono',monospace; font-size:8px; font-weight:700;
+  letter-spacing:0.08em; color:var(--c05); opacity:0.7;
+  border-right:1px solid var(--line); padding:10px 0; flex-shrink:0;
+  transition:color 0.15s;
+}
+.const-nav-title {
+  padding:10px 12px; font-family:'Barlow Condensed',sans-serif;
+  font-size:13px; font-weight:600; text-transform:uppercase;
+  letter-spacing:0.04em; color:var(--ink); line-height:1.2;
+  transition:color 0.15s;
+}
+.const-text-body {
+  padding:36px 44px; display:flex; flex-direction:column; gap:0;
+  overflow-y:auto;
+}
+.const-ch-heading {
+  display:flex; align-items:baseline; gap:14px;
+  font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:800;
+  text-transform:uppercase; letter-spacing:0.06em; color:var(--ink);
+  margin-top:36px; margin-bottom:12px; padding-top:8px;
+  border-top:2px solid var(--ink); scroll-margin-top:80px;
+}
+.const-ch-heading:first-child { margin-top:0; border-top:none; }
+.const-ch-num-inline {
+  font-family:'Share Tech Mono',monospace; font-size:10px;
+  color:var(--c05); letter-spacing:0.12em; flex-shrink:0;
+  border:1px solid var(--c05); padding:2px 7px; opacity:0.8;
+}
+.const-line {
+  font-family:'Share Tech Mono',monospace; font-size:10px;
+  letter-spacing:0.05em; color:var(--ink); line-height:1.85;
+  padding:1px 0;
+}
+.const-line-blank { height:10px; }
+
 /* ══ ADMIN CONSTITUTION ══ */
 .const-chapter-list-admin { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
 .const-ch-admin-row {
@@ -2250,23 +2315,83 @@ function renderConstitutionView() {
   const text = constitution.pdf_data || '';
   if (!text.trim()) {
     container.innerHTML = `
-      <div style="
-        padding:48px 32px; text-align:center;
-        border:1px solid var(--ink);
-        font-family:'Share Tech Mono',monospace; font-size:9px;
-        letter-spacing:0.25em; text-transform:uppercase;
-        color:var(--ink2); opacity:0.4;
-      ">// Текст конституции не добавлен — используйте панель администратора</div>`;
+      <div style="padding:48px 32px;text-align:center;border:1px solid var(--ink);
+        font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;
+        text-transform:uppercase;color:var(--ink2);opacity:0.4;">
+        // Текст конституции не добавлен — используйте панель администратора</div>`;
     return;
   }
+
+  // ── Parse chapters ─────────────────────────────────────────────────────────
+  const chapterRegex = /^Глава\s+(\d+)\.\s+(.+)$/m;
+  const lines = text.split('\n');
+  const chapters = [];
+  lines.forEach((line, i) => {
+    const m = line.trim().match(/^Глава\s+(\d+)\.\s+(.+)$/);
+    if (m) chapters.push({ num: m[1], title: m[2].trim(), lineIdx: i });
+  });
+
+  // ── Build text HTML with anchor spans ──────────────────────────────────────
+  const chapterLineSet = new Set(chapters.map(c => c.lineIdx));
+  const textHtml = lines.map((line, i) => {
+    const m = line.trim().match(/^Глава\s+(\d+)\.\s+(.+)$/);
+    if (m) {
+      return `<div id="const-ch-${m[1]}" class="const-ch-heading">
+        <span class="const-ch-num-inline">${m[1].padStart(2,'0')}</span>${escHtml(line.trim())}
+      </div>`;
+    }
+    const trimmed = line.trim();
+    if (!trimmed) return '<div class="const-line-blank"></div>';
+    return `<div class="const-line">${escHtml(trimmed)}</div>`;
+  }).join('');
+
+  // ── Nav items HTML ──────────────────────────────────────────────────────────
+  const navHtml = chapters.map(ch => `
+    <div class="const-nav-item" onclick="constJumpTo('${ch.num}',this)">
+      <span class="const-nav-num">${ch.num.padStart(2,'0')}</span>
+      <span class="const-nav-title">${escHtml(ch.title)}</span>
+    </div>`).join('');
+
   container.innerHTML = `
-    <div style="
-      border:1px solid var(--ink);
-      padding:40px 48px;
-      font-family:'Share Tech Mono',monospace;
-      font-size:11px; line-height:2; letter-spacing:0.06em;
-      color:var(--ink); white-space:pre-wrap; word-break:break-word;
-    ">${escHtml(text)}</div>`;
+    <div class="const-layout">
+      <div class="const-sidebar" id="constSidebar">
+        <div class="const-sidebar-head">// Главы</div>
+        <div class="const-sidebar-list">${navHtml}</div>
+      </div>
+      <div class="const-text-body" id="constTextBody">${textHtml}</div>
+    </div>`;
+
+  requestAnimationFrame(_initConstitutionObserver);
+}
+
+function constJumpTo(num, el) {
+  document.querySelectorAll('.const-nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const target = document.getElementById('const-ch-' + num);
+  if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function _initConstitutionObserver() {
+  const headings = document.querySelectorAll('.const-ch-heading');
+  if (!headings.length) return;
+  const body = document.getElementById('constTextBody');
+  if (!body) return;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const num = entry.target.id.replace('const-ch-', '');
+        document.querySelectorAll('.const-nav-item').forEach(n => n.classList.remove('active'));
+        const navItem = document.querySelector(`.const-nav-item[onclick*="'${num}'"]`);
+        if (navItem) {
+          navItem.classList.add('active');
+          navItem.scrollIntoView({ block:'nearest' });
+        }
+      }
+    });
+  }, { root: null, rootMargin: '-55px 0px -70% 0px', threshold: 0 });
+
+  headings.forEach(h => observer.observe(h));
 }
 
 
