@@ -2769,7 +2769,7 @@ function openCategory(key) {
   } else if (key === 'constitution') {
     currentConstTab = 'fulltext';
     buildNav(key);
-    renderConstitutionView();
+    // НЕ рендерим здесь — тяжёлый DOM блокирует page-exit анимацию
   } else {
     document.getElementById('innerCards').innerHTML = '';
   }
@@ -2791,6 +2791,11 @@ function openCategory(key) {
       inner.removeEventListener('animationend', onEnter);
       inner.classList.remove('page-enter');
     }, {once:true});
+
+    // Рендерим конституцию после того как page-enter уже стартовал — не блокирует анимацию
+    if (currentSection === 'constitution') {
+      requestAnimationFrame(() => renderConstitutionView());
+    }
 
     window.scrollTo({top:0,behavior:'smooth'});
   }, {once:true});
