@@ -470,7 +470,7 @@ header::before {
   background:var(--white);
   border:2px solid var(--ink);
   position:relative;
-  animation:modalIn 0.22s cubic-bezier(0.2,0,0,1) both;
+  animation:modalIn 0.28s cubic-bezier(0.16,1,0.3,1) both;
 
   overflow-y: auto;   /* вертикальный скролл */
   overflow-x: hidden; /* отключаем горизонтальный */
@@ -478,8 +478,9 @@ header::before {
 .party-modal::-webkit-scrollbar:hover{
 }
 @keyframes modalIn {
-  from { opacity:0; transform:translateY(18px) scale(0.98); }
-  to   { opacity:1; transform:none; }
+  0%   { clip-path:inset(0 0 100% 0); filter:brightness(2.2) saturate(0); }
+  6%   { clip-path:inset(0 0 92%  0); filter:brightness(1)   saturate(1); }
+  100% { clip-path:inset(0 0 0%   0); filter:brightness(1)   saturate(1); }
 }
 .party-modal-close {
   position:absolute; top:16px; right:16px; width:32px; height:32px;
@@ -1347,75 +1348,94 @@ mark.const-highlight.current { background:var(--c05); color:var(--ink); }
 }
 
 @keyframes slideUp {
-  0%   { opacity:0; transform:translateY(10px); clip-path:inset(0 0 100% 0); }
-  100% { opacity:1; transform:translateY(0);    clip-path:inset(0 0 0 0); }
+  0%   { opacity:0; transform:translateY(8px); clip-path:inset(0 0 100% 0); }
+  100% { opacity:1; transform:translateY(0);   clip-path:inset(0 0 0% 0); }
 }
-.fade-in { animation:slideUp 0.22s cubic-bezier(0.16,1,0.3,1) forwards; }
+.fade-in { animation:slideUp 0.2s cubic-bezier(0.16,1,0.3,1) forwards; }
 
-/* ══ FLASH — single clean cut ══ */
+/* ══ FLASH — single hard cut ══ */
 #flashBlink {
   position:fixed; inset:0; z-index:9998; pointer-events:none;
   background:#fff; opacity:0;
 }
 @keyframes blinkFlash {
-  0%   { opacity:0; }
-  10%  { opacity:0.45; }
-  25%  { opacity:0.0; }
+  0%   { opacity:0.5; }
   100% { opacity:0; }
 }
-#flashBlink.active { animation:blinkFlash 0.18s linear forwards; }
+#flashBlink.active { animation:blinkFlash 0.14s cubic-bezier(0.4,0,1,1) forwards; }
 
 /* ══ PAGE TRANSITIONS ══ */
+/* Leading-edge wipe: content reveals left→right with bright line at the front */
 @keyframes pageOut {
-  0%   { clip-path:inset(0 0% 0 0);   opacity:1; filter:brightness(1); }
-  18%  { clip-path:inset(0 0% 0 0);   opacity:1; filter:brightness(2.2); }
-  20%  { clip-path:inset(0 0% 0 0);   opacity:0.6; filter:brightness(1); }
-  100% { clip-path:inset(0 100% 0 0); opacity:0;   filter:brightness(1); }
+  0%   { clip-path:inset(0 0%   0 0); filter:brightness(1)   saturate(1); }
+  8%   { clip-path:inset(0 0%   0 0); filter:brightness(2.4) saturate(0); }
+  10%  { clip-path:inset(0 2%   0 0); filter:brightness(1)   saturate(1); }
+  100% { clip-path:inset(0 100% 0 0); filter:brightness(1)   saturate(1); }
 }
 @keyframes pageIn {
-  0%   { clip-path:inset(0 100% 0 0); opacity:1; filter:brightness(2); }
-  8%   { clip-path:inset(0 92% 0 0);  opacity:1; filter:brightness(1); }
-  100% { clip-path:inset(0 0% 0 0);   opacity:1; filter:brightness(1); }
+  0%   { clip-path:inset(0 100% 0 0); filter:brightness(2.4) saturate(0); }
+  4%   { clip-path:inset(0 97%  0 0); filter:brightness(1)   saturate(1); }
+  100% { clip-path:inset(0 0%   0 0); filter:brightness(1)   saturate(1); }
 }
+
+/* Cards: same wipe but horizontal per-card, with stagger applied outside */
 @keyframes cardGlitchIn {
-  0%   { clip-path:inset(0 100% 0 0); filter:brightness(1.8); }
-  10%  { clip-path:inset(0 88% 0 0);  filter:brightness(1); }
-  100% { clip-path:inset(0 0% 0 0);   filter:brightness(1); }
+  0%   { clip-path:inset(0 100% 0 0); filter:brightness(2.2) saturate(0); opacity:1; }
+  6%   { clip-path:inset(0 93%  0 0); filter:brightness(1)   saturate(1); }
+  100% { clip-path:inset(0 0%   0 0); filter:brightness(1)   saturate(1); }
 }
+
+/* Section swap flicker — single precise flash */
 @keyframes sectionFlicker {
-  0%   { opacity:1; filter:brightness(1); }
-  12%  { opacity:1; filter:brightness(2); }
-  14%  { opacity:1; filter:brightness(1); }
-  100% { opacity:1; filter:brightness(1); }
+  0%   { filter:brightness(1); }
+  10%  { filter:brightness(2.2) saturate(0); }
+  12%  { filter:brightness(1); }
+  100% { filter:brightness(1); }
 }
+
+/* Scan line — sharp bright sweep */
 @keyframes scanSweep {
-  0%   { top:-2px; opacity:1; }
-  85%  { opacity:0.8; }
+  0%   { top:-2px; opacity:1;   scaleX:0; }
+  5%   { opacity:1; }
+  90%  { opacity:0.6; }
   100% { top:100%; opacity:0; }
 }
 #transitionScan {
-  position:fixed; left:0; right:0; height:2px; top:-2px;
-  background:linear-gradient(90deg, transparent 0%, rgba(0,87,255,0.4) 15%, rgba(255,255,255,1) 50%, rgba(0,87,255,0.4) 85%, transparent 100%);
+  position:fixed; left:0; right:0; height:1px; top:-2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(0,87,255,0.3) 10%,
+    rgba(255,255,255,1) 45%,
+    rgba(255,255,255,1) 55%,
+    rgba(0,87,255,0.3) 90%,
+    transparent 100%);
   z-index:9999; pointer-events:none; display:none;
-  box-shadow: 0 0 12px rgba(255,255,255,0.9), 0 0 24px rgba(0,87,255,0.6);
+  box-shadow: 0 0 6px 1px rgba(255,255,255,0.9), 0 0 20px 2px rgba(0,87,255,0.5);
 }
-#transitionScan.active { display:block; animation:scanSweep 0.22s cubic-bezier(0.4,0,1,1) forwards; }
+#transitionScan.active { display:block; animation:scanSweep 0.2s cubic-bezier(0.4,0,0.8,1) forwards; }
+
+/* Header: wipe down from top */
 @keyframes headerDrop {
-  0%   { clip-path:inset(0 0 100% 0); opacity:0; }
-  100% { clip-path:inset(0 0 0% 0);   opacity:1; }
+  0%   { clip-path:inset(0 0 100% 0); }
+  100% { clip-path:inset(0 0 0%   0); }
 }
+
+/* Hero: wipe right with leading-edge flash */
 @keyframes heroWipe {
-  0%   { clip-path:inset(0 100% 0 0); filter:brightness(1.5); }
-  8%   { clip-path:inset(0 90% 0 0);  filter:brightness(1); }
-  100% { clip-path:inset(0 0 0 0);    filter:brightness(1); }
+  0%   { clip-path:inset(0 100% 0 0); filter:brightness(2) saturate(0); }
+  5%   { clip-path:inset(0 93%  0 0); filter:brightness(1) saturate(1); }
+  100% { clip-path:inset(0 0%   0 0); filter:brightness(1) saturate(1); }
 }
+
+/* Cat cards boot: same wipe, stagger via delay */
 @keyframes catBoot {
-  0%   { clip-path:inset(0 100% 0 0); filter:brightness(1.6); }
-  12%  { clip-path:inset(0 86% 0 0);  filter:brightness(1); }
-  100% { clip-path:inset(0 0 0 0);    filter:brightness(1); }
+  0%   { clip-path:inset(0 100% 0 0); filter:brightness(2.2) saturate(0); }
+  8%   { clip-path:inset(0 90%  0 0); filter:brightness(1)   saturate(1); }
+  100% { clip-path:inset(0 0%   0 0); filter:brightness(1)   saturate(1); }
 }
-.page-exit  { animation:pageOut 0.22s cubic-bezier(0.4,0,1,1)   forwards; pointer-events:none; }
-.page-enter { animation:pageIn  0.32s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+.page-exit  { animation:pageOut 0.2s  cubic-bezier(0.55,0,1,1)    forwards; pointer-events:none; }
+.page-enter { animation:pageIn  0.3s  cubic-bezier(0.16,1,0.3,1)  forwards; }
 #homeView  { will-change:clip-path,filter; }
 #innerView { will-change:clip-path,filter; }
 </style>
@@ -2210,7 +2230,7 @@ function animateCards(container) {
     card.style.clipPath = 'inset(0 100% 0 0)';
     card.style.filter = 'brightness(2)';
     setTimeout(() => {
-      card.style.animation = 'cardGlitchIn 0.28s cubic-bezier(0.16,1,0.3,1) forwards';
+      card.style.animation = 'cardGlitchIn 0.26s cubic-bezier(0.16,1,0.3,1) forwards';
       card.addEventListener('animationend', () => {
         card.style.animation = '';
         card.style.opacity = '1';
@@ -2760,6 +2780,7 @@ function openCategory(key) {
   const inner = document.getElementById('innerView');
 
   fireScanLine();
+  document.documentElement.style.overflow = 'hidden';
 
   homeView.classList.add('page-exit');
   homeView.addEventListener('animationend', function onExit() {
@@ -2767,14 +2788,15 @@ function openCategory(key) {
     homeView.classList.remove('page-exit');
     homeView.style.display = 'none';
 
+    window.scrollTo(0, 0);
     inner.classList.add('active');
     inner.classList.add('page-enter');
     inner.addEventListener('animationend', function onEnter() {
       inner.removeEventListener('animationend', onEnter);
       inner.classList.remove('page-enter');
+      document.documentElement.style.overflow = '';
     }, {once:true});
 
-    window.scrollTo({top:0,behavior:'smooth'});
   }, {once:true});
 }
 
@@ -2783,6 +2805,7 @@ function goHome() {
   const homeView = document.getElementById('homeView');
 
   fireScanLine();
+  document.documentElement.style.overflow = 'hidden';
 
   inner.classList.add('page-exit');
   inner.addEventListener('animationend', function onExit() {
@@ -2794,14 +2817,15 @@ function goHome() {
     document.getElementById('breadcrumb').classList.remove('active');
     currentSection = null;
 
+    window.scrollTo(0, 0);
     homeView.style.display = 'block';
     homeView.classList.add('page-enter');
     homeView.addEventListener('animationend', function onEnter() {
       homeView.removeEventListener('animationend', onEnter);
       homeView.classList.remove('page-enter');
+      document.documentElement.style.overflow = '';
     }, {once:true});
 
-    window.scrollTo({top:0,behavior:'smooth'});
   }, {once:true});
 }
 
@@ -3903,7 +3927,7 @@ function escHtml(str) {
   hero.style.opacity = '0';
   hero.style.clipPath = 'inset(0 100% 0 0)';
   setTimeout(() => {
-    hero.style.animation = 'heroWipe 0.36s cubic-bezier(0.16,1,0.3,1) forwards';
+    hero.style.animation = 'heroWipe 0.4s cubic-bezier(0.16,1,0.3,1) forwards';
     hero.addEventListener('animationend', () => {
       hero.style.animation = '';
       hero.style.clipPath = '';
@@ -3915,14 +3939,14 @@ function escHtml(str) {
     card.style.opacity = '0';
     card.style.clipPath = 'inset(0 100% 0 0)';
     setTimeout(() => {
-      card.style.animation = 'catBoot 0.26s cubic-bezier(0.16,1,0.3,1) forwards';
+      card.style.animation = 'catBoot 0.28s cubic-bezier(0.16,1,0.3,1) forwards';
       card.addEventListener('animationend', () => {
         card.style.animation = '';
         card.style.opacity = '1';
         card.style.clipPath = '';
         card.style.filter = '';
       }, {once:true});
-    }, 420 + i * 65);
+    }, 300 + i * 45);
   });
 })();
 
