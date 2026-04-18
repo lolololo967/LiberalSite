@@ -1972,6 +1972,25 @@ mark.const-highlight.current { background:var(--c05); color:var(--ink); }
               // Если пусто — используется «Глава» по умолчанию
             </div>
             <div id="constitutionPatternError" style="display:none"></div>
+
+            <div style="margin-top:16px">
+              <div class="admin-field-label" style="margin-bottom:10px">Тип нумерации глав</div>
+              <div style="display:flex;gap:0;border:1px solid var(--ink);width:fit-content">
+                <button id="numTypeArabic" onclick="setNumeralType('arabic')"
+                  style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;padding:8px 20px;border:none;border-right:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;transition:all 0.2s">
+                  1 2 3 — ОБЫЧНЫЕ
+                </button>
+                <button id="numTypeRoman" onclick="setNumeralType('roman')"
+                  style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;padding:8px 20px;border:none;background:none;color:var(--ink2);cursor:pointer;transition:all 0.2s">
+                  I II III — РИМСКИЕ
+                </button>
+              </div>
+              <input type="hidden" id="constitutionNumeralType" value="arabic">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:0.08em;color:var(--ink2);opacity:0.5;margin-top:6px;line-height:1.8">
+                // Обычные: «Глава 1.», «Глава 2.» и т.д.<br>
+                // Римские: «Глава I.», «Глава II.» и т.д.
+              </div>
+            </div>
           </div>
 
           <div class="admin-field">
@@ -2448,28 +2467,38 @@ async function loadConstitution() {
 
 function _parseConstitutionData() {
   const raw = constitution.pdf_data || '';
-  if (!raw.trim()) return { text: '', word: CONST_DEFAULT_WORD, pdf: null };
+  if (!raw.trim()) return { text: '', word: CONST_DEFAULT_WORD, pdf: null, numeralType: 'arabic' };
   try {
     const obj = JSON.parse(raw);
-    if (obj && typeof obj.text === 'string') return { text: obj.text, word: obj.word || obj.pattern || CONST_DEFAULT_WORD, pdf: obj.pdf || null };
+    if (obj && typeof obj.text === 'string') return {
+      text: obj.text,
+      word: obj.word || obj.pattern || CONST_DEFAULT_WORD,
+      pdf: obj.pdf || null,
+      numeralType: obj.numeral_type || 'arabic'
+    };
   } catch(e) {}
-  return { text: raw, word: CONST_DEFAULT_WORD, pdf: null };
+  return { text: raw, word: CONST_DEFAULT_WORD, pdf: null, numeralType: 'arabic' };
 }
 
-// Detect chapter line: starts with word + space/number, e.g. "Глава 1. Title"
-function _matchChapterLine(line, word) {
+// Detect chapter line: starts with word + space/number, e.g. "Глава 1. Title" or "Глава I. Title"
+function _matchChapterLine(line, word, numeralType) {
   const t = line.trim();
   if (!t.startsWith(word)) return null;
   const rest = t.slice(word.length).trimStart();
-  const m = rest.match(/^(\d+)[.:\s]\s*(.+)$/);
+  let m;
+  if (numeralType === 'roman') {
+    m = rest.match(/^([IVXLCDM]+)[.:\s]\s*(.+)$/i);
+  } else {
+    m = rest.match(/^(\d+)[.:\s]\s*(.+)$/);
+  }
   if (!m) return null;
-  return { num: m[1], title: m[2].trim() };
+  return { num: m[1].toUpperCase(), title: m[2].trim() };
 }
 
 function renderConstitutionView() {
   const container = document.getElementById('innerCards');
   if (!container) return;
-  const { text, word, pdf } = _parseConstitutionData();
+  const { text, word, pdf, numeralType } = _parseConstitutionData();
   if (!text.trim()) {
     container.innerHTML = `<div style="padding:48px 32px;text-align:center;border:1px solid var(--ink);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--ink2);opacity:0.4;">// Текст конституции не добавлен — используйте панель администратора</div>`;
     return;
@@ -2477,20 +2506,20 @@ function renderConstitutionView() {
 
   const lines = text.split('\n');
   const chapters = [];
-  lines.forEach(line => { const m = _matchChapterLine(line, word); if (m) chapters.push(m); });
+  lines.forEach(line => { const m = _matchChapterLine(line, word, numeralType); if (m) chapters.push(m); });
 
   // ── Classify each line ──
   function classifyLine(line) {
     const t = line.trim();
     if (!t) return { type: 'blank' };
-    if (_matchChapterLine(t, word)) return { type: 'chapter', m: _matchChapterLine(t, word), raw: t };
+    if (_matchChapterLine(t, word, numeralType)) return { type: 'chapter', m: _matchChapterLine(t, word, numeralType), raw: t };
     if (/^(○|•|–|-)/.test(t)) return { type: 'bullet', raw: t };
     if (/^\d+\.\s+\S/.test(t)) return { type: 'section', raw: t };
     return { type: 'text', raw: t };
   }
 
   // ── Preamble: lines before first chapter ──
-  const firstChIdx = lines.findIndex(l => _matchChapterLine(l, word));
+  const firstChIdx = lines.findIndex(l => _matchChapterLine(l, word, numeralType));
   const preambleLines = firstChIdx > 0 ? lines.slice(0, firstChIdx) : [];
   let docTitle = '', docDate = '', docPrinciples = [];
   preambleLines.forEach(l => {
@@ -3764,8 +3793,22 @@ function renderAdminParliamentList() {
 // ══════════════════════════════════════════
 // CONSTITUTION ADMIN
 // ══════════════════════════════════════════
+function setNumeralType(type) {
+  document.getElementById('constitutionNumeralType').value = type;
+  const arabicBtn = document.getElementById('numTypeArabic');
+  const romanBtn  = document.getElementById('numTypeRoman');
+  if (!arabicBtn || !romanBtn) return;
+  if (type === 'roman') {
+    arabicBtn.style.background = 'none';   arabicBtn.style.color = 'var(--ink2)';
+    romanBtn.style.background  = 'var(--ink)'; romanBtn.style.color = '#fff';
+  } else {
+    arabicBtn.style.background = 'var(--ink)'; arabicBtn.style.color = '#fff';
+    romanBtn.style.background  = 'none';   romanBtn.style.color = 'var(--ink2)';
+  }
+}
+
 function loadConstitutionAdminForm() {
-  const { text, word, pdf } = _parseConstitutionData();
+  const { text, word, pdf, numeralType } = _parseConstitutionData();
   const ta = document.getElementById('constitutionTextArea');
   if (ta) ta.value = text;
   const pi = document.getElementById('constitutionPatternInput');
@@ -3781,6 +3824,7 @@ function loadConstitutionAdminForm() {
   if (msg) { msg.style.display = 'none'; msg.textContent = ''; }
   const err = document.getElementById('constitutionPatternError');
   if (err) err.style.display = 'none';
+  setNumeralType(numeralType || 'arabic');
 }
 
 function handleConstitutionPdf(input) {
@@ -3811,7 +3855,8 @@ function previewConstitutionPattern() {
   const pi = document.getElementById('constitutionPatternInput');
   const text = document.getElementById('constitutionTextArea').value || '';
   const word = pi.value.trim() || CONST_DEFAULT_WORD;
-  const found = text.split('\n').filter(l => _matchChapterLine(l, word));
+  const numeralType = document.getElementById('constitutionNumeralType').value || 'arabic';
+  const found = text.split('\n').filter(l => _matchChapterLine(l, word, numeralType));
   const msg = document.getElementById('adminConstitutionSaveMsg');
   msg.style.display = 'block';
   if (found.length) {
@@ -3829,7 +3874,8 @@ async function saveConstitution() {
   const text = document.getElementById('constitutionTextArea').value || '';
   const word = document.getElementById('constitutionPatternInput').value.trim() || CONST_DEFAULT_WORD;
   const pdf = document.getElementById('constitutionPdfBase64').value || null;
-  const payload = JSON.stringify({ text, word, pdf });
+  const numeral_type = document.getElementById('constitutionNumeralType').value || 'arabic';
+  const payload = JSON.stringify({ text, word, pdf, numeral_type });
   msgEl.style.display = 'block'; msgEl.style.color = 'var(--ink2)'; msgEl.textContent = '// Сохранение...';
   const r = await apiPost('/api/constitution', { pdf_data: payload, chapters: [] }, adminToken);
   if (r.ok) {
