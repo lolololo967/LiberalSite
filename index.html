@@ -470,7 +470,7 @@ header::before {
   background:var(--white);
   border:2px solid var(--ink);
   position:relative;
-  animation:modalIn 0.22s cubic-bezier(0.2,0,0,1) both;
+  animation:modalIn 0.42s cubic-bezier(0,0,0.2,1) both;
 
   overflow-y: auto;   /* вертикальный скролл */
   overflow-x: hidden; /* отключаем горизонтальный */
@@ -478,8 +478,9 @@ header::before {
 .party-modal::-webkit-scrollbar:hover{
 }
 @keyframes modalIn {
-  from { opacity:0; transform:translateY(18px) scale(0.98); }
-  to   { opacity:1; transform:none; }
+  0%   { opacity:0; transform:translateY(20px); }
+  60%  { opacity:1; transform:translateY(-2px); }
+  100% { opacity:1; transform:translateY(0); }
 }
 .party-modal-close {
   position:absolute; top:16px; right:16px; width:32px; height:32px;
@@ -1347,94 +1348,71 @@ mark.const-highlight.current { background:var(--c05); color:var(--ink); }
 }
 
 @keyframes slideUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
-.fade-in { animation:slideUp 0.45s ease forwards; }
+.fade-in { animation:slideUp 0.55s cubic-bezier(0,0,0.2,1) forwards; }
 
-/* ══ FLASH BLINK OVERLAY ══ */
+/* ══ VEIL OVERLAY (boot) ══ */
 #flashBlink {
   position:fixed; inset:0; z-index:9998; pointer-events:none;
-  background:#fff; opacity:0;
+  background:var(--white); opacity:0;
 }
-@keyframes blinkFlash {
-  0%   { opacity:0; }
-  18%  { opacity:0.55; }
-  32%  { opacity:0.1; }
-  48%  { opacity:0.4; }
-  60%  { opacity:0; }
+@keyframes veilOut {
+  0%   { opacity:1; }
   100% { opacity:0; }
 }
-#flashBlink.active { animation:blinkFlash 0.22s ease-out forwards; }
+#flashBlink.active { animation:veilOut 0.7s cubic-bezier(0.4,0,0.2,1) forwards; }
 
 /* ══ PAGE TRANSITIONS ══ */
 @keyframes pageOut {
-  0%   { opacity:1; transform:translateX(0) skewX(0deg); clip-path:inset(0 0 0 0); }
-  15%  { opacity:0.7; transform:translateX(-4px) skewX(-1.5deg); clip-path:inset(10% 0 5% 0); }
-  20%  { opacity:1; transform:translateX(2px) skewX(0.5deg); clip-path:inset(0 0 0 0); }
-  30%  { opacity:0.4; transform:translateX(-6px) skewX(-2deg); clip-path:inset(25% 0 30% 0); }
-  35%  { opacity:0.9; transform:translateX(3px) skewX(1deg); clip-path:inset(0 0 0 0); }
-  55%  { opacity:0.6; transform:translateX(-3px) skewX(-0.8deg); clip-path:inset(5% 0 60% 0); filter:brightness(1.4); }
-  65%  { opacity:0.2; transform:translateX(5px); clip-path:inset(70% 0 0 0); }
-  80%  { opacity:0.05; transform:translateX(-2px) skewX(-3deg); clip-path:inset(0 0 95% 0); filter:brightness(2); }
-  100% { opacity:0; transform:translateX(-8px) skewX(0deg); clip-path:inset(0 0 100% 0); filter:brightness(1); }
+  0%   { opacity:1; transform:translateY(0); }
+  30%  { opacity:0.6; transform:translateY(-6px); }
+  100% { opacity:0; transform:translateY(-18px); }
 }
 @keyframes pageIn {
-  0%   { opacity:0; transform:translateX(12px) skewX(2deg); clip-path:inset(100% 0 0 0); filter:brightness(2); }
-  10%  { opacity:0.6; transform:translateX(-4px) skewX(-1deg); clip-path:inset(0 0 70% 0); filter:brightness(1.8); }
-  18%  { opacity:0.3; transform:translateX(6px) skewX(1.5deg); clip-path:inset(30% 0 20% 0); filter:brightness(1.5); }
-  25%  { opacity:0.8; transform:translateX(-2px) skewX(-0.5deg); clip-path:inset(0 0 10% 0); filter:brightness(1.2); }
-  35%  { opacity:0.5; transform:translateX(4px) skewX(1deg); clip-path:inset(5% 0 40% 0); }
-  45%  { opacity:0.9; transform:translateX(-1px) skewX(-0.3deg); clip-path:inset(0 0 5% 0); }
-  55%  { opacity:0.75; transform:translateX(2px); clip-path:inset(2% 0 0 0); filter:brightness(1.1); }
-  70%  { opacity:0.95; transform:translateX(-1px) skewX(-0.2deg); clip-path:inset(0 0 0 0); }
-  82%  { opacity:0.88; transform:translateX(1px) skewX(0.2deg); filter:brightness(1.05); }
-  90%  { opacity:1; transform:translateX(0) skewX(0deg); filter:brightness(1); }
-  100% { opacity:1; transform:translateX(0) skewX(0deg); clip-path:inset(0 0 0 0); filter:brightness(1); }
+  0%   { opacity:0; transform:translateY(22px); }
+  60%  { opacity:1; transform:translateY(-2px); }
+  100% { opacity:1; transform:translateY(0); }
 }
-@keyframes cardGlitchIn {
-  0%   { opacity:0; transform:translateX(8px) skewX(1.5deg); clip-path:inset(0 100% 0 0); }
-  20%  { opacity:0.7; transform:translateX(-3px) skewX(-0.8deg); clip-path:inset(0 30% 0 0); filter:brightness(1.5); }
-  35%  { opacity:0.5; transform:translateX(4px) skewX(0.5deg); clip-path:inset(0 50% 0 0); }
-  50%  { opacity:0.9; transform:translateX(-1px); clip-path:inset(0 10% 0 0); filter:brightness(1.2); }
-  65%  { opacity:0.8; transform:translateX(2px) skewX(-0.3deg); clip-path:inset(0 3% 0 0); }
-  80%  { opacity:0.95; transform:translateX(-1px); clip-path:inset(0 0 0 0); }
-  90%  { opacity:0.9; transform:translateX(1px); filter:brightness(1.05); }
-  100% { opacity:1; transform:translateX(0) skewX(0deg); clip-path:inset(0 0 0 0); filter:brightness(1); }
+@keyframes cardFadeIn {
+  0%   { opacity:0; transform:translateY(14px); }
+  100% { opacity:1; transform:translateY(0); }
 }
-@keyframes sectionFlicker {
-  0%,100% { opacity:1; filter:brightness(1); }
-  20%     { opacity:0.5; filter:brightness(1.6) contrast(1.2); }
-  25%     { opacity:0.9; filter:brightness(1); }
-  50%     { opacity:0.3; filter:brightness(1.8); }
-  55%     { opacity:0.85; filter:brightness(1); }
-  75%     { opacity:0.6; filter:brightness(1.3); }
-  80%     { opacity:1; filter:brightness(1); }
+@keyframes sectionFade {
+  0%   { opacity:0.4; }
+  100% { opacity:1; }
 }
 @keyframes scanSweep {
-  0%   { top:-4px; opacity:0.7; }
-  100% { top:110%; opacity:0; }
+  0%   { top:-2px; opacity:0; }
+  8%   { opacity:0.9; }
+  100% { top:105%; opacity:0; }
 }
 #transitionScan {
-  position:fixed; left:0; right:0; height:3px; top:-4px;
-  background:linear-gradient(90deg,transparent 0%,rgba(0,87,255,0.6) 20%,rgba(255,255,255,0.9) 50%,rgba(0,87,255,0.6) 80%,transparent 100%);
+  position:fixed; left:0; right:0; height:1px; top:-2px;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(0,87,255,0.3) 15%,
+    rgba(0,87,255,0.9) 40%,
+    rgba(180,210,255,1) 50%,
+    rgba(0,87,255,0.9) 60%,
+    rgba(0,87,255,0.3) 85%,
+    transparent 100%);
   z-index:9999; pointer-events:none; display:none;
-  box-shadow:0 0 8px rgba(0,87,255,0.8),0 0 20px rgba(0,87,255,0.3);
+  box-shadow:0 0 6px rgba(0,87,255,0.5), 0 0 18px rgba(0,87,255,0.18);
 }
-#transitionScan.active { display:block; animation:scanSweep 0.35s linear forwards; }
-@keyframes headerDrop {
+#transitionScan.active { display:block; animation:scanSweep 0.7s cubic-bezier(0.4,0,0.6,1) forwards; }
+@keyframes headerReveal {
   0%   { transform:translateY(-100%); opacity:0; }
-  60%  { transform:translateY(3px); opacity:1; }
   100% { transform:translateY(0); opacity:1; }
 }
-@keyframes heroWipe {
-  0%   { clip-path:inset(0 100% 0 0); opacity:0; }
-  100% { clip-path:inset(0 0 0 0); opacity:1; }
+@keyframes heroReveal {
+  0%   { opacity:0; transform:translateY(24px); }
+  100% { opacity:1; transform:translateY(0); }
 }
-@keyframes catBoot {
-  0%   { clip-path:inset(0 100% 0 0); opacity:0; filter:brightness(1.4); }
-  60%  { clip-path:inset(0 3% 0 0); opacity:1; filter:brightness(1.05); }
-  100% { clip-path:inset(0 0 0 0); opacity:1; filter:brightness(1); }
+@keyframes catFadeUp {
+  0%   { opacity:0; transform:translateY(16px); }
+  100% { opacity:1; transform:translateY(0); }
 }
-.page-exit  { animation:pageOut 0.32s steps(1,end) forwards; pointer-events:none; }
-.page-enter { animation:pageIn  0.45s steps(1,end) forwards; }
+.page-exit  { animation:pageOut 0.38s cubic-bezier(0.4,0,1,1) forwards; pointer-events:none; }
+.page-enter { animation:pageIn  0.52s cubic-bezier(0,0,0.2,1) forwards; }
 #homeView  { will-change:transform,opacity; }
 #innerView { will-change:transform,opacity; }
 </style>
@@ -2226,17 +2204,15 @@ function animateCards(container) {
   const cards = container.querySelectorAll('.log-card, .party-card');
   cards.forEach((card, i) => {
     card.style.opacity = '0';
-    card.style.clipPath = 'inset(0 100% 0 0)';
-    card.style.filter = 'brightness(2)';
+    card.style.transform = 'translateY(12px)';
     setTimeout(() => {
-      card.style.animation = 'cardGlitchIn 0.38s steps(1,end) forwards';
+      card.style.animation = `cardFadeIn 0.5s cubic-bezier(0,0,0.2,1) forwards`;
       card.addEventListener('animationend', () => {
         card.style.animation = '';
         card.style.opacity = '1';
-        card.style.clipPath = '';
-        card.style.filter = '';
+        card.style.transform = '';
       }, {once:true});
-    }, 60 + i * 70);
+    }, 40 + i * 55);
   });
 }
 
@@ -2438,18 +2414,14 @@ function setElectionFilter(filter, rowEl) {
   rowEl.classList.add('active');
 
   const container = document.getElementById('innerCards');
-  const blink = document.getElementById('flashBlink');
-  blink.classList.remove('active');
-  void blink.offsetWidth;
-  blink.classList.add('active');
-  blink.addEventListener('animationend', () => blink.classList.remove('active'), {once:true});
 
-  container.style.animation = 'sectionFlicker 0.16s ease-in forwards';
+  container.style.transition = 'opacity 0.22s ease';
+  container.style.opacity = '0';
   setTimeout(() => {
-    container.style.animation = '';
+    container.style.transition = '';
     container.style.opacity = '';
     renderInnerCards('elections');
-  }, 160);
+  }, 230);
 }
 
 // ══════════════════════════════════════════
@@ -2734,12 +2706,6 @@ function fireScanLine() {
   void scan.offsetWidth;
   scan.classList.add('active');
   scan.addEventListener('animationend', () => scan.classList.remove('active'), {once:true});
-
-  const blink = document.getElementById('flashBlink');
-  blink.classList.remove('active');
-  void blink.offsetWidth;
-  blink.classList.add('active');
-  blink.addEventListener('animationend', () => blink.classList.remove('active'), {once:true});
 }
 
 function openCategory(key) {
@@ -3909,43 +3875,51 @@ function escHtml(str) {
 // PAGE BOOT ANIMATION
 // ══════════════════════════════════════════
 (function bootSequence() {
+  // Veil fade-out on load
   const blink = document.getElementById('flashBlink');
-  blink.classList.add('active');
-  blink.addEventListener('animationend', () => blink.classList.remove('active'), {once:true});
+  blink.style.opacity = '1';
+  requestAnimationFrame(() => {
+    blink.classList.add('active');
+    blink.addEventListener('animationend', () => {
+      blink.classList.remove('active');
+      blink.style.opacity = '0';
+    }, {once:true});
+  });
 
+  // Elegant scan line on boot
   setTimeout(() => {
     const scan = document.getElementById('transitionScan');
     scan.classList.add('active');
     scan.addEventListener('animationend', () => scan.classList.remove('active'), {once:true});
-  }, 60);
+  }, 120);
 
+  // Header smooth reveal
   const header = document.querySelector('header');
-  header.style.animation = 'headerDrop 0.3s cubic-bezier(0.2,0,0,1) 0.05s both';
+  header.style.animation = 'headerReveal 0.55s cubic-bezier(0,0,0.2,1) 0.05s both';
 
+  // Hero smooth fade-up
   const hero = document.querySelector('.hero');
   hero.style.opacity = '0';
-  hero.style.clipPath = 'inset(0 100% 0 0)';
   setTimeout(() => {
-    hero.style.animation = 'heroWipe 0.32s ease-out forwards';
+    hero.style.animation = 'heroReveal 0.65s cubic-bezier(0,0,0.2,1) forwards';
     hero.addEventListener('animationend', () => {
       hero.style.animation = '';
-      hero.style.clipPath = '';
       hero.style.opacity = '1';
     }, {once:true});
-  }, 180);
+  }, 200);
 
+  // Cards staggered fade-up
   document.querySelectorAll('.cat-card').forEach((card, i) => {
     card.style.opacity = '0';
-    card.style.clipPath = 'inset(0 100% 0 0)';
+    card.style.transform = 'translateY(16px)';
     setTimeout(() => {
-      card.style.animation = 'catBoot 0.28s steps(1,end) forwards';
+      card.style.animation = `catFadeUp 0.55s cubic-bezier(0,0,0.2,1) forwards`;
       card.addEventListener('animationend', () => {
         card.style.animation = '';
         card.style.opacity = '1';
-        card.style.clipPath = '';
-        card.style.filter = '';
+        card.style.transform = '';
       }, {once:true});
-    }, 420 + i * 65);
+    }, 380 + i * 55);
   });
 })();
 
