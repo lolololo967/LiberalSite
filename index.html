@@ -1366,28 +1366,12 @@ mark.const-highlight.current { background:var(--c05); color:var(--ink); }
 
 /* ══ PAGE TRANSITIONS ══ */
 @keyframes pageOut {
-  0%   { opacity:1; transform:translateX(0) skewX(0deg); clip-path:inset(0 0 0 0); }
-  15%  { opacity:0.7; transform:translateX(-4px) skewX(-1.5deg); clip-path:inset(10% 0 5% 0); }
-  20%  { opacity:1; transform:translateX(2px) skewX(0.5deg); clip-path:inset(0 0 0 0); }
-  30%  { opacity:0.4; transform:translateX(-6px) skewX(-2deg); clip-path:inset(25% 0 30% 0); }
-  35%  { opacity:0.9; transform:translateX(3px) skewX(1deg); clip-path:inset(0 0 0 0); }
-  55%  { opacity:0.6; transform:translateX(-3px) skewX(-0.8deg); clip-path:inset(5% 0 60% 0); filter:brightness(1.4); }
-  65%  { opacity:0.2; transform:translateX(5px); clip-path:inset(70% 0 0 0); }
-  80%  { opacity:0.05; transform:translateX(-2px) skewX(-3deg); clip-path:inset(0 0 95% 0); filter:brightness(2); }
-  100% { opacity:0; transform:translateX(-8px) skewX(0deg); clip-path:inset(0 0 100% 0); filter:brightness(1); }
+  0%   { opacity:1; transform:translateY(0);    clip-path:inset(0 0 0 0); }
+  100% { opacity:0; transform:translateY(-12px); clip-path:inset(0 0 100% 0); }
 }
 @keyframes pageIn {
-  0%   { opacity:0; transform:translateX(12px) skewX(2deg); clip-path:inset(100% 0 0 0); filter:brightness(2); }
-  10%  { opacity:0.6; transform:translateX(-4px) skewX(-1deg); clip-path:inset(0 0 70% 0); filter:brightness(1.8); }
-  18%  { opacity:0.3; transform:translateX(6px) skewX(1.5deg); clip-path:inset(30% 0 20% 0); filter:brightness(1.5); }
-  25%  { opacity:0.8; transform:translateX(-2px) skewX(-0.5deg); clip-path:inset(0 0 10% 0); filter:brightness(1.2); }
-  35%  { opacity:0.5; transform:translateX(4px) skewX(1deg); clip-path:inset(5% 0 40% 0); }
-  45%  { opacity:0.9; transform:translateX(-1px) skewX(-0.3deg); clip-path:inset(0 0 5% 0); }
-  55%  { opacity:0.75; transform:translateX(2px); clip-path:inset(2% 0 0 0); filter:brightness(1.1); }
-  70%  { opacity:0.95; transform:translateX(-1px) skewX(-0.2deg); clip-path:inset(0 0 0 0); }
-  82%  { opacity:0.88; transform:translateX(1px) skewX(0.2deg); filter:brightness(1.05); }
-  90%  { opacity:1; transform:translateX(0) skewX(0deg); filter:brightness(1); }
-  100% { opacity:1; transform:translateX(0) skewX(0deg); clip-path:inset(0 0 0 0); filter:brightness(1); }
+  0%   { opacity:0; transform:translateY(16px);  clip-path:inset(100% 0 0 0); }
+  100% { opacity:1; transform:translateY(0);     clip-path:inset(0 0 0 0); }
 }
 @keyframes cardGlitchIn {
   0%   { opacity:0; transform:translateX(8px) skewX(1.5deg); clip-path:inset(0 100% 0 0); }
@@ -1433,8 +1417,8 @@ mark.const-highlight.current { background:var(--c05); color:var(--ink); }
   60%  { clip-path:inset(0 3% 0 0); opacity:1; filter:brightness(1.05); }
   100% { clip-path:inset(0 0 0 0); opacity:1; filter:brightness(1); }
 }
-.page-exit  { animation:pageOut 0.32s steps(1,end) forwards; pointer-events:none; }
-.page-enter { animation:pageIn  0.45s steps(1,end) forwards; }
+.page-exit  { animation:pageOut 0.28s cubic-bezier(0.4,0,1,1)   forwards; pointer-events:none; }
+.page-enter { animation:pageIn  0.38s cubic-bezier(0,0,0.2,1)   forwards; }
 #homeView  { will-change:transform,opacity; }
 #innerView { will-change:transform,opacity; }
 </style>
