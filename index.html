@@ -584,7 +584,7 @@ header::after {
   margin-bottom:32px; overflow:hidden;
 }
 .party-card {
-  display:grid; grid-template-columns: 33.3333333333% 1fr 80px;
+  display:grid; grid-template-columns:33% 1fr 80px;
   align-items:stretch; border-bottom:1px solid var(--mist-2);
   cursor:pointer; transition:background 0.2s;
   min-height:140px; background:var(--paper);
@@ -792,7 +792,12 @@ header::after {
 .card-modal-close svg { width:12px; height:12px; stroke:var(--ink); fill:none; stroke-width:2; }
 
 /* ══ PARLIAMENT ══ */
-.parliament-wrap { display:flex; flex-direction:column; gap:32px; padding-bottom:40px; }
+.parliament-wrap {     display: flex;
+    gap: 32px;
+    padding-bottom: 40px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;}
 .parliament-svg-wrap { max-width:560px; margin:0 auto; position:relative; width:100%; }
 .parliament-svg-wrap svg { width:100%; height:auto; display:block; }
 .parliament-seat { cursor:pointer; transform-box:fill-box; transform-origin:center; transition:transform 0.15s,filter 0.15s; }
@@ -816,12 +821,24 @@ header::after {
 }
 .parliament-legend-title { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.3em; text-transform:uppercase; color:#fff; }
 .parliament-legend-count { font-family:'Playfair Display',monospace; font-size:22px; font-weight:900; color:var(--gold); opacity:0.7; }
-.parliament-seats-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); }
+.parliament-seats-grid {     display: flex;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    justify-items: stretch;
+    grid-auto-flow: row;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+    justify-content: space-around; }
 .parliament-seat-row {
-  display:flex; align-items:center; gap:0;
-  border-right:1px solid var(--mist); border-bottom:1px solid var(--mist);
-  transition:background 0.2s; position:relative; overflow:hidden;
-  background:var(--paper);
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border-right: 1px solid var(--mist);
+    border-bottom: 1px solid var(--mist);
+    transition: background 0.2s;
+    position: relative;
+    overflow: hidden;
+    width: 50%;
+    background: var(--paper);
 }
 .parliament-seat-row:hover { background:var(--paper-2); }
 .parliament-seat-row-stripe { position:absolute; left:0; top:0; bottom:0; width:3px; }
@@ -1116,7 +1133,7 @@ mark.const-highlight.current { background:var(--gold); color:var(--obsidian); }
   .cat-card.featured .cat-name { color:var(--ink); }
   .cat-card.featured .cat-sub { color:var(--smoke); }
   .cat-card.featured .cat-icon-box svg { stroke:var(--smoke); }
-  .party-card { grid-template-columns:160px 1fr auto; }
+  .party-card { grid-template-columns:33.3333333333% 1fr auto; }
 }
 @media (max-width:768px) {
   header { padding:0 20px; }
