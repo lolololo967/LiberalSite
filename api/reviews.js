@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -7,13 +7,13 @@ const supabase = createClient(
 
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  // ══ GET — все отзывы ══
+  // ══ GET ══
   if (req.method === 'GET') {
     const { data, error } = await supabase
       .from('reviews')
@@ -28,12 +28,17 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { name, text, rating } = req.body || {};
 
-    if (!name || typeof name !== 'string' || name.trim().length < 1)
+    if (!name || typeof name !== 'string' || !name.trim())
       return res.status(400).json({ error: 'Укажите имя' });
     if (!text || typeof text !== 'string' || text.trim().length < 3)
       return res.status(400).json({ error: 'Отзыв слишком короткий' });
     if (!['like', 'dislike'].includes(rating))
       return res.status(400).json({ error: 'Укажите оценку' });
+
+    // Проверка env переменных
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return res.status(500).json({ error: 'Не заданы переменные SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY' });
+    }
 
     const { data, error } = await supabase
       .from('reviews')
@@ -56,7 +61,7 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Unauthorized' });
 
     const { id, reply } = req.body || {};
-    if (!id || !reply || typeof reply !== 'string' || reply.trim().length < 1)
+    if (!id || !reply || typeof reply !== 'string' || !reply.trim())
       return res.status(400).json({ error: 'Неверные данные' });
 
     const { data, error } = await supabase
@@ -74,4 +79,4 @@ export default async function handler(req, res) {
   }
 
   return res.status(405).json({ error: 'Method not allowed' });
-}
+};
