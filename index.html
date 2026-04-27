@@ -1102,6 +1102,245 @@ mark.const-highlight.current { background:var(--gold); color:var(--obsidian); }
 .const-view-tab:hover:not(.active) { background:var(--paper-2); }
 .const-no-pdf { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; height:320px; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.2em; color:var(--ash); text-transform:uppercase; }
 
+/* ══ REVIEWS ══ */
+.reviews-section {
+  background: var(--obsidian);
+  border-top: 1px solid var(--gold-line);
+  padding: 56px 48px 80px;
+  position: relative; z-index: 1;
+}
+.reviews-section::before {
+  content: '';
+  position: absolute; top: 0; left: 48px; right: 48px; height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  opacity: 0.3;
+}
+.reviews-inner { max-width: 1360px; margin: 0 auto; }
+
+.reviews-head { display: flex; align-items: center; gap: 0; margin-bottom: 40px; }
+.reviews-head-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px; letter-spacing: 0.4em; text-transform: uppercase;
+  color: var(--gold); padding: 10px 20px;
+  border: 1px solid var(--gold-line);
+  background: rgba(76,132,201,0.06);
+  white-space: nowrap; display: flex; align-items: center; gap: 8px;
+}
+.reviews-head-label::before { content: '✦'; font-size: 10px; opacity: 0.6; }
+.reviews-head-line { flex: 1; height: 1px; background: linear-gradient(to right, var(--gold-line), transparent); }
+
+.reviews-stats {
+  display: flex; gap: 0; border: 1px solid var(--gold-line);
+  margin-bottom: 40px; overflow: hidden;
+}
+.reviews-stat {
+  flex: 1; padding: 18px 28px; border-right: 1px solid var(--gold-line);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.reviews-stat:last-child { border-right: none; }
+.reviews-stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px; font-weight: 900; color: #fff; line-height: 1;
+}
+.reviews-stat-num.like-color { color: #0E9F6E; }
+.reviews-stat-num.dislike-color { color: #C81E1E; }
+.reviews-stat-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+
+/* Form */
+.reviews-form-wrap {
+  border: 1px solid var(--gold-line);
+  margin-bottom: 48px; overflow: hidden;
+}
+.reviews-form-head {
+  background: var(--obsidian-3); padding: 14px 24px;
+  border-bottom: 1px solid var(--gold-line);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.reviews-form-head-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold); opacity: 0.8;
+}
+.reviews-form-body { padding: 24px; background: var(--obsidian-2); display: flex; flex-direction: column; gap: 18px; }
+
+.rv-field { display: flex; flex-direction: column; gap: 6px; }
+.rv-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+}
+.rv-input {
+  background: var(--obsidian); border: 1px solid rgba(255,255,255,0.1);
+  padding: 10px 14px; color: #fff; outline: none;
+  font-family: 'Share Tech Mono', monospace; font-size: 14px;
+  transition: border-color 0.2s;
+}
+.rv-input:focus { border-color: var(--gold); }
+.rv-input::placeholder { color: rgba(255,255,255,0.2); }
+.rv-textarea { min-height: 100px; resize: vertical; }
+
+.rv-rating-row { display: flex; gap: 12px; }
+.rv-rating-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 22px; border: 1px solid rgba(255,255,255,0.12);
+  background: none; cursor: pointer; transition: all 0.2s;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.45);
+}
+.rv-rating-btn:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+.rv-rating-btn.active.like { border-color: #0E9F6E; color: #0E9F6E; background: rgba(14,159,110,0.08); }
+.rv-rating-btn.active.dislike { border-color: #C81E1E; color: #C81E1E; background: rgba(200,30,30,0.08); }
+.rv-rating-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+.rv-warning {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px; letter-spacing: 0.12em; line-height: 1.7;
+  color: rgba(255,255,255,0.3);
+  border-left: 2px solid rgba(201,168,76,0.35);
+  padding-left: 12px;
+}
+.rv-warning strong { color: rgba(201,168,76,0.7); }
+
+.rv-submit-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.rv-submit-btn {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: #fff; background: var(--gold); border: none;
+  padding: 11px 28px; cursor: pointer; transition: all 0.25s;
+}
+.rv-submit-btn:hover { background: var(--gold-light); }
+.rv-submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.rv-submit-msg {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px; letter-spacing: 0.15em; color: var(--ash);
+  display: none;
+}
+.rv-cooldown {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px; letter-spacing: 0.12em;
+  color: rgba(201,168,76,0.6);
+}
+
+/* Review cards */
+.reviews-list { display: flex; flex-direction: column; gap: 0; border: 1px solid rgba(255,255,255,0.06); }
+.review-card {
+  padding: 28px 32px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: var(--obsidian-2);
+  transition: background 0.2s;
+  position: relative;
+}
+.review-card:last-child { border-bottom: none; }
+.review-card:hover { background: var(--obsidian-3); }
+.review-card-top {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 12px; gap: 16px;
+}
+.review-author-row { display: flex; align-items: center; gap: 14px; }
+.review-rating-badge {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.review-rating-badge.like { background: rgba(14,159,110,0.15); border: 1px solid rgba(14,159,110,0.3); color: #0E9F6E; }
+.review-rating-badge.dislike { background: rgba(200,30,30,0.12); border: 1px solid rgba(200,30,30,0.25); color: #C81E1E; }
+.review-rating-badge svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+.review-author-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px; font-weight: 700; color: #fff;
+}
+.review-date {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px; letter-spacing: 0.18em; color: rgba(255,255,255,0.3);
+  text-transform: uppercase; white-space: nowrap; flex-shrink: 0;
+}
+.review-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.75;
+  margin-bottom: 16px;
+}
+
+/* Admin reply */
+.review-reply {
+  margin-top: 16px; padding: 16px 20px;
+  background: rgba(76,132,201,0.07);
+  border-left: 2px solid var(--gold);
+}
+.review-reply-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 7px; letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--gold); opacity: 0.7; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.review-reply-label::before { content: '⬡'; font-size: 9px; }
+.review-reply-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.7;
+}
+.review-reply-date {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 7px; letter-spacing: 0.12em; color: rgba(255,255,255,0.2);
+  text-transform: uppercase; margin-top: 6px;
+}
+
+/* Admin reply form (inline) */
+.review-admin-reply-wrap {
+  margin-top: 14px; display: none; flex-direction: column; gap: 8px;
+}
+.review-admin-reply-wrap.open { display: flex; }
+.review-admin-reply-input {
+  background: var(--obsidian); border: 1px solid var(--gold-line);
+  padding: 9px 13px; color: #fff; outline: none;
+  font-family: 'Share Tech Mono', monospace; font-size: 13px;
+  width: 100%; resize: none; min-height: 72px;
+}
+.review-admin-reply-input:focus { border-color: var(--gold); }
+.review-admin-btn-row { display: flex; gap: 8px; }
+.review-admin-send-btn {
+  font-family: 'IBM Plex Mono', monospace; font-size: 8px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: #fff; background: var(--gold); border: none;
+  padding: 8px 20px; cursor: pointer; transition: opacity 0.2s;
+}
+.review-admin-send-btn:hover { opacity: 0.85; }
+.review-admin-cancel-btn {
+  font-family: 'IBM Plex Mono', monospace; font-size: 8px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(255,255,255,0.4); background: none;
+  border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px;
+  cursor: pointer; transition: all 0.2s;
+}
+.review-admin-cancel-btn:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+.rv-admin-action-btn {
+  font-family: 'IBM Plex Mono', monospace; font-size: 7px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(201,168,76,0.55); background: none;
+  border: 1px solid rgba(201,168,76,0.2); padding: 5px 12px;
+  cursor: pointer; transition: all 0.2s;
+}
+.rv-admin-action-btn:hover { color: var(--gold); border-color: var(--gold); }
+
+.reviews-empty {
+  padding: 64px 40px; text-align: center;
+  border: 1px solid rgba(255,255,255,0.06);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+}
+
+@media (max-width:768px) {
+  .reviews-section { padding: 40px 24px 60px; }
+  .reviews-stats { flex-direction: column; }
+  .reviews-stat { border-right: none; border-bottom: 1px solid var(--gold-line); }
+  .reviews-stat:last-child { border-bottom: none; }
+  .review-card { padding: 20px; }
+  .review-card-top { flex-direction: column; gap: 6px; }
+}
+
 /* ══ PAGE TRANSITIONS ══ */
 @keyframes pageOut { 0%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-14px)} }
 @keyframes pageIn  { 0%{opacity:0;transform:translateY(18px)} 60%{opacity:1;transform:translateY(-2px)} 100%{opacity:1;transform:translateY(0)} }
@@ -1366,6 +1605,81 @@ mark.const-highlight.current { background:var(--gold); color:var(--obsidian); }
     </div>
 
   </div>
+
+  <!-- ══ REVIEWS ══ -->
+  <section class="reviews-section" id="reviewsSection">
+    <div class="reviews-inner">
+
+      <div class="reviews-head">
+        <div class="reviews-head-label">Отзывы — Reviews</div>
+        <div class="reviews-head-line"></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="reviews-stats">
+        <div class="reviews-stat">
+          <div class="reviews-stat-num" id="rvStatTotal">0</div>
+          <div class="reviews-stat-label">Всего отзывов</div>
+        </div>
+        <div class="reviews-stat">
+          <div class="reviews-stat-num like-color" id="rvStatLikes">0</div>
+          <div class="reviews-stat-label">👍 Положительных</div>
+        </div>
+        <div class="reviews-stat">
+          <div class="reviews-stat-num dislike-color" id="rvStatDislikes">0</div>
+          <div class="reviews-stat-label">👎 Отрицательных</div>
+        </div>
+      </div>
+
+      <!-- Submit Form -->
+      <div class="reviews-form-wrap">
+        <div class="reviews-form-head">
+          <span class="reviews-form-head-title">// ОСТАВИТЬ ОТЗЫВ</span>
+          <span class="rv-cooldown" id="rvCooldownLabel" style="display:none"></span>
+        </div>
+        <div class="reviews-form-body">
+          <div class="rv-field">
+            <div class="rv-label">Ваше имя *</div>
+            <input class="rv-input" id="rvName" type="text" maxlength="50" placeholder="Как вас зовут?">
+          </div>
+          <div class="rv-field">
+            <div class="rv-label">Ваша оценка *</div>
+            <div class="rv-rating-row">
+              <button class="rv-rating-btn like" id="rvBtnLike" onclick="selectRating('like')">
+                <svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/><path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>
+                Положительно
+              </button>
+              <button class="rv-rating-btn dislike" id="rvBtnDislike" onclick="selectRating('dislike')">
+                <svg viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0122 4v7a2.31 2.31 0 01-2.33 2H17"/></svg>
+                Отрицательно
+              </button>
+            </div>
+          </div>
+          <div class="rv-field">
+            <div class="rv-label">Текст отзыва *</div>
+            <textarea class="rv-input rv-textarea" id="rvText" maxlength="800" placeholder="Поделитесь своим мнением о Либеральной Группе..."></textarea>
+          </div>
+          <div class="rv-warning">
+            <strong>⚠ Внимание:</strong> После отправки отзыв <strong>невозможно изменить или удалить</strong>.
+            Пожалуйста, убедитесь в правильности написанного перед публикацией.<br>
+            Также вы сможете отправить следующий отзыв только через <strong>60 секунд</strong>.
+          </div>
+          <div class="rv-submit-row">
+            <button class="rv-submit-btn" id="rvSubmitBtn" onclick="submitReview()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Отправить отзыв
+            </button>
+            <div class="rv-submit-msg" id="rvSubmitMsg"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews List -->
+      <div id="rvList"></div>
+
+    </div>
+  </section>
+
 </div>
 
 <!-- ══ INNER VIEW ══ -->
@@ -2247,6 +2561,185 @@ document.addEventListener('keydown',e=>{
 })();
 
 currentElectionFilter='all';
+
+// ══════════════════════════════════════════
+// REVIEWS
+// ══════════════════════════════════════════
+let allReviews = [];
+let rvSelectedRating = null;
+const RV_COOLDOWN_MS = 60_000;
+const RV_LS_KEY = 'lg_last_review_ts';
+
+function selectRating(r) {
+  rvSelectedRating = r;
+  document.getElementById('rvBtnLike').classList.toggle('active', r === 'like');
+  document.getElementById('rvBtnDislike').classList.toggle('active', r === 'dislike');
+}
+
+function rvFmtDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase()
+    + ' · ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+}
+
+function rvCooldownRemaining() {
+  const last = parseInt(localStorage.getItem(RV_LS_KEY) || '0', 10);
+  return Math.max(0, RV_COOLDOWN_MS - (Date.now() - last));
+}
+
+let _rvCooldownTimer = null;
+function startCooldownUI() {
+  clearInterval(_rvCooldownTimer);
+  const btn = document.getElementById('rvSubmitBtn');
+  const lbl = document.getElementById('rvCooldownLabel');
+  function tick() {
+    const rem = rvCooldownRemaining();
+    if (rem <= 0) {
+      btn.disabled = false;
+      lbl.style.display = 'none';
+      clearInterval(_rvCooldownTimer);
+    } else {
+      btn.disabled = true;
+      lbl.style.display = '';
+      lbl.textContent = '// Следующий отзыв через ' + Math.ceil(rem / 1000) + ' сек.';
+    }
+  }
+  tick();
+  _rvCooldownTimer = setInterval(tick, 1000);
+}
+
+async function loadReviews() {
+  try {
+    const data = await fetch('/api/reviews').then(r => r.json());
+    allReviews = Array.isArray(data) ? data : [];
+  } catch (e) { allReviews = []; }
+  renderReviews();
+  updateReviewStats();
+}
+
+function updateReviewStats() {
+  const total = allReviews.length;
+  const likes = allReviews.filter(r => r.rating === 'like').length;
+  const dislikes = allReviews.filter(r => r.rating === 'dislike').length;
+  document.getElementById('rvStatTotal').textContent = total;
+  document.getElementById('rvStatLikes').textContent = likes;
+  document.getElementById('rvStatDislikes').textContent = dislikes;
+}
+
+function renderReviews() {
+  const container = document.getElementById('rvList');
+  if (!allReviews.length) {
+    container.innerHTML = '<div class="reviews-empty">// Отзывов пока нет — будьте первым</div>';
+    return;
+  }
+  const sorted = [...allReviews].reverse();
+  const isAdmin = !!adminToken;
+  const likeIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/><path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>';
+  const dislikeIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0122 4v7a2.31 2.31 0 01-2.33 2H17"/></svg>';
+
+  container.innerHTML = '<div class="reviews-list">' + sorted.map(rv => {
+    const badge = '<div class="review-rating-badge ' + rv.rating + '">' + (rv.rating === 'like' ? likeIcon : dislikeIcon) + '</div>';
+
+    const replyHtml = rv.reply_text
+      ? '<div class="review-reply">'
+          + '<div class="review-reply-label">Ответ администрации</div>'
+          + '<div class="review-reply-text">' + escHtml(rv.reply_text) + '</div>'
+          + '<div class="review-reply-date">' + rvFmtDate(rv.reply_at) + '</div>'
+          + '</div>'
+      : '';
+
+    const adminActions = isAdmin
+      ? '<div style="margin-top:10px">'
+          + '<button class="rv-admin-action-btn" onclick="rvToggleReplyForm(\'' + rv.id + '\')">'
+          + (rv.reply_text ? '✎ ИЗМЕНИТЬ ОТВЕТ' : '+ ОТВЕТИТЬ')
+          + '</button></div>'
+          + '<div class="review-admin-reply-wrap" id="rvReplyWrap_' + rv.id + '">'
+          + '<textarea class="review-admin-reply-input" id="rvReplyInput_' + rv.id + '" placeholder="Ответ администрации...">' + escHtml(rv.reply_text || '') + '</textarea>'
+          + '<div class="review-admin-btn-row">'
+          + '<button class="review-admin-send-btn" onclick="rvSendReply(\'' + rv.id + '\')">СОХРАНИТЬ ОТВЕТ</button>'
+          + '<button class="review-admin-cancel-btn" onclick="rvToggleReplyForm(\'' + rv.id + '\')">ОТМЕНА</button>'
+          + '</div></div>'
+      : '';
+
+    return '<div class="review-card" id="rvCard_' + rv.id + '">'
+      + '<div class="review-card-top">'
+      + '<div class="review-author-row">' + badge + '<div class="review-author-name">' + escHtml(rv.name) + '</div></div>'
+      + '<div class="review-date">' + rvFmtDate(rv.created_at) + '</div>'
+      + '</div>'
+      + '<div class="review-text">' + escHtml(rv.text) + '</div>'
+      + replyHtml + adminActions
+      + '</div>';
+  }).join('') + '</div>';
+}
+
+function rvToggleReplyForm(id) {
+  const wrap = document.getElementById('rvReplyWrap_' + id);
+  if (wrap) wrap.classList.toggle('open');
+}
+
+async function rvSendReply(id) {
+  if (!adminToken) { doLogout(); return; }
+  const input = document.getElementById('rvReplyInput_' + id);
+  if (!input || !input.value.trim()) return;
+  const r = await fetch('/api/reviews', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
+    body: JSON.stringify({ id: id, reply: input.value.trim() })
+  });
+  if (r.status === 401) { doLogout(); return; }
+  if (r.ok) { await loadReviews(); }
+}
+
+async function submitReview() {
+  const name = document.getElementById('rvName').value.trim();
+  const text = document.getElementById('rvText').value.trim();
+  const msgEl = document.getElementById('rvSubmitMsg');
+
+  function showMsg(txt, color) {
+    msgEl.textContent = txt;
+    msgEl.style.color = color || 'var(--ash)';
+    msgEl.style.display = 'block';
+  }
+
+  if (rvCooldownRemaining() > 0) return;
+  if (!name) { showMsg('// Укажите ваше имя', 'var(--c07)'); return; }
+  if (!rvSelectedRating) { showMsg('// Выберите оценку', 'var(--c07)'); return; }
+  if (!text) { showMsg('// Напишите текст отзыва', 'var(--c07)'); return; }
+
+  const btn = document.getElementById('rvSubmitBtn');
+  btn.disabled = true;
+  showMsg('// Отправка...', 'var(--ash)');
+
+  try {
+    const r = await fetch('/api/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, text: text, rating: rvSelectedRating })
+    });
+    if (r.ok) {
+      localStorage.setItem(RV_LS_KEY, Date.now().toString());
+      document.getElementById('rvName').value = '';
+      document.getElementById('rvText').value = '';
+      rvSelectedRating = null;
+      document.getElementById('rvBtnLike').classList.remove('active');
+      document.getElementById('rvBtnDislike').classList.remove('active');
+      showMsg('// Отзыв отправлен ✓', 'var(--c02)');
+      await loadReviews();
+      startCooldownUI();
+    } else {
+      const err = await r.json().catch(function() { return {}; });
+      showMsg('// Ошибка: ' + (err.error || r.status), 'var(--c07)');
+      btn.disabled = false;
+    }
+  } catch (e) {
+    showMsg('// Сетевая ошибка', 'var(--c07)');
+    btn.disabled = false;
+  }
+}
+
+// Init reviews on page load
+loadReviews();
+startCooldownUI();
 </script>
 </body>
 </html>
