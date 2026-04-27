@@ -54,7 +54,7 @@ function sbRequest(method, path, body) {
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
 
@@ -99,6 +99,17 @@ module.exports = async (req, res) => {
         reply_at: new Date().toISOString(),
       });
       return res.status(r.status).json(r.data);
+    }
+
+    // ══ DELETE — удаление отзыва (только админ) ══
+    if (req.method === 'DELETE') {
+      if (!verifyToken(req)) return res.status(401).json({ error: 'Не авторизован' });
+
+      const { id } = req.body || {};
+      if (!id) return res.status(400).json({ error: 'Нет id' });
+
+      const r = await sbRequest('DELETE', `/reviews?id=eq.${id}`);
+      return res.status(r.status).json({ success: true });
     }
 
     return res.status(405).end();
