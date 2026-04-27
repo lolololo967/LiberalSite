@@ -2351,10 +2351,10 @@ async function doLogin(){
   const pw=document.getElementById('adminPasswordInput').value,errEl=document.getElementById('adminLoginError');
   errEl.classList.remove('show');if(!pw){errEl.textContent='// ВВЕДИТЕ ПАРОЛЬ';errEl.classList.add('show');return;}
   const r=await apiPost('/api/auth',{password:pw});
-  if(r.ok){const d=await r.json();adminToken=d.token;localStorage.setItem('lg_admin_token',adminToken);document.getElementById('adminPasswordInput').value='';showAdminDashboard();}
+  if(r.ok){const d=await r.json();adminToken=d.token;localStorage.setItem('lg_admin_token',adminToken);document.getElementById('adminPasswordInput').value='';showAdminDashboard();renderReviews();}
   else{errEl.textContent='// НЕВЕРНЫЙ ПАРОЛЬ';errEl.classList.add('show');}
 }
-function doLogout(){adminToken=null;localStorage.removeItem('lg_admin_token');document.getElementById('adminLoginPanel').style.display='block';document.getElementById('adminDashboard').style.display='none';document.getElementById('adminView').classList.remove('active');document.getElementById('adminNavBtn').classList.remove('active');document.getElementById('homeView').style.display='';}
+function doLogout(){adminToken=null;localStorage.removeItem('lg_admin_token');document.getElementById('adminLoginPanel').style.display='block';document.getElementById('adminDashboard').style.display='none';document.getElementById('adminView').classList.remove('active');document.getElementById('adminNavBtn').classList.remove('active');document.getElementById('homeView').style.display='';renderReviews();}
 function showAdminDashboard(){document.getElementById('adminLoginPanel').style.display='none';document.getElementById('adminDashboard').style.display='block';loadCards().then(()=>{if(adminCurrentTab!=='parties'&&adminCurrentTab!=='parliament'&&adminCurrentTab!=='constitution')renderAdminCardsList();});loadParties().then(()=>{if(adminCurrentTab==='parties')renderAdminPartiesList();populateParliamentPartySelect();});loadParliamentSeats().then(()=>{if(adminCurrentTab==='parliament')renderAdminParliamentList();});loadConstitution().then(()=>{if(adminCurrentTab==='constitution')loadConstitutionAdminForm();});}
 
 // ══ ADMIN TABS ══
@@ -2649,10 +2649,12 @@ function renderReviews() {
       : '';
 
     const adminActions = isAdmin
-      ? '<div style="margin-top:10px">'
+      ? '<div style="margin-top:10px;display:flex;gap:8px;align-items:center">'
           + '<button class="rv-admin-action-btn" onclick="rvToggleReplyForm(\'' + rv.id + '\')">'
           + (rv.reply_text ? '✎ ИЗМЕНИТЬ ОТВЕТ' : '+ ОТВЕТИТЬ')
-          + '</button></div>'
+          + '</button>'
+          + '<button class="rv-admin-action-btn" style="color:rgba(200,30,30,0.6);border-color:rgba(200,30,30,0.2)" onclick="rvDeleteReview(\'' + rv.id + '\')">✕ УДАЛИТЬ</button>'
+          + '</div>'
           + '<div class="review-admin-reply-wrap" id="rvReplyWrap_' + rv.id + '">'
           + '<textarea class="review-admin-reply-input" id="rvReplyInput_' + rv.id + '" placeholder="Ответ администрации...">' + escHtml(rv.reply_text || '') + '</textarea>'
           + '<div class="review-admin-btn-row">'
@@ -2670,6 +2672,18 @@ function renderReviews() {
       + replyHtml + adminActions
       + '</div>';
   }).join('') + '</div>';
+}
+
+async function rvDeleteReview(id) {
+  if (!adminToken) { doLogout(); return; }
+  if (!confirm('Удалить этот отзыв? Действие необратимо.')) return;
+  const r = await fetch('/api/reviews', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
+    body: JSON.stringify({ id: id })
+  });
+  if (r.status === 401) { doLogout(); return; }
+  if (r.ok) { await loadReviews(); }
 }
 
 function rvToggleReplyForm(id) {
