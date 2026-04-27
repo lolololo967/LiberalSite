@@ -1746,6 +1746,7 @@ mark.const-highlight.current { background:var(--gold); color:var(--obsidian); }
         <button class="admin-tab-btn" onclick="switchAdminTab('parliament',this)">Парламент</button>
         <button class="admin-tab-btn" onclick="switchAdminTab('parties',this)">Партии</button>
         <button class="admin-tab-btn" onclick="switchAdminTab('constitution',this)">Конституция</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab('reviews',this)">Отзывы</button>
       </div>
 
       <!-- Card Form -->
@@ -1976,6 +1977,19 @@ mark.const-highlight.current { background:var(--gold); color:var(--obsidian); }
             <button class="admin-btn admin-btn-primary" onclick="saveConstitution()">СОХРАНИТЬ</button>
           </div>
           <div id="adminConstitutionSaveMsg" style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:0.15em;display:none;margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <!-- Reviews Admin Panel -->
+      <div id="reviewsAdminPanel" style="display:none">
+        <div class="admin-form-wrap">
+          <div class="admin-form-head">
+            <span class="admin-form-head-title">// УПРАВЛЕНИЕ ОТЗЫВАМИ</span>
+            <span id="adminReviewsCount" style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:0.15em;color:var(--ash)"></span>
+          </div>
+          <div id="adminReviewsList" style="background:var(--paper)">
+            <div class="admin-cards-empty">// Загрузка...</div>
+          </div>
         </div>
       </div>
 
@@ -2360,17 +2374,19 @@ function showAdminDashboard(){document.getElementById('adminLoginPanel').style.d
 // ══ ADMIN TABS ══
 function switchAdminTab(section,btn){
   adminCurrentTab=section;document.querySelectorAll('.admin-tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
-  const isP=section==='parties',isPar=section==='parliament',isC=section==='constitution';
-  document.getElementById('cardFormWrap').style.display=(!isP&&!isPar&&!isC)?'block':'none';
+  const isP=section==='parties',isPar=section==='parliament',isC=section==='constitution',isR=section==='reviews';
+  document.getElementById('cardFormWrap').style.display=(!isP&&!isPar&&!isC&&!isR)?'block':'none';
   document.getElementById('partyFormWrap').style.display=isP?'block':'none';
   document.getElementById('parliamentFormWrap').style.display=isPar?'block':'none';
   document.getElementById('constitutionFormWrap').style.display=isC?'block':'none';
+  document.getElementById('reviewsAdminPanel').style.display=isR?'block':'none';
   const ls=document.getElementById('adminListSection'),cl=document.getElementById('adminCardsList');
-  if(ls)ls.style.display=isC?'none':'block';if(cl)cl.style.display=isC?'none':'block';
-  if(!isP&&!isPar&&!isC){document.getElementById('adminListLabel').textContent=`Карточки — ${section==='elections'?'Выборы':'Референдумы'}`;document.getElementById('electionCategoryField').style.display=section==='elections'?'flex':'none';cancelEdit();renderAdminCardsList();}
+  if(ls)ls.style.display=(isC||isR)?'none':'block';if(cl)cl.style.display=(isC||isR)?'none':'block';
+  if(!isP&&!isPar&&!isC&&!isR){document.getElementById('adminListLabel').textContent=`Карточки — ${section==='elections'?'Выборы':'Референдумы'}`;document.getElementById('electionCategoryField').style.display=section==='elections'?'flex':'none';cancelEdit();renderAdminCardsList();}
   else if(isP){document.getElementById('adminListLabel').textContent='Существующие партии';cancelPartyEdit();renderAdminPartiesList();}
   else if(isPar){document.getElementById('adminListLabel').textContent='Места в парламенте';cancelParliamentEdit();renderAdminParliamentList();}
   else if(isC){loadConstitutionAdminForm();}
+  else if(isR){renderAdminReviewsList();}
 }
 
 // ══ CARD FORM ══
@@ -2674,6 +2690,69 @@ function renderReviews() {
   }).join('') + '</div>';
 }
 
+function renderAdminReviewsList() {
+  const container = document.getElementById('adminReviewsList');
+  const countEl = document.getElementById('adminReviewsCount');
+  if (!container) return;
+  if (!allReviews.length) {
+    if (countEl) countEl.textContent = '// 0 отзывов';
+    container.innerHTML = '<div class="admin-cards-empty">// Отзывов пока нет</div>';
+    return;
+  }
+  if (countEl) countEl.textContent = '// ' + allReviews.length + ' отзыв(ов)';
+  const sorted = [...allReviews].reverse();
+  container.innerHTML = sorted.map(rv => {
+    const ratingIcon = rv.rating === 'like' ? '👍' : '👎';
+    const ratingColor = rv.rating === 'like' ? 'var(--c02)' : 'var(--c07)';
+    const replyInfo = rv.reply_text
+      ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:0.1em;color:var(--c02);margin-top:4px">✓ ЕСТЬ ОТВЕТ</div>`
+      : `<div style="font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:0.1em;color:var(--ash);margin-top:4px">— БЕЗ ОТВЕТА</div>`;
+    return `<div class="admin-card-row" style="flex-direction:column;align-items:stretch;gap:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+          <div style="font-size:18px;flex-shrink:0">${ratingIcon}</div>
+          <div>
+            <div class="admin-card-row-title">${escHtml(rv.name)}</div>
+            <div class="admin-card-row-meta">${rvFmtDate(rv.created_at)}</div>
+            ${replyInfo}
+          </div>
+        </div>
+        <div class="admin-card-row-actions">
+          <button class="admin-btn admin-btn-secondary" onclick="adminRvToggleReply('${rv.id}')">ОТВЕТИТЬ</button>
+          <button class="admin-btn admin-btn-danger" onclick="rvDeleteReview('${rv.id}')">УДАЛИТЬ</button>
+        </div>
+      </div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--smoke);line-height:1.6;padding:12px 14px;background:var(--paper-2);border-left:3px solid ${ratingColor}">${escHtml(rv.text)}</div>
+      ${rv.reply_text ? `<div style="font-family:'Space Grotesk',sans-serif;font-size:12px;color:var(--smoke);padding:10px 14px;border-left:3px solid var(--gold);background:rgba(76,132,201,0.04)"><span style="font-family:'IBM Plex Mono',monospace;font-size:7px;letter-spacing:0.15em;color:var(--gold);display:block;margin-bottom:4px">ОТВЕТ АДМИНА</span>${escHtml(rv.reply_text)}</div>` : ''}
+      <div id="adminRvReplyWrap_${rv.id}" style="display:none;flex-direction:column;gap:8px">
+        <textarea class="admin-textarea" id="adminRvReplyInput_${rv.id}" placeholder="Напишите ответ..." style="min-height:72px">${escHtml(rv.reply_text || '')}</textarea>
+        <div style="display:flex;gap:8px">
+          <button class="admin-btn admin-btn-primary" onclick="rvSendReplyAdmin('${rv.id}')">СОХРАНИТЬ ОТВЕТ</button>
+          <button class="admin-btn admin-btn-secondary" onclick="adminRvToggleReply('${rv.id}')">ОТМЕНА</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function adminRvToggleReply(id) {
+  const wrap = document.getElementById('adminRvReplyWrap_' + id);
+  if (wrap) wrap.style.display = wrap.style.display === 'none' ? 'flex' : 'none';
+}
+
+async function rvSendReplyAdmin(id) {
+  if (!adminToken) { doLogout(); return; }
+  const input = document.getElementById('adminRvReplyInput_' + id);
+  if (!input || !input.value.trim()) return;
+  const r = await fetch('/api/reviews', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
+    body: JSON.stringify({ id: id, reply: input.value.trim() })
+  });
+  if (r.status === 401) { doLogout(); return; }
+  if (r.ok) { await loadReviews(); renderAdminReviewsList(); }
+}
+
 async function rvDeleteReview(id) {
   if (!adminToken) { doLogout(); return; }
   if (!confirm('Удалить этот отзыв? Действие необратимо.')) return;
@@ -2683,7 +2762,7 @@ async function rvDeleteReview(id) {
     body: JSON.stringify({ id: id })
   });
   if (r.status === 401) { doLogout(); return; }
-  if (r.ok) { await loadReviews(); }
+  if (r.ok) { await loadReviews(); renderAdminReviewsList(); }
 }
 
 function rvToggleReplyForm(id) {
