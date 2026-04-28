@@ -1252,6 +1252,7 @@ mark.const-highlight.current { background:var(--gold); color:var(--obsidian); }
 .review-author-name {
   font-family: 'Playfair Display', serif;
   font-size: 16px; font-weight: 700; color: #fff;
+  word-break: break-word; overflow-wrap: break-word;
 }
 .review-date {
   font-family: 'IBM Plex Mono', monospace;
@@ -1262,6 +1263,9 @@ mark.const-highlight.current { background:var(--gold); color:var(--obsidian); }
   font-family: 'Space Grotesk', sans-serif;
   font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.75;
   margin-bottom: 16px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 /* Admin reply */
@@ -1280,6 +1284,7 @@ mark.const-highlight.current { background:var(--gold); color:var(--obsidian); }
 .review-reply-text {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.7;
+  word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap;
 }
 .review-reply-date {
   font-family: 'IBM Plex Mono', monospace;
@@ -1623,16 +1628,24 @@ mark.const-highlight.current { background:var(--gold); color:var(--obsidian); }
         </div>
         <div class="reviews-stat">
           <div class="reviews-stat-num like-color" id="rvStatLikes">0</div>
-          <div class="reviews-stat-label">Положительных</div>
+          <div class="reviews-stat-label">👍 Положительных</div>
         </div>
         <div class="reviews-stat">
           <div class="reviews-stat-num dislike-color" id="rvStatDislikes">0</div>
-          <div class="reviews-stat-label">Отрицательных</div>
+          <div class="reviews-stat-label">👎 Отрицательных</div>
         </div>
       </div>
 
-      <!-- Submit Form -->
-      <div class="reviews-form-wrap">
+      <!-- Write Review Button -->
+      <div style="margin-bottom:24px">
+        <button class="rv-submit-btn" id="rvOpenFormBtn" onclick="rvToggleForm()" style="background:none;border:1px solid var(--gold-line);color:var(--gold);padding:13px 28px;display:flex;align-items:center;gap:10px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          НАПИСАТЬ ОТЗЫВ
+        </button>
+      </div>
+
+      <!-- Submit Form (hidden by default) -->
+      <div class="reviews-form-wrap" id="rvFormWrap" style="display:none;margin-bottom:32px">
         <div class="reviews-form-head">
           <span class="reviews-form-head-title">// ОСТАВИТЬ ОТЗЫВ</span>
           <span class="rv-cooldown" id="rvCooldownLabel" style="display:none"></span>
@@ -1657,7 +1670,7 @@ mark.const-highlight.current { background:var(--gold); color:var(--obsidian); }
           </div>
           <div class="rv-field">
             <div class="rv-label">Текст отзыва *</div>
-            <textarea class="rv-input rv-textarea" id="rvText" maxlength="800" placeholder="Поделитесь своим мнением о Либеральной Группе или сайте..."></textarea>
+            <textarea class="rv-input rv-textarea" id="rvText" maxlength="800" placeholder="Поделитесь своим мнением о Либеральной Группе..."></textarea>
           </div>
           <div class="rv-warning">
             <strong>⚠ Внимание:</strong> После отправки отзыв <strong>невозможно изменить или удалить</strong>.
@@ -2586,6 +2599,17 @@ let rvSelectedRating = null;
 const RV_COOLDOWN_MS = 60_000;
 const RV_LS_KEY = 'lg_last_review_ts';
 
+function rvToggleForm() {
+  const wrap = document.getElementById('rvFormWrap');
+  const btn = document.getElementById('rvOpenFormBtn');
+  const isOpen = wrap.style.display !== 'none';
+  wrap.style.display = isOpen ? 'none' : 'block';
+  btn.innerHTML = isOpen
+    ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> НАПИСАТЬ ОТЗЫВ'
+    : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg> СВЕРНУТЬ';
+  if (!isOpen) wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
 function selectRating(r) {
   rvSelectedRating = r;
   document.getElementById('rvBtnLike').classList.toggle('active', r === 'like');
@@ -2819,6 +2843,7 @@ async function submitReview() {
       showMsg('// Отзыв отправлен ✓', 'var(--c02)');
       await loadReviews();
       startCooldownUI();
+      setTimeout(() => { document.getElementById('rvFormWrap').style.display='none'; document.getElementById('rvOpenFormBtn').innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> НАПИСАТЬ ОТЗЫВ'; }, 1200);
     } else {
       const err = await r.json().catch(function() { return {}; });
       showMsg('// Ошибка: ' + (err.error || r.status), 'var(--c07)');
