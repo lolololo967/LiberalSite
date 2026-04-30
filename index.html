@@ -1420,19 +1420,22 @@ mark.const-highlight.current { background:var(--gold); color:var(--obsidian); }
 }
 .splash-icon-wrap {
   position: relative;
-  width: 140px; height: 140px;
+  width: 180px; height: 180px;
   display: flex; align-items: center; justify-content: center;
 }
 .splash-icon-base {
   position: absolute;
-  width: 90px; height: 90px;
+  width: 100px; height: 100px;
   object-fit: contain;
+  z-index: 2;
 }
 .splash-icon-star {
   position: absolute;
-  width: 140px; height: 140px;
+  width: 180px; height: 180px;
   object-fit: contain;
-  animation: splashSpin 3s linear infinite;
+  z-index: 1;
+  opacity: 0.25;
+  animation: splashSpin 4s linear infinite;
 }
 @keyframes splashSpin {
   from { transform: rotate(0deg); }
@@ -1464,22 +1467,32 @@ mark.const-highlight.current { background:var(--gold); color:var(--obsidian); }
 // Блокируем прокрутку во время splash
 document.documentElement.style.overflow = 'hidden';
 
+// Скрываем header и hero сразу чтобы не мелькали до анимации
+document.addEventListener('DOMContentLoaded', function() {
+  var h = document.querySelector('header');
+  var hero = document.querySelector('.hero');
+  if (h) h.style.opacity = '0';
+  if (hero) hero.style.opacity = '0';
+  document.querySelectorAll('.cat-card').forEach(function(c){ c.style.opacity='0'; c.style.transform='translateY(14px)'; });
+  document.querySelectorAll('.official-item').forEach(function(el){ el.style.opacity='0'; el.style.transform='translateY(10px)'; });
+});
+
 window.addEventListener('load', function() {
-  // Минимум 2.5 секунды показа splash
   setTimeout(function() {
     var splash = document.getElementById('splashScreen');
     var root   = document.getElementById('siteRoot');
 
-    // Fade out splash
     splash.classList.add('fade-out');
 
-    // Показываем сайт чуть позже чтобы fade пересёкся
     setTimeout(function() {
       splash.style.display = 'none';
       document.documentElement.style.overflow = '';
       root.classList.add('visible');
+
+      // Запускаем boot анимации ПОСЛЕ splash
+      bootSequence();
     }, 550);
-  }, 2500);
+  }, 1500);
 });
 </script>
 
@@ -2652,18 +2665,18 @@ document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='f'&&currentSection==='constitution'){e.preventDefault();constOpenSearch();}
 });
 
-// ══ BOOT ANIMATION ══
-(function bootSequence(){
+// ══ BOOT ANIMATION ══ (вызывается после splash)
+function bootSequence(){
   const blink=document.getElementById('flashBlink');
   blink.style.opacity='1';
   requestAnimationFrame(()=>{blink.classList.add('active');blink.addEventListener('animationend',()=>{blink.classList.remove('active');blink.style.opacity='0';},{once:true});});
   setTimeout(()=>{const s=document.getElementById('transitionScan');s.classList.add('active');s.addEventListener('animationend',()=>s.classList.remove('active'),{once:true});},150);
-  document.querySelector('header').style.animation='headerReveal 0.5s cubic-bezier(0,0,0.2,1) 0.05s both';
+  const h=document.querySelector('header');h.style.opacity='';h.style.animation='headerReveal 0.5s cubic-bezier(0,0,0.2,1) 0.05s both';
   const hero=document.querySelector('.hero');hero.style.opacity='0';
   setTimeout(()=>{hero.style.animation='heroReveal 0.6s cubic-bezier(0,0,0.2,1) forwards';hero.addEventListener('animationend',()=>{hero.style.animation='';hero.style.opacity='1';},{once:true});},220);
   document.querySelectorAll('.cat-card').forEach((card,i)=>{card.style.opacity='0';card.style.transform='translateY(14px)';setTimeout(()=>{card.style.animation=`catFadeUp 0.5s cubic-bezier(0,0,0.2,1) forwards`;card.addEventListener('animationend',()=>{card.style.animation='';card.style.opacity='1';card.style.transform='';},{once:true});},400+i*45);});
   setTimeout(()=>{document.querySelectorAll('.official-item').forEach((el,i)=>{el.style.opacity='0';el.style.transform='translateY(10px)';setTimeout(()=>{el.style.transition='opacity 0.5s ease, transform 0.5s ease';el.style.opacity='1';el.style.transform='';setTimeout(()=>el.style.transition='',500);},600+i*80);});},0);
-})();
+}
 
 currentElectionFilter='all';
 
