@@ -423,12 +423,14 @@ header::after {
 /* Base animation overlay */
 .cat-anim {
   position:absolute; bottom:0; left:0; right:0;
-  height:56px;
+  height:60px;
   opacity:0; pointer-events:none;
-  transition:opacity 0.3s ease;
-  padding:0 14px 10px;
+  transition:opacity 0.35s ease;
+  padding:0 16px 12px;
   display:flex; align-items:flex-end; gap:4px;
   overflow:hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 30%, black 55%);
+  mask-image:         linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 30%, black 55%);
 }
 .cat-card:hover .cat-anim { opacity:1; }
 
