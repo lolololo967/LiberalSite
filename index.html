@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ЛИБЕРАЛЬНАЯ ГРУППА</title>
 <link rel="icon" href="img/Icon.png">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@200;300;400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
 /* ══════════════════════════════════════════
@@ -47,7 +47,7 @@ html { scroll-behavior:smooth; font-size:16px; }
 body {
   background: var(--paper);
   color: var(--ink);
-  font-family:'Share Tech Mono', monospace;
+  font-family:'Exo 2', 'Rajdhani', sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
   cursor: default;
@@ -115,8 +115,9 @@ header::after {
 .logo-text { display:flex; flex-direction:column; gap:1px; }
 .logo-title {
   font-size:15px; font-weight:700;
-  letter-spacing:0.12em; color:#fff;
+  letter-spacing:0.15em; color:#fff;
   text-transform:uppercase; line-height:1;
+  font-family:'Orbitron', sans-serif;
 }
 
 .header-right { display:flex; align-items:center; gap:16px; }
@@ -248,8 +249,8 @@ header::after {
   margin-bottom:2px;
 }
 .section-head-label {
-  font-family:'IBM Plex Mono', monospace;
-  font-size:8px; letter-spacing:0.4em; text-transform:uppercase;
+  font-family:'Orbitron', sans-serif;
+  font-size:8px; letter-spacing:0.3em; text-transform:uppercase;
   color:var(--gold); padding:10px 20px;
   border:1px solid var(--gold-line);
   background:rgba(76, 86, 201, 0.04);
@@ -343,10 +344,10 @@ header::after {
 }
 .cat-bottom { position:relative; z-index:1; }
 .cat-name {
-    font-family: 'Barlow Condensed', sans-serif;
-  font-size:25px; font-weight:700;
-  color:var(--ink); letter-spacing:0.01em;
-  margin-bottom:4px; line-height:1.1;
+    font-family: 'Orbitron', sans-serif;
+  font-size:19px; font-weight:700;
+  color:var(--ink); letter-spacing:0.04em;
+  margin-bottom:4px; line-height:1.15;
 }
 .cat-sub {
   font-family:'IBM Plex Mono', monospace;
@@ -401,7 +402,7 @@ header::after {
   margin-bottom:10px;
 }
 .official-name {
-  font-family:'Playfair Display', serif;
+  font-family:'Exo 2', sans-serif;
   font-size:22px; font-weight:700;
   color:#fff; line-height:1; flex:1;
 }
@@ -417,7 +418,231 @@ header::after {
 }
 .official-meta-item span { color:rgba(255,255,255,0.55); margin-left:4px; }
 
-/* ══ INNER VIEW ══ */
+/* ══ DETROIT-STYLE CARD HOVER ANIMATIONS ══ */
+
+/* Base animation overlay */
+.cat-anim {
+  position:absolute; bottom:0; left:0; right:0;
+  height:56px;
+  opacity:0; pointer-events:none;
+  transition:opacity 0.3s ease;
+  padding:0 14px 10px;
+  display:flex; align-items:flex-end; gap:4px;
+  overflow:hidden;
+}
+.cat-card:hover .cat-anim { opacity:1; }
+
+/* ── 01 Elections: animated bar chart ── */
+.anim-bars { display:flex; align-items:flex-end; gap:3px; height:38px; width:100%; }
+.anim-bar {
+  flex:1; background:var(--card-color, var(--c01));
+  opacity:0.6; border-radius:1px 1px 0 0;
+  transform:scaleY(0); transform-origin:bottom;
+  transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.cat-card:hover .anim-bar:nth-child(1) { transform:scaleY(1); transition-delay:0.0s; }
+.cat-card:hover .anim-bar:nth-child(2) { transform:scaleY(1); transition-delay:0.06s; }
+.cat-card:hover .anim-bar:nth-child(3) { transform:scaleY(1); transition-delay:0.12s; }
+.cat-card:hover .anim-bar:nth-child(4) { transform:scaleY(1); transition-delay:0.18s; }
+.cat-card:hover .anim-bar:nth-child(5) { transform:scaleY(1); transition-delay:0.24s; }
+
+/* ── 02 Referendums: YES/NO split bar ── */
+.anim-yesno { display:flex; flex-direction:column; gap:5px; width:100%; }
+.anim-yn-row { display:flex; align-items:center; gap:6px; }
+.anim-yn-lbl {
+  font-family:'Orbitron',sans-serif; font-size:7px; letter-spacing:0.1em;
+  color:var(--card-color, var(--c02)); width:22px; flex-shrink:0;
+}
+.anim-yn-track { flex:1; height:4px; background:rgba(0,0,0,0.1); border-radius:2px; overflow:hidden; }
+.anim-yn-fill {
+  height:100%; border-radius:2px;
+  transform:scaleX(0); transform-origin:left;
+  transition:transform 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.cat-card:hover .anim-yn-fill { transform:scaleX(1); }
+.anim-yn-fill.yes { background:var(--c02); transition-delay:0.05s; }
+.anim-yn-fill.no  { background:var(--c07); transition-delay:0.15s; }
+.anim-yn-pct {
+  font-family:'Orbitron',sans-serif; font-size:7px;
+  color:var(--smoke); width:28px; text-align:right;
+}
+
+/* ── 03 Parliament: seat dots matrix ── */
+.anim-seats { display:flex; flex-wrap:wrap; gap:3px; align-items:flex-end; }
+.anim-seat {
+  width:7px; height:7px; border-radius:50%;
+  background:var(--card-color, var(--c03));
+  opacity:0; transform:scale(0);
+  transition:opacity 0.25s, transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+.cat-card:hover .anim-seat { opacity:0.7; transform:scale(1); }
+.cat-card:hover .anim-seat:nth-child(1)  { transition-delay:.00s; }
+.cat-card:hover .anim-seat:nth-child(2)  { transition-delay:.03s; }
+.cat-card:hover .anim-seat:nth-child(3)  { transition-delay:.06s; }
+.cat-card:hover .anim-seat:nth-child(4)  { transition-delay:.09s; }
+.cat-card:hover .anim-seat:nth-child(5)  { transition-delay:.12s; }
+.cat-card:hover .anim-seat:nth-child(6)  { transition-delay:.15s; }
+.cat-card:hover .anim-seat:nth-child(7)  { transition-delay:.18s; }
+.cat-card:hover .anim-seat:nth-child(8)  { transition-delay:.21s; }
+.cat-card:hover .anim-seat:nth-child(9)  { transition-delay:.24s; }
+.cat-card:hover .anim-seat:nth-child(10) { transition-delay:.27s; }
+.cat-card:hover .anim-seat:nth-child(11) { transition-delay:.30s; }
+.cat-card:hover .anim-seat:nth-child(12) { transition-delay:.33s; }
+.cat-card:hover .anim-seat.highlighted { background:var(--card-color, var(--c03)); opacity:1; }
+
+/* ── 04 Parties: pie-slice arcs ── */
+.anim-pie { position:relative; width:44px; height:44px; flex-shrink:0; }
+.anim-pie svg { width:44px; height:44px; transform:rotate(-90deg); }
+.anim-pie-arc {
+  fill:none; stroke-width:12; stroke-linecap:butt;
+  stroke-dashoffset:0;
+  transition:stroke-dasharray 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.anim-pie-legend { display:flex; flex-direction:column; gap:3px; justify-content:center; }
+.anim-pie-item {
+  display:flex; align-items:center; gap:4px;
+  font-family:'Orbitron',sans-serif; font-size:6px; letter-spacing:0.05em; color:var(--smoke);
+  opacity:0; transform:translateX(-6px);
+  transition:opacity 0.3s, transform 0.3s;
+}
+.cat-card:hover .anim-pie-item { opacity:1; transform:translateX(0); }
+.cat-card:hover .anim-pie-item:nth-child(1) { transition-delay:0.1s; }
+.cat-card:hover .anim-pie-item:nth-child(2) { transition-delay:0.2s; }
+.cat-card:hover .anim-pie-item:nth-child(3) { transition-delay:0.3s; }
+.anim-pie-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+
+/* ── 05 Constitution: scanning lines ── */
+.anim-doc { display:flex; flex-direction:column; gap:4px; width:100%; }
+.anim-doc-line {
+  height:3px; border-radius:1px;
+  background:var(--card-color, var(--c05)); opacity:0.4;
+  transform:scaleX(0); transform-origin:left;
+  transition:transform 0.4s ease;
+}
+.anim-doc-line:nth-child(1) { width:85%; }
+.anim-doc-line:nth-child(2) { width:70%; }
+.anim-doc-line:nth-child(3) { width:90%; }
+.anim-doc-line:nth-child(4) { width:55%; }
+.cat-card:hover .anim-doc-line { transform:scaleX(1); }
+.cat-card:hover .anim-doc-line:nth-child(1) { transition-delay:0.0s; }
+.cat-card:hover .anim-doc-line:nth-child(2) { transition-delay:0.08s; }
+.cat-card:hover .anim-doc-line:nth-child(3) { transition-delay:0.16s; }
+.cat-card:hover .anim-doc-line:nth-child(4) { transition-delay:0.24s; }
+
+/* ── 06 Laws: shield progress ring ── */
+.anim-shield { display:flex; align-items:center; gap:8px; }
+.anim-ring { position:relative; width:38px; height:38px; flex-shrink:0; }
+.anim-ring svg { width:38px; height:38px; transform:rotate(-90deg); }
+.anim-ring-bg { fill:none; stroke:rgba(0,0,0,0.1); stroke-width:4; }
+.anim-ring-fill {
+  fill:none; stroke:var(--card-color, var(--c06));
+  stroke-width:4; stroke-linecap:round;
+  stroke-dasharray:0 100;
+  transition:stroke-dasharray 0.7s cubic-bezier(0.4,0,0.2,1) 0.1s;
+}
+.cat-card:hover .anim-ring-fill { stroke-dasharray:82 100; }
+.anim-ring-label {
+  font-family:'Orbitron',sans-serif; font-size:7px; letter-spacing:0.08em; color:var(--smoke);
+  display:flex; flex-direction:column; gap:2px;
+}
+.anim-ring-pct {
+  font-family:'Orbitron',sans-serif; font-size:13px; font-weight:700;
+  color:var(--card-color, var(--c06));
+  opacity:0; transform:translateY(4px);
+  transition:opacity 0.3s 0.4s, transform 0.3s 0.4s;
+}
+.cat-card:hover .anim-ring-pct { opacity:1; transform:translateY(0); }
+
+/* ── 07 Rules: pulse waves ── */
+.anim-pulse { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+.anim-wave {
+  position:absolute; width:20px; height:20px; border-radius:50%;
+  border:1.5px solid var(--card-color, var(--c07));
+  opacity:0; transform:scale(1);
+}
+.cat-card:hover .anim-wave {
+  animation:waveOut 1.2s ease-out infinite;
+}
+.cat-card:hover .anim-wave:nth-child(2) { animation-delay:0.4s; }
+.cat-card:hover .anim-wave:nth-child(3) { animation-delay:0.8s; }
+@keyframes waveOut {
+  0%   { opacity:0.6; transform:scale(1); }
+  100% { opacity:0; transform:scale(3); }
+}
+
+/* ── 08 Projects: stacked progress bars ── */
+.anim-projects { display:flex; flex-direction:column; gap:5px; width:100%; }
+.anim-proj-row { display:flex; align-items:center; gap:6px; }
+.anim-proj-name {
+  font-family:'Orbitron',sans-serif; font-size:6px; letter-spacing:0.08em;
+  color:var(--smoke); width:24px; flex-shrink:0;
+}
+.anim-proj-bar { flex:1; height:3px; background:rgba(0,0,0,0.08); border-radius:2px; overflow:hidden; }
+.anim-proj-fill {
+  height:100%; background:var(--card-color, var(--c08));
+  border-radius:2px;
+  transform:scaleX(0); transform-origin:left;
+  transition:transform 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.cat-card:hover .anim-proj-fill { transform:scaleX(1); }
+.cat-card:hover .anim-proj-row:nth-child(1) .anim-proj-fill { transition-delay:0.0s; }
+.cat-card:hover .anim-proj-row:nth-child(2) .anim-proj-fill { transition-delay:0.1s; }
+.cat-card:hover .anim-proj-row:nth-child(3) .anim-proj-fill { transition-delay:0.2s; }
+
+/* ── 09 Debates: speech bubbles ── */
+.anim-bubbles { display:flex; align-items:flex-end; gap:5px; }
+.anim-bubble {
+  padding:4px 7px; border-radius:10px;
+  font-family:'Orbitron',sans-serif; font-size:6px; letter-spacing:0.06em;
+  color:#fff; opacity:0; transform:translateY(8px) scale(0.8);
+  transition:opacity 0.3s, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+.anim-bubble:nth-child(1) { background:var(--card-color, var(--c09)); align-self:flex-start; }
+.anim-bubble:nth-child(2) { background:rgba(0,0,0,0.25); align-self:flex-end; }
+.anim-bubble:nth-child(3) { background:var(--card-color, var(--c09)); align-self:flex-start; }
+.cat-card:hover .anim-bubble { opacity:1; transform:translateY(0) scale(1); }
+.cat-card:hover .anim-bubble:nth-child(1) { transition-delay:0.0s; }
+.cat-card:hover .anim-bubble:nth-child(2) { transition-delay:0.12s; }
+.cat-card:hover .anim-bubble:nth-child(3) { transition-delay:0.24s; }
+
+/* ── 10 Tests: check counter ── */
+.anim-checks { display:flex; gap:6px; align-items:center; }
+.anim-check {
+  width:18px; height:18px; border-radius:50%;
+  border:1.5px solid var(--card-color, var(--c10));
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; transform:scale(0);
+  transition:opacity 0.25s, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.anim-check svg { width:10px; height:10px; stroke:var(--card-color, var(--c10)); stroke-width:2; fill:none; }
+.anim-check.done { background:var(--card-color, var(--c10)); }
+.anim-check.done svg { stroke:#fff; }
+.cat-card:hover .anim-check { opacity:1; transform:scale(1); }
+.cat-card:hover .anim-check:nth-child(1) { transition-delay:0.0s; }
+.cat-card:hover .anim-check:nth-child(2) { transition-delay:0.08s; }
+.cat-card:hover .anim-check:nth-child(3) { transition-delay:0.16s; }
+.cat-card:hover .anim-check:nth-child(4) { transition-delay:0.24s; }
+.cat-card:hover .anim-check:nth-child(5) { transition-delay:0.32s; }
+
+/* ── 11 Info: data ticker ── */
+.anim-ticker { display:flex; flex-direction:column; gap:3px; width:100%; overflow:hidden; }
+.anim-ticker-row {
+  display:flex; align-items:center; gap:6px;
+  font-family:'Orbitron',sans-serif; font-size:6.5px; letter-spacing:0.08em;
+  color:var(--smoke);
+  opacity:0; transform:translateX(-10px);
+  transition:opacity 0.3s, transform 0.3s ease;
+}
+.anim-ticker-tag {
+  padding:1px 5px; background:var(--card-color, var(--c11));
+  color:#fff; border-radius:2px; font-size:6px; letter-spacing:0.05em; flex-shrink:0;
+}
+.cat-card:hover .anim-ticker-row { opacity:1; transform:translateX(0); }
+.cat-card:hover .anim-ticker-row:nth-child(1) { transition-delay:0.0s; }
+.cat-card:hover .anim-ticker-row:nth-child(2) { transition-delay:0.1s; }
+.cat-card:hover .anim-ticker-row:nth-child(3) { transition-delay:0.2s; }
+
+/* inner-title Orbitron */
 .inner-view { display:none; padding-top:88px; padding-bottom:80px; position:relative; z-index:1; }
 .inner-view.active { display:block; }
 
@@ -445,9 +670,9 @@ header::after {
 }
 .inner-eyebrow::before { content:''; width:24px; height:1px; background:var(--gold); }
 .inner-title {
-  font-family:'Playfair Display', serif;
-  font-size:clamp(36px,4vw,62px); font-weight:900;
-  color:#0088f7; line-height:1; letter-spacing:0.01em;
+  font-family:'Orbitron', sans-serif;
+  font-size:clamp(28px,3.5vw,52px); font-weight:800;
+  color:#0088f7; line-height:1; letter-spacing:0.04em;
 }
 .inner-back {
   display:flex; align-items:center; gap:8px;
@@ -492,8 +717,8 @@ header::after {
   border-color:color-mix(in srgb, var(--lc-accent,var(--c01)) 50%, transparent);
 }
 .log-card-title {
-  font-family:'Playfair Display', serif;
-  font-size:20px; font-weight:700; color:var(--ink); line-height:1.2;
+  font-family:'Exo 2', sans-serif;
+  font-size:18px; font-weight:700; color:var(--ink); line-height:1.2;
 }
 .log-card-text {
   font-family:'Space Grotesk', sans-serif;
@@ -551,8 +776,8 @@ header::after {
   display:flex; align-items:center; justify-content:space-between;
 }
 .el-label {
-  font-family:'Playfair Display',serif;
-  font-size:20px; font-weight:700; color:var(--ink);
+  font-family:'Orbitron',sans-serif;
+  font-size:16px; font-weight:700; color:var(--ink);
 }
 .el-meta {
   font-family:'IBM Plex Mono',monospace;
@@ -1571,6 +1796,15 @@ window.addEventListener('load', function() {
           <div class="cat-name">Выборы</div>
           <div class="cat-sub">Elections</div>
         </div>
+        <div class="cat-anim">
+          <div class="anim-bars">
+            <div class="anim-bar" style="height:55%"></div>
+            <div class="anim-bar" style="height:80%"></div>
+            <div class="anim-bar" style="height:40%"></div>
+            <div class="anim-bar" style="height:95%"></div>
+            <div class="anim-bar" style="height:65%"></div>
+          </div>
+        </div>
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
@@ -1583,6 +1817,20 @@ window.addEventListener('load', function() {
           <div class="cat-name">Референдумы</div>
           <div class="cat-sub">Referendums</div>
         </div>
+        <div class="cat-anim">
+          <div class="anim-yesno">
+            <div class="anim-yn-row">
+              <div class="anim-yn-lbl">ЗА</div>
+              <div class="anim-yn-track"><div class="anim-yn-fill yes" style="width:68%"></div></div>
+              <div class="anim-yn-pct">68%</div>
+            </div>
+            <div class="anim-yn-row">
+              <div class="anim-yn-lbl">НЕТ</div>
+              <div class="anim-yn-track"><div class="anim-yn-fill no" style="width:32%"></div></div>
+              <div class="anim-yn-pct">32%</div>
+            </div>
+          </div>
+        </div>
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
@@ -1591,6 +1839,14 @@ window.addEventListener('load', function() {
           <div class="cat-icon-box"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/></svg></div>
         </div>
         <div class="cat-bottom"><div class="cat-name">Парламент</div><div class="cat-sub">Parliament</div></div>
+        <div class="cat-anim">
+          <div class="anim-seats">
+            <div class="anim-seat highlighted"></div><div class="anim-seat highlighted"></div><div class="anim-seat highlighted"></div>
+            <div class="anim-seat"></div><div class="anim-seat"></div><div class="anim-seat highlighted"></div>
+            <div class="anim-seat"></div><div class="anim-seat highlighted"></div><div class="anim-seat"></div>
+            <div class="anim-seat highlighted"></div><div class="anim-seat"></div><div class="anim-seat highlighted"></div>
+          </div>
+        </div>
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
@@ -1599,6 +1855,20 @@ window.addEventListener('load', function() {
           <div class="cat-icon-box"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
         </div>
         <div class="cat-bottom"><div class="cat-name">Партии</div><div class="cat-sub">Parties</div></div>
+        <div class="cat-anim" style="align-items:center; gap:10px;">
+          <div class="anim-pie">
+            <svg viewBox="0 0 44 44">
+              <circle class="anim-pie-arc" cx="22" cy="22" r="16" stroke="#7E3AF2" stroke-dasharray="50 100"/>
+              <circle class="anim-pie-arc" cx="22" cy="22" r="16" stroke="#1A56DB" stroke-dasharray="25 100" stroke-dashoffset="-50"/>
+              <circle class="anim-pie-arc" cx="22" cy="22" r="16" stroke="#0E9F6E" stroke-dasharray="25 100" stroke-dashoffset="-75"/>
+            </svg>
+          </div>
+          <div class="anim-pie-legend">
+            <div class="anim-pie-item"><div class="anim-pie-dot" style="background:#7E3AF2"></div>Lib — 50%</div>
+            <div class="anim-pie-item"><div class="anim-pie-dot" style="background:#1A56DB"></div>Dem — 25%</div>
+            <div class="anim-pie-item"><div class="anim-pie-dot" style="background:#0E9F6E"></div>Grn — 25%</div>
+          </div>
+        </div>
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
@@ -1607,6 +1877,14 @@ window.addEventListener('load', function() {
           <div class="cat-icon-box"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
         </div>
         <div class="cat-bottom"><div class="cat-name">Конституция</div><div class="cat-sub">Constitution</div></div>
+        <div class="cat-anim">
+          <div class="anim-doc">
+            <div class="anim-doc-line"></div>
+            <div class="anim-doc-line"></div>
+            <div class="anim-doc-line"></div>
+            <div class="anim-doc-line"></div>
+          </div>
+        </div>
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
@@ -1615,6 +1893,20 @@ window.addEventListener('load', function() {
           <div class="cat-icon-box"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
         </div>
         <div class="cat-bottom"><div class="cat-name">Законы</div><div class="cat-sub">Laws</div></div>
+        <div class="cat-anim" style="align-items:center;">
+          <div class="anim-shield">
+            <div class="anim-ring">
+              <svg viewBox="0 0 38 38">
+                <circle class="anim-ring-bg" cx="19" cy="19" r="15" pathLength="100"/>
+                <circle class="anim-ring-fill" cx="19" cy="19" r="15" pathLength="100"/>
+              </svg>
+            </div>
+            <div class="anim-ring-label">
+              <div class="anim-ring-pct">82%</div>
+              <div style="font-family:'Orbitron',sans-serif;font-size:6px;letter-spacing:0.08em;color:var(--smoke)">COMPLIANCE</div>
+            </div>
+          </div>
+        </div>
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
@@ -1623,6 +1915,13 @@ window.addEventListener('load', function() {
           <div class="cat-icon-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
         </div>
         <div class="cat-bottom"><div class="cat-name">Правила</div><div class="cat-sub">Rules</div></div>
+        <div class="cat-anim" style="justify-content:flex-start; align-items:center;">
+          <div class="anim-pulse">
+            <div class="anim-wave"></div>
+            <div class="anim-wave"></div>
+            <div class="anim-wave"></div>
+          </div>
+        </div>
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
@@ -1631,6 +1930,22 @@ window.addEventListener('load', function() {
           <div class="cat-icon-box"><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
         </div>
         <div class="cat-bottom"><div class="cat-name">Проекты</div><div class="cat-sub">Projects</div></div>
+        <div class="cat-anim">
+          <div class="anim-projects">
+            <div class="anim-proj-row">
+              <div class="anim-proj-name">PRJ-A</div>
+              <div class="anim-proj-bar"><div class="anim-proj-fill" style="width:78%"></div></div>
+            </div>
+            <div class="anim-proj-row">
+              <div class="anim-proj-name">PRJ-B</div>
+              <div class="anim-proj-bar"><div class="anim-proj-fill" style="width:55%"></div></div>
+            </div>
+            <div class="anim-proj-row">
+              <div class="anim-proj-name">PRJ-C</div>
+              <div class="anim-proj-bar"><div class="anim-proj-fill" style="width:90%"></div></div>
+            </div>
+          </div>
+        </div>
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
@@ -1639,6 +1954,13 @@ window.addEventListener('load', function() {
           <div class="cat-icon-box"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
         </div>
         <div class="cat-bottom"><div class="cat-name">Дебаты</div><div class="cat-sub">Debates</div></div>
+        <div class="cat-anim" style="align-items:center;">
+          <div class="anim-bubbles">
+            <div class="anim-bubble">ЗА</div>
+            <div class="anim-bubble">ПРОТИВ</div>
+            <div class="anim-bubble">ИТОГ</div>
+          </div>
+        </div>
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
@@ -1647,6 +1969,15 @@ window.addEventListener('load', function() {
           <div class="cat-icon-box"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
         </div>
         <div class="cat-bottom"><div class="cat-name">Тесты</div><div class="cat-sub">Tests</div></div>
+        <div class="cat-anim" style="align-items:center;">
+          <div class="anim-checks">
+            <div class="anim-check done"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+            <div class="anim-check done"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+            <div class="anim-check done"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+            <div class="anim-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+            <div class="anim-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+          </div>
+        </div>
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
@@ -1655,6 +1986,13 @@ window.addEventListener('load', function() {
           <div class="cat-icon-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
         </div>
         <div class="cat-bottom"><div class="cat-name">Информация</div><div class="cat-sub">Information</div></div>
+        <div class="cat-anim">
+          <div class="anim-ticker">
+            <div class="anim-ticker-row"><div class="anim-ticker-tag">NEW</div>Обновление системы</div>
+            <div class="anim-ticker-row"><div class="anim-ticker-tag">INFO</div>Данные актуальны</div>
+            <div class="anim-ticker-row"><div class="anim-ticker-tag">SYS</div>v2.4.1 online</div>
+          </div>
+        </div>
         <div class="cat-arrow"><svg viewBox="0 0 20 20"><line x1="3" y1="10" x2="17" y2="10"/><polyline points="11,4 17,10 11,16"/></svg></div>
       </div>
 
